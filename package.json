@@ -1,0 +1,47 @@
+{
+  "name": "ul-import",
+  "version": "1.0.0",
+  "description": "The scripts used to import data into the Unified Listing.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node node_modules/istanbul/lib/cli.js cover tests/all-tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-t-in-rtf/ul-import.git"
+  },
+  "author": "Tony Atkins <tony@raisingthefloor.org>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/the-t-in-rtf/ul-import/issues"
+  },
+  "homepage": "https://github.com/the-t-in-rtf/ul-import#readme",
+  "dependencies": {
+    "gpii-express": "1.0.1-dev.20161219T161942Z.50ed093",
+    "gpii-express-user": "1.0.0-dev.20161219T192728Z.df3de96",
+    "gpii-handlebars": "1.0.0-dev.20161219T181822Z.0445c4c",
+    "gpii-json-schema": "1.0.0-dev.20161219T192320Z.03caf53",
+    "gpii-launcher": "1.0.0-dev.20161125T160059Z.e8f50d4",
+    "gpii-location-bar-relay": "1.0.0-dev.20161219T181437Z.74a3f94",
+    "gpii-pouchdb-lucene": "0.1.0-dev.20161219T181232Z.aab549f",
+    "gpii-sort": "git://github.com/the-t-in-rtf/gpii-sort#3508dc67e9d84311249192102c22829931315b20",
+    "handlebars": "4.0.5",
+    "infusion": "2.0.0-dev.20161219T170555Z.5778f7e",
+    "universal": "GPII/universal#88aec55cd2cafb2cab914978b11c5e1bc7926260"
+  },
+  "devDependencies": {
+    "eslint": "3.10.2",
+    "eslint-config-fluid": "1.0.0",
+    "fluid-grunt-eslint": "18.1.2",
+    "grunt": "1.0.1",
+    "grunt-jsonlint": "1.1.0",
+    "istanbul": "^0.4.5",
+    "kettle": "1.2.2",
+    "node-jqunit": "1.1.4",
+    "request": "2.79.0",
+    "ul-api": "git://github.com/the-t-in-rtf/ul-api.git#f25aea238a88fb2d9b29a5463b964cecac1dc656"
+  }
+}
