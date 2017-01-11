@@ -30,6 +30,12 @@ fluid.defaults("gpii.tests.ul.imports.harness", {
                 funcName: "fluid.stringTemplate",
                 args:     ["http://localhost:%port/api/product", { port: "{that}.options.ports.api"}]
             }
+        },
+        products: {
+            expander: {
+                funcName: "fluid.stringTemplate",
+                args:     ["http://localhost:%port/api/products", { port: "{that}.options.ports.api"}]
+            }
         }
     },
     listeners: {

@@ -1,0 +1,4 @@
+{
+  "type": "ul.imports.sai.devConfig",
+  "mergeConfigs": ["%ul-import/configs/base-dev.json", "%ul-import/configs/sai-base.json"]
+}

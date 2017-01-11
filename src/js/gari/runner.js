@@ -36,8 +36,8 @@ fluid.defaults("gpii.ul.imports.gari.runner", {
         syncer: {
             type: "gpii.ul.imports.syncer",
             options: {
-                loginUsername: "gari",
-                loginPassword: "gari",
+                username: "gari",
+                password: "gari",
                 model: {
                     data: "{transformer}.model.remappedJson"
                 }

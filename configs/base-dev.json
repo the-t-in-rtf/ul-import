@@ -1,0 +1,12 @@
+{
+  "type": "devConfig",
+  "options": {
+    "gradeNames": ["fluid.component"],
+    "couchAuthCreds": "",
+    "ports": {
+      "api":   6714,
+      "couch": 6715
+    }
+  },
+  "mergeConfigs": ["%ul-import/configs/base-prod.json"]
+}

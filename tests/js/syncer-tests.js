@@ -150,10 +150,9 @@ fluid.defaults("gpii.tests.ul.imports.sync.environment", {
         syncer: {
             type: "gpii.ul.imports.syncer",
             options: {
-                loginUrl:  "{harness}.options.urls.login",
-                putApiUrl: "{harness}.options.urls.product",
-                loginUsername: "existing",
-                loginPassword: "password"
+                urls: "{harness}.options.urls",
+                username: "existing",
+                password: "password"
             }
         },
         caseHolder: {
