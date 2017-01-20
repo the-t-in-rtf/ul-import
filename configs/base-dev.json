@@ -4,9 +4,9 @@
     "gradeNames": ["fluid.component"],
     "couchAuthCreds": "",
     "ports": {
-      "api":   6714,
-      "couch": 6715
+      "api":    7217,
+      "couch":  7218
     }
   },
-  "mergeConfigs": ["%ul-import/configs/base-prod.json"]
+  "mergeConfigs": ["%ul-imports/configs/base-prod.json"]
 }

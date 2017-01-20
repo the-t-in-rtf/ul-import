@@ -112,13 +112,13 @@ fluid.defaults("gpii.tests.ul.imports.harness", {
                             databases: {
                                 ul:    {
                                     data: [
-                                        "%ul-import/tests/data/existing.json",
+                                        "%ul-imports/tests/data/existing.json",
                                         "%ul-api/tests/data/views.json",
                                         // "empty" bulk documents to avoid loading the default data from the parent grade.
                                         // TODO: Replace these once gpii-pouchdb is updated to use "database components" - https://issues.gpii.net/browse/GPII-2163
-                                        "%ul-import/tests/data/empty.json",
-                                        "%ul-import/tests/data/empty.json",
-                                        "%ul-import/tests/data/empty.json"
+                                        "%ul-imports/tests/data/empty.json",
+                                        "%ul-imports/tests/data/empty.json",
+                                        "%ul-imports/tests/data/empty.json"
                                     ]
                                 }
                             }

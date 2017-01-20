@@ -168,3 +168,26 @@ gpii.ul.imports.transforms.stripNonValues = function (value) {
 fluid.defaults("gpii.ul.imports.transforms.stripNonValues", {
     gradeNames: ["fluid.standardTransformFunction"]
 });
+
+
+gpii.ul.imports.transforms.join = function (transformSpec, transformer) {
+    if (!transformSpec.values || !transformSpec.values.length) {
+        fluid.fail("join transformer requires an array of values at path named \"values\", supplied", transformSpec);
+    }
+
+    var values = fluid.transform(transformSpec.values, transformer.expand);
+    var joinWith = transformSpec.joinWith || ",";
+    return fluid.makeArray(values).join(joinWith);
+};
+
+fluid.defaults("gpii.ul.imports.transforms.join", {
+    gradeNames: ["fluid.standardOutputTransformFunction"]
+});
+
+gpii.ul.imports.transforms.encodeURIComponent = function (value) {
+    return encodeURIComponent(value);
+};
+
+fluid.defaults("gpii.ul.imports.transforms.encodeURIComponent", {
+    gradeNames: ["fluid.standardTransformFunction"]
+});

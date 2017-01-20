@@ -8,12 +8,14 @@ var os   = require("os");
 var path = require("path");
 var cacheFile = path.resolve(os.tmpDir(), "sai.json");
 
-require("kettle");
+fluid.require("%ul-imports");
+fluid.require("%kettle");
 
 require("../cacher");
-require("../deepEq");
 require("../launcher");
 require("../syncer");
+require("../transformer");
+require("./transforms");
 
 fluid.registerNamespace("gpii.ul.imports.sai");
 
@@ -77,44 +79,9 @@ Transform a raw SAI record, which should look something like:
 },
  */
 
-fluid.registerNamespace("gpii.ul.imports.sai.transformer");
-
-// We could have written this using invokers, but a small function makes it easier to debug.
-gpii.ul.imports.sai.transformer.transformAndSave = function (that) {
-    var transformedRecords = that.transform();
-    that.applier.change("transformedJson", transformedRecords);
-};
-
-fluid.defaults("gpii.ul.imports.sai.transformer.firstSaneValue", {
-    gradeNames: "fluid.standardOutputTransformFunction"
-});
-
-// This function is required because undefined values are represented as empty arrays in the SAI.
-gpii.ul.imports.sai.transformer.firstSaneValue = function (transformSpec, transformer) {
-    var sanitizedTransformSpec = fluid.copy(transformSpec);
-
-    sanitizedTransformSpec.values = fluid.transform(sanitizedTransformSpec.values, function (value) {
-        var expanded = transformer.expand(value);
-
-        if (expanded === "" || gpii.ul.imports.deepEq([], expanded)) {
-            return "notfound";
-        }
-        else {
-            return value;
-        }
-    });
-
-    return fluid.transforms.firstValue(sanitizedTransformSpec, transformer);
-};
-
 // Transform the downloaded results
 fluid.defaults("gpii.ul.imports.sai.transformer", {
-    gradeNames: ["fluid.modelComponent"],
-    model: {
-        rawJson:         [],
-        transformedJson: []
-    },
-    //   "required": ["description", "manufacturer", "name", "sid", "source", "status"],
+    gradeNames: ["gpii.ul.imports.transformer"],
     rules: {
         "uid": {
             transform: {
@@ -138,23 +105,6 @@ fluid.defaults("gpii.ul.imports.sai.transformer", {
             }
         },
         "sourceData": ""
-    },
-    invokers: {
-        transform: {
-            funcName: "fluid.transform",
-            args:     ["{that}.model.rawJson", "{that}.transformOne"]
-        },
-        transformOne: {
-            funcName: "fluid.model.transformWithRules",
-            args:     ["{arguments}.0", "{that}.options.rules"]
-        }
-    },
-    modelListeners: {
-        rawJson: {
-            funcName:      "gpii.ul.imports.sai.transformer.transformAndSave",
-            args:          ["{that}"],
-            excludeSource: "init"
-        }
     }
 });
 
@@ -195,6 +145,7 @@ fluid.defaults("gpii.ul.imports.sai", {
                 source:   "{gpii.ul.imports.sai}.options.source",
                 username: "{gpii.ul.imports.sai}.options.username",
                 password: "{gpii.ul.imports.sai}.options.password",
+                urls:     "{gpii.ul.imports.sai}.options.urls",
                 model: {
                     data: "{transformer}.model.transformedJson"
                 }
@@ -219,7 +170,7 @@ fluid.defaults("gpii.ul.imports.sai", {
 
 fluid.defaults("gpii.ul.imports.sai.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-import/configs/sai-dev.json",
+    optionsFile: "%ul-imports/configs/sai-dev.json",
     "yargsOptions": {
         "describe": {
             "username":  "The username to use when writing records to the UL.",

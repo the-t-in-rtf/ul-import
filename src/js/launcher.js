@@ -1,10 +1,12 @@
 "use strict";
 var fluid = require("infusion");
+
 fluid.require("%gpii-launcher");
+fluid.require("%ul-imports");
 
 fluid.defaults("gpii.ul.imports.launcher", {
     gradeNames: ["gpii.launcher"],
-    optionsFile: "%ul-import/config/base-dev.json",
+    optionsFile: "%ul-imports/configs/base-dev.json",
     yargsOptions: {
         describe: {
             "ports.api":      "The port where the UL API is available.",

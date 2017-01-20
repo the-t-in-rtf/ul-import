@@ -11,6 +11,7 @@ var request = require("request");
 
 fluid.setLogging(true);
 fluid.require("%kettle");
+fluid.require("%ul-imports");
 
 require("../launcher");
 require("../dataSource");
@@ -28,16 +29,20 @@ fluid.registerNamespace("gpii.ul.imports.unifier.singleAdoptionHandler");
 
 // TODO: Consider converting to an invoker once https://issues.fluidproject.org/browse/KETTLE-54 is resolved.
 gpii.ul.imports.unifier.singleAdoptionHandler.login = function (that) {
+    that.promise = fluid.promise();
+    that.jar = request.jar();
+
     // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
     var options = {
-        jar: true,
+        url: that.options.urls.login,
+        jar: that.jar,
         json: true,
         body: {
             username: that.options.username,
             password: that.options.password
         }
     };
-    request.post(that.options.urls.login, options, function (error, response, body) {
+    request.post(options, function (error, response, body) {
         if (error) {
             that.promise.reject(error);
         }
@@ -56,10 +61,11 @@ gpii.ul.imports.unifier.singleAdoptionHandler.readChild = function (that) {
     // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
     var childReaderUrl = fluid.stringTemplate("%baseUrl/%source/%sid", { baseUrl: that.options.urls.product, source: that.options.source, sid: that.options.sid });
     var options = {
-        jar: true,
+        url:  childReaderUrl,
+        jar:  that.jar,
         json: true
     };
-    request.get(childReaderUrl, options, function (error, response, body) {
+    request.get(options, function (error, response, body) {
         if (error) {
             that.promise.reject(error);
         }
@@ -87,11 +93,12 @@ gpii.ul.imports.unifier.singleAdoptionHandler.handleChildReadResponse = function
 
     // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
     var options = {
-        jar:  true,
+        url:  that.options.urls.product,
+        jar:  that.jar,
         json: true,
         body: unifiedRecord
     };
-    request.post(that.options.urls.product, options, function (error, response, body) {
+    request.post(options, function (error, response, body) {
         if (error) {
             that.promise.reject(error);
         }
@@ -110,11 +117,12 @@ gpii.ul.imports.unifier.singleAdoptionHandler.handleParentWriteResponse = functi
 
     // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
     var options = {
-        jar: true,
+        url:  that.options.urls.product,
+        jar:  that.jar,
         json: true,
         body: that.childRecord
     };
-    request.post(that.options.urls.product, options, function (error, response, body) {
+    request.post(options, function (error, response, body) {
         if (error) {
             that.promise.reject(error);
         }
@@ -133,8 +141,7 @@ gpii.ul.imports.unifier.singleAdoptionHandler.handleParentWriteResponse = functi
 fluid.defaults("gpii.ul.imports.unifier.singleAdoptionHandler", {
     gradeNames: ["fluid.component"],
     members: {
-        childRecord: {},
-        promise: fluid.promise()
+        childRecord: {}
     },
     listeners: {
         "onCreate.login": {
@@ -170,21 +177,28 @@ gpii.ul.imports.unifier.findOrphanedRecords = function (that) {
     promise.then(that.handleOrphanResponse, that.handleError);
 };
 
+gpii.ul.imports.unifier.generateAdoptionFunction = function (that, record) {
+    return function () {
+        var adoptionHandler = gpii.ul.imports.unifier.singleAdoptionHandler({
+            source: record.value.source,
+            sid: record.value.sid,
+            username: that.options.username,
+            password: that.options.password,
+            urls: that.options.urls,
+            members: {
+                cookieJar: that.cookieJar
+            }
+        });
+        return adoptionHandler.promise;
+    };
+};
+
 gpii.ul.imports.unifier.handleOrphanResponse = function (that, response) {
     var promises = [];
-    // TODO: Remove this once we have tested the process
-    fluid.each(response.rows.slice(0,1), function (record) {
-    // fluid.each(response.rows, function (record) {
+    fluid.each(response.rows, function (record) {
         if (record.value.source && record.value.sid) {
-            var adoptionHandler = gpii.ul.imports.unifier.singleAdoptionHandler({
-                source: record.value.source,
-                sid: record.value.sid,
-                urls: that.options.urls,
-                members: {
-                    cookieJar: that.cookieJar
-                }
-            });
-            promises.push(adoptionHandler.promise);
+            // We use a promise-returning function in our sequence to avoid immediately starting all requests.
+            promises.push(gpii.ul.imports.unifier.generateAdoptionFunction(that, record));
         }
     });
 
@@ -230,7 +244,7 @@ fluid.defaults("gpii.ul.imports.unifier", {
 
 fluid.defaults("gpii.ul.imports.unifier.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-import/configs/unifier-dev.json",
+    optionsFile: "%ul-imports/configs/unifier-dev.json",
     "yargsOptions": {
         "describe": {
             "username":  "The username to use when writing changes to the UL.",

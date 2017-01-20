@@ -3,7 +3,7 @@
 var fluid = require("infusion");
 var gpii  = fluid.registerNamespace("gpii");
 
-fluid.require("%ul-import/src/js/deepEq.js");
+fluid.require("%ul-imports/src/js/deepEq.js");
 
 var jqUnit = require("node-jqunit");
 

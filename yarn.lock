@@ -1857,15 +1857,6 @@ gpii-json-schema@1.0.0-dev.20161219T192320Z.03caf53:
     jsonpointer.js "0.4.0"
     quoted-printable "1.0.1"
 
-gpii-launcher@1.0.0-dev.20161125T160059Z.e8f50d4:
-  version "1.0.0-dev.20161125T160059Z.e8f50d4"
-  resolved "https://registry.yarnpkg.com/gpii-launcher/-/gpii-launcher-1.0.0-dev.20161125T160059Z.e8f50d4.tgz#79cfdbad6dd75cb37e4679e2cb02470e95149905"
-  dependencies:
-    infusion "2.0.0-dev.20161027T155641Z.0bcd507"
-    istanbul "0.4.5"
-    kettle "1.2.2"
-    yargs "6.4.0"
-
 gpii-launcher@1.0.0-dev.20161219T174154Z.1d71e9c:
   version "1.0.0-dev.20161219T174154Z.1d71e9c"
   resolved "https://registry.yarnpkg.com/gpii-launcher/-/gpii-launcher-1.0.0-dev.20161219T174154Z.1d71e9c.tgz#78d6c665f75918f3fb77eea0184134414d0d482b"
@@ -1878,6 +1869,15 @@ gpii-launcher@1.0.0-dev.20161219T174154Z.1d71e9c:
 gpii-launcher@1.0.0-dev.20170106T131608Z.4177cc4:
   version "1.0.0-dev.20170106T131608Z.4177cc4"
   resolved "https://registry.yarnpkg.com/gpii-launcher/-/gpii-launcher-1.0.0-dev.20170106T131608Z.4177cc4.tgz#e0603d90a11cc977e3ec222a2dba132f0460fd47"
+  dependencies:
+    infusion "2.0.0"
+    istanbul "0.4.5"
+    kettle "1.3.0"
+    yargs "6.5.0"
+
+gpii-launcher@1.0.0-dev.20170113T104654Z.903ad25:
+  version "1.0.0-dev.20170113T104654Z.903ad25"
+  resolved "https://registry.yarnpkg.com/gpii-launcher/-/gpii-launcher-1.0.0-dev.20170113T104654Z.903ad25.tgz#14345198f37362ba1d483820e6c0063d67d2f428"
   dependencies:
     infusion "2.0.0"
     istanbul "0.4.5"
@@ -4663,9 +4663,9 @@ uid2@0.0.x:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/uid2/-/uid2-0.0.3.tgz#483126e11774df2f71b8b639dcd799c376162b82"
 
-ul-api@1.0.0-dev.20170109T161536Z.ddb379d:
-  version "1.0.0-dev.20170109T161536Z.ddb379d"
-  resolved "https://registry.yarnpkg.com/ul-api/-/ul-api-1.0.0-dev.20170109T161536Z.ddb379d.tgz#bb800b32eb5a2350869550142f0e16171ffb6f42"
+ul-api@1.0.0-dev.20170111T152413Z.ea6cbba:
+  version "1.0.0-dev.20170111T152413Z.ea6cbba"
+  resolved "https://registry.yarnpkg.com/ul-api/-/ul-api-1.0.0-dev.20170111T152413Z.ea6cbba.tgz#82914d4a23c0e010d9a20f3da028f107b86855b0"
   dependencies:
     gpii-binder "1.0.0-dev.20161219T173834Z.5ecfb7b"
     gpii-express "1.0.1-dev.20170106T131203Z.a048e61"
@@ -4926,30 +4926,11 @@ yallist@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-2.0.0.tgz#306c543835f09ee1a4cb23b7bce9ab341c91cdd4"
 
-yargs-parser@^4.1.0, yargs-parser@^4.2.0:
+yargs-parser@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-4.2.0.tgz#6ced869cd05a3dca6a1eaee38b68aeed4b0b4101"
   dependencies:
     camelcase "^3.0.0"
-
-yargs@6.4.0:
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-6.4.0.tgz#816e1a866d5598ccf34e5596ddce22d92da490d4"
-  dependencies:
-    camelcase "^3.0.0"
-    cliui "^3.2.0"
-    decamelize "^1.1.1"
-    get-caller-file "^1.0.1"
-    os-locale "^1.4.0"
-    read-pkg-up "^1.0.1"
-    require-directory "^2.1.1"
-    require-main-filename "^1.0.1"
-    set-blocking "^2.0.0"
-    string-width "^1.0.2"
-    which-module "^1.0.0"
-    window-size "^0.2.0"
-    y18n "^3.2.1"
-    yargs-parser "^4.1.0"
 
 yargs@6.5.0:
   version "6.5.0"

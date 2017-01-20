@@ -1,4 +1,4 @@
 {
   "type": "ul.imports.unifier.devConfig",
-  "mergeConfigs": ["%ul-import/configs/base-dev.json", "%ul-import/configs/unifier-base.json"]
+  "mergeConfigs": ["%ul-imports/configs/base-dev.json", "%ul-imports/configs/unifier-base.json"]
 }

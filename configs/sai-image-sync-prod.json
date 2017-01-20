@@ -1,0 +1,4 @@
+{
+  "type": "ul.imports.images.sai.prodConfig",
+  "mergeConfigs": ["%ul-imports/configs/base-prod.json", "%ul-imports/configs/sai-image-sync-base.json"]
+}
