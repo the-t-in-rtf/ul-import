@@ -2,7 +2,7 @@
   "type": "ul.imports.unifier.baseConfig",
   "options": {
     "gradeNames": ["gpii.ul.imports.unifier"],
-    "username": "reviewer",
+    "username": "importer",
     "password": "password",
     "orphanUrl": {
       "expander": {

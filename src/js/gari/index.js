@@ -1,13 +1,76 @@
-// This script is designed to (optionally) download data from GARI and get it ready to importer into the Unified Listing.
-//
-// For full details, see the README.md file in this directory
-//
-// To see the list of default options, look at `./src/js/importer`
+/*
 
+    This script is designed to download data from GARI and get it ready to import into the Unified Listing.  GARI
+    records are XML, and look something like:
+
+    <product>
+        <objectid>1597</objectid>
+        <productpic>http://gari.info/goget.cfm?picfile=17131D0D1101134C1B0D55575E565F1F554C0D1115</productpic>
+        <Manufacturer-Importer>Microsoft (Nokia)</Manufacturer-Importer>
+        <ProductBrand>Nokia</ProductBrand>
+        <Model>Lumia 630 (USA)</Model>
+        <Platform>Windows Phone</Platform>
+        <PlatformVersion>8</PlatformVersion>
+        <Countries>Mexico,United States</Countries>
+        <Regions>Latin America,North America</Regions>
+        <PhoneShape>Touchscreen</PhoneShape>
+        <Website>http://www.microsoft.com</Website>
+        <DateCompleted>Apr-22-2016</DateCompleted>
+        <!-- One or more <item> elements representing the product's features.  Not used in the UL, omitted for clarify -->
+    </product>
+
+    Our "source data" is stored in JSON, so we convert the XML to JSON before further transforming it.
+
+*/
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 var gpii  = fluid.registerNamespace("gpii");
 
-require("./runner");
-gpii.ul.imports.gari.runner();
+require("../importer");
+require("../launcher");
+require("../downloader");
+require("../syncer");
+require("./transformer");
+
+fluid.defaults("gpii.ul.imports.gari", {
+    gradeNames: ["gpii.ul.imports.importer"],
+    cacheFilename: "gari.xml",
+    model: {
+        rawData:       "{transformer}.model.xml",
+        processedData: "{transformer}.model.remappedJson"
+    },
+    components: {
+        downloader: {
+            options: {
+                url: "{gpii.ul.imports.gari}.options.urls.gari",
+                components: {
+                    encoding: {
+                        type: "kettle.dataSource.encoding.none" // We are dealing with XML data.
+                    }
+                }
+            }
+        },
+        transformer: {
+            type: "gpii.ul.imports.gari.transformer"
+        }
+    }
+});
+
+fluid.defaults("gpii.ul.imports.gari.launcher", {
+    gradeNames:  ["gpii.ul.imports.launcher"],
+    optionsFile: "%ul-imports/configs/gari-dev.json",
+    "yargsOptions": {
+        "describe": {
+            "username":   "The username to use when writing records to the UL.",
+            "password":   "The password to use when writing records to the UL.",
+            "source":     "The UL source to sync records with.",
+            "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
+            "urls.gari":   "The URL to use when retrieving records from GARI."
+        },
+        "coerce": {
+            "setLogging": JSON.parse
+        }
+    }
+});
+
+gpii.ul.imports.gari.launcher();

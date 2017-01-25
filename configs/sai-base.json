@@ -5,7 +5,7 @@
       "gpii.ul.imports.sai"
     ],
     "source":   "sai",
-    "username": "sai",
+    "username": "importer",
     "password": "password",
     "urls": {
       "sai": "http://staging.saa.gpii.net/api/v1/products"

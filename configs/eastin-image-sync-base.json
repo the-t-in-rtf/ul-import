@@ -5,7 +5,7 @@
     "sources": [
       "Handicat", "Vlibank", "Siva", "EASTIN Admin", "Hjælpemiddelbasen", "Rehadat", "Hulpmiddelenwijzer", "Oaeg", "Dlf data"
     ],
-    "username": "reviewer",
+    "username": "importer",
     "password": "password"
   }
 }

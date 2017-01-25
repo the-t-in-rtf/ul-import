@@ -13,7 +13,8 @@ var fluid  =  require("infusion");
 var gpii   = fluid.registerNamespace("gpii");
 fluid.registerNamespace("gpii.ul.imports.cacher");
 
-var fs = require("fs");
+var fs   = require("fs");
+var path = require("path");
 
 // All of our functions should fail if `options.cacheFile` is not set.
 gpii.ul.imports.cacher.failOnMissingOption = function (that) {
@@ -36,7 +37,7 @@ gpii.ul.imports.cacher.saveToCache = function (that, dataToSave) {
     fluid.log("Caching data to '" + that.options.cacheFile + "'...");
 
     var fd = fs.openSync(that.options.cacheFile, "w");
-    var stringData = JSON.stringify(dataToSave, null, 2);
+    var stringData = typeof dataToSave === "object" ? JSON.stringify(dataToSave, null, 2) : dataToSave;
     var buffer = new Buffer(stringData);
     fs.writeSync(fd, buffer, 0, buffer.length);
     fs.closeSync(fd);
@@ -49,7 +50,17 @@ gpii.ul.imports.cacher.loadFromCache = function (that) {
     if (gpii.ul.imports.cacher.cacheFileExists(that)) {
         fluid.log("Loading cached data...");
 
-        return JSON.parse(fs.readFileSync(that.options.cacheFile, { encoding: "utf8"}));
+        var data = fs.readFileSync(that.options.cacheFile, { encoding: "utf8"});
+        var extension = path.extname(that.options.cacheFile).toLowerCase();
+        if (extension === "json") {
+            var records = JSON.parse(data);
+            fluid.log("Loaded " + records.length + " records from cache....");
+            return records;
+        }
+        else {
+            return data;
+        }
+
     }
     else {
         fluid.fail("Cannot load cached data, file does not exist...");
