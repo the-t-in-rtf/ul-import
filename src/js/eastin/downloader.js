@@ -69,9 +69,13 @@ gpii.ul.imports.eastin.downloader.retrieveRecordListsByIsoCode = function (that)
         deferrals.push(gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction(that, code));
     });
 
-    fluid.promise.sequence(deferrals).then(function () {
+    var sequence = fluid.promise.sequence(deferrals);
+
+    sequence.then(function () {
         that.events.onIsoSearchComplete.fire(that);
     });
+
+    return sequence;
 };
 
 gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
@@ -103,24 +107,26 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
                         var data = JSON.parse(body);
                         // If we receive an "ExceptionMessage" object, display its contents in the console.
                         if (data.ExceptionMessages) {
-                            fluid.log("There were errors returned when retrieving records:\n" + JSON.stringify(data.ExceptionMessages, null, 2));
+                            promise.reject(data.ExceptionMessages);
                         }
-
-                        if (error) {
-                            fluid.log(error);
+                        else if (error) {
+                            promise.reject(error);
                         }
                         else if (data) {
                             that.originalRecords.push(data.Record);
+                            promise.resolve(data.Record);
                         }
                         else {
                             fluid.log("Skipping empty record retrieved from '" + response.request.uri.href + "'...");
+                            promise.resolve();
                         }
                     }
                     catch (e) {
+                        // Ignore "junk" HTML records.
                         fluid.log("Error retrieving record from '" + response.request.uri.href + "':\n");
+                        promise.resolve();
                     }
 
-                    promise.resolve();
                 });
             }
         });
@@ -146,7 +152,8 @@ fluid.defaults("gpii.ul.imports.eastin.downloader", {
         onRecordsRetrieved:  null
     },
     invokers: {
-        "download": {
+        // TODO: Use an actual dataSource here.
+        "get": {
             funcName: "gpii.ul.imports.eastin.downloader.retrieveRecordListsByIsoCode",
             args:     ["{that}"]
         }

@@ -3,17 +3,29 @@
 A launcher for the EASTIN synchronization process.  Instantiates the relevant runner and launches it.
 
  */
-
-// TODO:  Add the ability to cleanly override options using command-line arguments or environment variables.
 "use strict";
 var fluid  = require("infusion");
 var gpii   = fluid.registerNamespace("gpii");
-fluid.setLogging(true);
 
-require("./runner");
+require("../launcher");
+require("./importer");
 
-var loader           = require("../../../../config/lib/config-loader");
-var config           = loader.loadConfig({});
+fluid.defaults("gpii.ul.imports.eastin.launcher", {
+    gradeNames:  ["gpii.ul.imports.launcher"],
+    optionsFile: "%ul-imports/configs/eastin-dev.json",
+    "yargsOptions": {
+        "describe": {
+            "username":                "The username to use when writing records to the UL.",
+            "password":                "The password to use when writing records to the UL.",
+            "source":                  "The UL source to sync records with.",
+            "setLogging":              "The logging level to use.  Set to `false` (only errors and warnings) by default.",
+            "urls.eastin.listSimilar": "The URL to use to retrieve the list of product records from EASTIN.",
+            "urls.eastin.detail":      "The URL to use to retrieve detailed information for each product from EASTIN."
+        },
+        "coerce": {
+            "setLogging": JSON.parse
+        }
+    }
+});
 
-// TODO:  Collapse the config file structure once we separate out the repository.
-gpii.ul.imports.eastin.runner(config.eastin);
+gpii.ul.imports.eastin.launcher();

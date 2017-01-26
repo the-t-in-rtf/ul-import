@@ -18,12 +18,6 @@ fluid.require("%gpii-launcher");
 
 require("./transformer");
 
-gpii.ul.imports.images.core.setLogLevel = function (that) {
-    if (that.options.logLevel) {
-        fluid.setLogging(that.options.logLevel);
-    }
-};
-
 gpii.ul.imports.images.core.login = function (that) {
     that.jar = request.jar();
 
@@ -83,18 +77,23 @@ gpii.ul.imports.images.core.saveImageRecords = function (that, imageRecordData) 
 
 fluid.defaults("gpii.ul.imports.images.core", {
     imageDir: "/opt/ul-files/originalsDir",
+    imagesToExclude: false,
     gradeNames: ["fluid.component"],
     rules: {
         extractImageRecords: {
             "": "products"
         }
     },
+    setLogging: false,
     messages: {
         errorLoadingImageData: "There was an error loading the source image data:"
     },
     components: {
         transformer: {
-            type: "gpii.ul.imports.images.transformer"
+            type: "gpii.ul.imports.images.transformer",
+            options: {
+                imagesToExclude: "{core}.options.imagesToExclude"
+            }
         },
         syncer: {
             type: "gpii.ul.imports.images.syncer",
@@ -111,10 +110,10 @@ fluid.defaults("gpii.ul.imports.images.core", {
         }
     },
     listeners: {
-        "onCreate.setLogLevel": {
+        "onCreate.setLogging": {
             priority: "first",
-            funcName: "gpii.ul.imports.images.core.setLogLevel",
-            args:     ["{that}"]
+            funcName: "fluid.setLogging",
+            args:     ["{that}.options.setLogging"]
         },
         "onCreate.login": {
             funcName: "gpii.ul.imports.images.core.login",
@@ -139,7 +138,7 @@ fluid.defaults("gpii.ul.imports.images.core.launcher", {
             "urls.sourceImages": "The URL we will use to retrieve the original source records containing image metadata.",
             "urls.imageApi": "The base URL for the UL Image API.",
             "imageDir": "The base directory in which we should store download images", // TODO: Remove this once we use the image API directly.
-            "logLevel": "The fluid.log messages to display.  Set to `true` to display messages at the INFO level or higher.",
+            "setLogging": "The fluid.log log level.  Set to `true` to display messages at the INFO level or higher.",
             "sources": "The sources we are importing images from.  Should be stringified JSON representing a string (i.e. with quotes) or array of strings.",
             "username": "The username to use when saving records to the image API.",
             "password": "The password to use when saving records to the image API."
@@ -147,8 +146,8 @@ fluid.defaults("gpii.ul.imports.images.core.launcher", {
             // "tmpDir": "The temporary directory to store images in before uploading them to the image API."
         },
         coerce: {
-            logLevel: JSON.parse,
-            sources:  JSON.parse
+            setLogging: JSON.parse,
+            sources:     JSON.parse
         },
         defaults: {
             "optionsFile": "{that}.options.optionsFile"

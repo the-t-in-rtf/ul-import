@@ -1,0 +1,9 @@
+{
+  "type": "ul.imports.images.gari.baseConfig",
+  "options": {
+    "gradeNames": ["gpii.ul.imports.images.gari"],
+    "sources": ["GARI"],
+    "username": "importer",
+    "password": "password"
+  }
+}

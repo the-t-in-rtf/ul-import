@@ -36,7 +36,7 @@ gpii.ul.imports.images.transformer.transformAndSave = function (that) {
 
         fluid.each(intermediateRecord.images, function (singleImage) {
             var singleRecord = fluid.model.transformWithRules({ singleImage: singleImage, intermediateRecord: intermediateRecord}, that.options.rules.intermediateToFinal);
-            if (singleRecord.image_id.match(that.options.imagesToExclude)) {
+            if (that.options.imagesToExclude && singleRecord.image_id.match(that.options.imagesToExclude)) {
                 fluid.log("Excluding blacklisted record...");
             }
             else {
@@ -51,7 +51,6 @@ gpii.ul.imports.images.transformer.transformAndSave = function (that) {
 // Transform the downloaded results
 fluid.defaults("gpii.ul.imports.images.transformer", {
     gradeNames: ["gpii.ul.imports.transformer"],
-    imagesToExclude: /-2108$/,
     rules: {
         rawToIntermediate: {
             "": ""

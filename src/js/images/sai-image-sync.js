@@ -70,6 +70,7 @@ fluid.defaults("gpii.ul.imports.images.sai.transformUri", {
 
 fluid.defaults("gpii.ul.imports.images.sai", {
     gradeNames: ["gpii.ul.imports.images.core"],
+    imagesToExclude: /-2108$/,
     rules: {
         extractImageRecords: {
             "": "products"

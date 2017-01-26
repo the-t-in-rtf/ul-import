@@ -127,7 +127,8 @@ gpii.ul.imports.unifier.singleAdoptionHandler.handleParentWriteResponse = functi
             that.promise.reject(error);
         }
         else if (response.statusCode !== 200) {
-            that.promise.reject({ isError: true, message: body });
+            that.promise.reject({ isError: true, message: body, parentRecord: parentRecord });
+            // The parent record is included so that we can manually clean up when a parent is created but the "adoption" is never completed.
         }
         else {
             var product = body.product;
@@ -210,7 +211,18 @@ gpii.ul.imports.unifier.handleOrphanResponse = function (that, response) {
 };
 
 gpii.ul.imports.unifier.handleError = function (that, errorResponse) {
-    fluid.fail("Error cloning orphaned record:", JSON.stringify(errorResponse, null, 2));
+    if (errorResponse.parentRecord) {
+        fluid.fail(
+            "There was an error associating a 'child' record with a newly created parent.  The following record should be manually deleted:\n",
+            JSON.stringify(errorResponse.parentRecord, null, 2),
+            "\nThe original error message is:\n",
+            errorResponse.message
+        );
+    }
+    else {
+        fluid.fail("Error cloning orphaned record:", JSON.stringify(errorResponse, null, 2));
+    }
+
 };
 
 

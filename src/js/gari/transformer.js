@@ -44,36 +44,10 @@ fluid.defaults("gpii.ul.imports.gari.transformer", {
             url:     "Website",
             country: "Countries"
         },
-        language: {
-            literalValue: "{that}.options.defaults.language"
-        },
-        images: [
-            {
-                url:         "productpic",
-                description: "Model"
-            }
-        ],
         updated: {
             transform: {
                 type: "fluid.transforms.dateToString",
                 inputPath: "DateCompleted"
-            }
-        },
-        ontologies: {
-            context: {
-                id: {
-                    transform: {
-                        type: "gpii.ul.imports.transforms.toLowerCase",
-                        inputPath: "Platform"
-                    }
-                },
-                version: {
-                    transform: {
-                        type: "gpii.ul.imports.transforms.regexp",
-                        inputPath: "PlatformVersion",
-                        regexp: "{that}.options.semverRegexp"
-                    }
-                }
             }
         },
         sourceData: ""
