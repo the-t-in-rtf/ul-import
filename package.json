@@ -21,8 +21,8 @@
   "homepage": "https://github.com/the-t-in-rtf/ul-import#readme",
   "dependencies": {
     "deep-equal": "1.0.1",
-    "gpii-express": "1.0.1-dev.20170127T142027Z.d7dabd6",
-    "gpii-express-user": "1.0.0-dev.20170123T140829Z.93d6266",
+    "gpii-express": "1.0.2",
+    "gpii-express-user": "1.0.0-dev.20170127T161422Z.9aa9bcb",
     "gpii-launcher": "1.0.0-dev.20170113T104654Z.903ad25",
     "gpii-pouchdb-lucene": "0.1.0-dev.20170127T145759Z.612ff0f",
     "gpii-sort": "1.0.0-dev.20170127T144010Z.d340240",
@@ -40,6 +40,6 @@
     "kettle": "1.3.1",
     "node-jqunit": "1.1.4",
     "request": "2.79.0",
-    "ul-api": "1.0.0-dev.20170127T153126Z.7c3221e"
+    "ul-api": "1.0.0-dev.20170127T161614Z.aa5ea79"
   }
 }
