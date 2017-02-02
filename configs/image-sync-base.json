@@ -4,7 +4,7 @@
     "gradeNames": [
       "gpii.ul.imports.images.core"
     ],
-    "username": "existing",
+    "username": "importer",
     "password": "password"
   }
 }
