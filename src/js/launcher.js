@@ -7,6 +7,7 @@ fluid.require("%ul-imports");
 fluid.defaults("gpii.ul.imports.launcher", {
     gradeNames: ["gpii.launcher"],
     optionsFile: "%ul-imports/configs/base-dev.json",
+    filterKeys: false,
     yargsOptions: {
         describe: {
             "ports.api":      "The port where the UL API is available.",
