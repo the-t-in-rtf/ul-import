@@ -76,7 +76,6 @@ gpii.ul.imports.images.core.saveImageRecords = function (that, imageRecordData) 
 };
 
 fluid.defaults("gpii.ul.imports.images.core", {
-    imageDir: "/opt/ul-files/originalsDir",
     imagesToExclude: false,
     gradeNames: ["fluid.component"],
     rules: {
