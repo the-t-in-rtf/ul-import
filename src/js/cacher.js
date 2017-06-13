@@ -49,7 +49,16 @@ gpii.ul.imports.cacher.loadFromCache = function (that) {
     if (gpii.ul.imports.cacher.cacheFileExists(that)) {
         fluid.log("Loading cached data...");
 
-        return require(that.options.cacheFile);
+        var data = fs.readFileSync(that.options.cacheFile, { encoding: "utf8"});
+
+        // Try to evolve the data if we can.
+        try {
+            var parsedData = JSON.parse(data);
+            return parsedData;
+        }
+        catch (e) {
+            return data;
+        }
     }
     else {
         fluid.fail("Cannot load cached data, file does not exist...");
