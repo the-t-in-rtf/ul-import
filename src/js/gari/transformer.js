@@ -19,6 +19,16 @@ gpii.ul.imports.gari.transformer.parseXml = function (that) {
     that.applier.change("remappedJson", remappedJson);
 };
 
+// Transform the unique ID into a full URL.  We cannot use fluid.transforms.stringTemplate because it only supports
+// literal values, and not input paths.
+gpii.ul.imports.gari.transformer.constructUrl = function (value) {
+    return fluid.stringTemplate("https://www.gari.info/findphones-detail.cfm?productid=%productID", { productID: value });
+};
+
+fluid.defaults("gpii.ul.imports.gari.transformer.constructUrl", {
+    gradeNames: "fluid.standardTransformFunction"
+});
+
 fluid.defaults("gpii.ul.imports.gari.transformer", {
     gradeNames: ["fluid.modelComponent"],
     model: {
@@ -48,6 +58,12 @@ fluid.defaults("gpii.ul.imports.gari.transformer", {
             transform: {
                 type: "fluid.transforms.dateToString",
                 inputPath: "DateCompleted"
+            }
+        },
+        sourceUrl: {
+            transform: {
+                type: "gpii.ul.imports.gari.transformer.constructUrl",
+                inputPath: "objectid"
             }
         },
         sourceData: ""

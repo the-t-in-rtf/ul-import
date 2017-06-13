@@ -16,10 +16,12 @@ fluid.registerNamespace("gpii.ul.imports.transformer");
 
 // We could have written this using invokers, but a small function makes it easier to debug.
 gpii.ul.imports.transformer.transformAndSave = function (that) {
+    fluid.log("Transforming records...");
     var transformedRecords = fluid.transform(fluid.makeArray(that.model.rawJson), function (rawRecord) {
         return fluid.model.transformWithRules(rawRecord, that.options.rules);
     });
 
+    fluid.log("Saving transformed records...");
     that.applier.change("transformedJson", transformedRecords);
 };
 

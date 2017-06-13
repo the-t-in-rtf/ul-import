@@ -134,8 +134,8 @@ fluid.defaults("gpii.ul.imports.images.core.launcher", {
     },
     yargsOptions: {
         describe: {
-            "urls.sourceImages": "The URL we will use to retrieve the original source records containing image metadata.",
-            "urls.imageApi": "The base URL for the UL Image API.",
+            "ports.api": "The port on which the API server is running",
+            "ports.couch": "The port on which CouchDB is running",
             "imageDir": "The base directory in which we should store download images", // TODO: Remove this once we use the image API directly.
             "setLogging": "The fluid.log log level.  Set to `true` to display messages at the INFO level or higher.",
             "sources": "The sources we are importing images from.  Should be stringified JSON representing a string (i.e. with quotes) or array of strings.",

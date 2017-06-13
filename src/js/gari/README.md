@@ -165,6 +165,7 @@ A final JSON representation of the sample record above should result in JSON dat
       ]
     }
   },
+  sourceUrl: "https://www.gari.info/findphones-detail.cfm?productid=1808",
   sourceRecord: {
    // omitted for brevity
   },

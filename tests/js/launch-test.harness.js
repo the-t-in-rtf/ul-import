@@ -11,5 +11,22 @@ gpii.tests.ul.imports.harness({
     ports: {
         couch: 9899,
         api:   3599
+    },
+    components: {
+        pouch: {
+            options: {
+                components: {
+                    pouch: {
+                        options: {
+                            databases: {
+                                ul:    {
+                                    data: "%ul-api/tests/data/views.json"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 });

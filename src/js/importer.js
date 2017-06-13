@@ -52,8 +52,8 @@ fluid.defaults("gpii.ul.imports.importer", {
         }
     },
     model: {
-        rawData:       "{transformer}.model.rawJson",
-        processedData: "{transformer}.model.transformedJson"
+        rawData:       [],
+        processedData: []
     },
     invokers: {
         "saveData": {
@@ -69,18 +69,26 @@ fluid.defaults("gpii.ul.imports.importer", {
                 url: "{gpii.ul.imports.importer}.options.urls.sai"
             }
         },
+        // Listens for changes to its `rawJson` model variable, transforms and saves results to its `transformedJson` model variable.
         transformer: {
-            type: "gpii.ul.imports.transformer"
+            type: "gpii.ul.imports.transformer",
+            options: {
+                model: {
+                    rawJson:         "{gpii.ul.imports.importer}.model.rawData",
+                    transformedJson: "{gpii.ul.imports.importer}.model.processedData"
+                }
+            }
         },
+        // Listens for changes to the transformer's `transformedJson` model variable and syncs with the database.
         syncer: {
             type: "gpii.ul.imports.syncer",
             options: {
-                source:   "{gpii.ul.imports.importer}.options.source",
+                sources:  "{gpii.ul.imports.importer}.options.sources",
                 username: "{gpii.ul.imports.importer}.options.username",
                 password: "{gpii.ul.imports.importer}.options.password",
                 urls:     "{gpii.ul.imports.importer}.options.urls",
                 model: {
-                    data: "{transformer}.model.transformedJson"
+                    data: "{gpii.ul.imports.importer}.model.processedData"
                 }
             }
         }

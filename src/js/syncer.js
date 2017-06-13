@@ -14,6 +14,7 @@ require("./deepEq");
 fluid.registerNamespace("gpii.ul.imports.syncer");
 
 gpii.ul.imports.syncer.LoginAndStartSync = function (that) {
+    fluid.log("Logging in to UL API...");
     var options = {
         jar: true,
         json: true,
@@ -37,13 +38,14 @@ gpii.ul.imports.syncer.LoginAndStartSync = function (that) {
 };
 
 gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
+    fluid.log("Retrieving existing source records...");
     var options = {
         jar: true,
         json: true,
         qs: {
             unified: false,
             limit:   100000,
-            sources: "\"" + that.options.source + "\""
+            sources: JSON.stringify(that.options.sources)
         }
     };
     request.get(that.options.urls.products, options, function (error, response, body) {
@@ -57,7 +59,8 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
             // I considered using a transform and indexArrayByKey here, but didn't want to remove the key from the results.
             // http://docs.fluidproject.org/infusion/development/ModelTransformationAPI.html#creates-an-object-indexed-with-keys-from-array-entries-fluid-transforms-indexarraybykey-
             fluid.each(body.products, function (record) {
-                that.existingRecords[record.sid] = record;
+                var key = record.source + ":" + record.sid;
+                that.existingRecords[key] = record;
             });
 
             fluid.log("Retrieved existing records...");
@@ -69,25 +72,42 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
 gpii.ul.imports.syncer.syncViaREST = function (that) {
     var checkTasks = [];
 
+    fluid.log("Syncing ", that.model.data.length, " records via the UL REST API...");
+
     // Iterate through each record
     fluid.each(that.model.data, function (record) {
         var combinedRecord = fluid.copy(record);
         combinedRecord.status = "new";
 
         // Confirm whether we have existing data or not
-        var existingRecord = that.existingRecords[record.sid];
+        var key = record.source + ":" + record.sid;
+        var existingRecord = that.existingRecords[key];
 
-        //  If there is no existing record or the record is different, upload the change.
-        if (!existingRecord || !gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, ["status", "updated"], true)) {
-            var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
-            checkTasks.push(recordUpdatePromise);
+        //  If there is no existing record, create one.
+        if (!existingRecord) {
+            var newRecordPromise = that.getRecordUpdatePromise(combinedRecord);
+            checkTasks.push(newRecordPromise);
         }
         else {
-            that.skippedRecords.push(combinedRecord);
+            // Make sure that we include a uid, if this has been set in the existing record.
+            if (existingRecord.uid) {
+                combinedRecord.uid = existingRecord.uid;
+            }
+
+            // If the record is not identical to what we have, perform an update.
+            if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, ["status", "updated"], true)) {
+                var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
+                checkTasks.push(recordUpdatePromise);
+            }
+            // If the record is identical, skip it.
+            else {
+                that.skippedRecords.push(combinedRecord);
+            }
         }
     });
 
     if (checkTasks.length === 0) {
+        fluid.log("No records to sync (or all were skipped)...");
         that.events.onSyncComplete.fire(that);
     }
     else {
@@ -97,7 +117,7 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
 
             // Fire an event so that we can chain in the "unifier" and other services
             that.events.onSyncComplete.fire(that);
-        });
+        }, fluid.fail);
     }
 };
 

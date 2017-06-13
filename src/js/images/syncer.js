@@ -185,15 +185,24 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
             }
             else {
                 // Adapted from: http://stackoverflow.com/questions/12740659/downloading-images-with-node-js
-                request(that.record.uri).pipe(fs.createWriteStream(filePath)).on("close", function (error) {
-                    if (error) {
-                        that.promise.reject(error);
-                    }
-                    else {
-                        fluid.log("Saved image file for record '" +  that.record.image_id + "' to disk...");
+                request(that.record.uri)
+                    .on("error", function (error) {
+                        // that.promise.reject(error);
+                        fluid.log("Error downloading file:", error);
                         that.promise.resolve();
-                    }
-                });
+                    })
+                    .pipe(fs.createWriteStream(filePath))
+                    .on("close", function (error) {
+                        if (error) {
+                            // that.promise.reject(error);
+                            fluid.log("Error downloading file:", error);
+                            that.promise.resolve();
+                        }
+                        else {
+                            fluid.log("Saved image file for record '" +  that.record.image_id + "' to disk...");
+                            that.promise.resolve();
+                        }
+                    });
             }
         });
     }

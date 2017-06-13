@@ -30,7 +30,7 @@ fluid.defaults("gpii.ul.imports.eastin", {
                 urls:     "{gpii.ul.imports.eastin}.options.urls.eastin",
                 isoCodes: "{gpii.ul.imports.eastin}.options.isoCodes",
                 model: {
-                    records: "{transformer}.model.rawJson"
+                    records: "{gpii.ul.imports.importer}.model.rawData"
                 }
             }
         },
@@ -44,7 +44,7 @@ fluid.defaults("gpii.ul.imports.eastin", {
             type: "gpii.ul.imports.eastin.stats",
             options: {
                 model: {
-                    data: "{transformer}.model.remappedJson"
+                    data: "{gpii.ul.imports.importer}.model.processedData"
                 }
             }
         }

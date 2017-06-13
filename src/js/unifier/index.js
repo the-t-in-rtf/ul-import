@@ -59,7 +59,7 @@ gpii.ul.imports.unifier.singleAdoptionHandler.login = function (that) {
 
 gpii.ul.imports.unifier.singleAdoptionHandler.readChild = function (that) {
     // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
-    var childReaderUrl = fluid.stringTemplate("%baseUrl/%source/%sid", { baseUrl: that.options.urls.product, source: that.options.source, sid: that.options.sid });
+    var childReaderUrl = fluid.stringTemplate("%baseUrl/%source/%sid", { baseUrl: that.options.urls.product, source: that.options.source, sid: encodeURIComponent(that.options.sid) });
     var options = {
         url:  childReaderUrl,
         jar:  that.jar,

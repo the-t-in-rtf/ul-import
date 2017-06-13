@@ -19,6 +19,8 @@ fluid.registerNamespace("gpii.ul.imports.eastin.downloader");
 
 var request = require("request");
 
+require("../concurrent-promise-queue");
+
 /* TODO: Only look up records newer than the cache using the new lastUpdateMin parameter
  and the maximum LastUpdateDate value stored in the cache */
 // http://webservices.eastin.eu/cloud4all/searches/products/listsimilarity?isoCodes=22.24.24&lastUpdateMin=2014-01-01T12:00
@@ -49,6 +51,7 @@ gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction = funct
                         fluid.log("There were errors returned when retrieving records:\n" + JSON.stringify(data.ExceptionMessages, null, 2));
                     }
 
+                    fluid.log("Retrieved ", data.Records.length , " records for ISO code '", myIsoCode, "'...");
                     that.isoRecordLists.push(data.Records);
                 }
                 catch (e) {
@@ -69,13 +72,12 @@ gpii.ul.imports.eastin.downloader.retrieveRecordListsByIsoCode = function (that)
         deferrals.push(gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction(that, code));
     });
 
-    var sequence = fluid.promise.sequence(deferrals);
-
-    sequence.then(function () {
+    var queue = gpii.ul.imports.promiseQueue.createQueue(deferrals, that.options.maxRequests);
+    queue.then(function () {
         that.events.onIsoSearchComplete.fire(that);
-    });
+    }, fluid.fail);
 
-    return sequence;
+    return queue;
 };
 
 gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
@@ -88,54 +90,67 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
             if (uniqueIds.indexOf(id) === -1) {
                 uniqueIds.push(id);
 
-                var promise = fluid.promise();
-                deferrals.push(promise);
+                deferrals.push(function () {
+                    var promise = fluid.promise();
 
-                var options = {
-                    "url": that.options.urls.detail,
-                    qs: {
-                        database:    record.Database,
-                        productCode: record.ProductCode
-                    }
-                };
+                    var options = {
+                        "timeout": that.options.detailedRecordTimeout,
+                        "url": that.options.urls.detail,
+                        qs: {
+                            database:    record.Database,
+                            productCode: record.ProductCode
+                        }
+                    };
 
-                fluid.log("Retrieving detailed record '" + record.Database + record.ProductCode + "'...");
+                    fluid.log("Retrieving detailed record '", record.Database, ":", record.ProductCode, "'...");
 
-                request(options, function (error, response, body) {
-                    // We have to make sure we are being given JSON data because EASTIN returns HTML errors at the moment.
-                    try {
-                        var data = JSON.parse(body);
-                        // If we receive an "ExceptionMessage" object, display its contents in the console.
-                        if (data.ExceptionMessages) {
-                            promise.reject(data.ExceptionMessages);
+                    request(options, function (error, response, body) {
+                        // We have to make sure we are being given JSON data because EASTIN returns HTML errors at the moment.
+                        try {
+                            var data = body && JSON.parse(body);
+                            // If we receive an "ExceptionMessage" object, display its contents in the console.
+                            if (data && !data.Ok) {
+                                fluid.log("Exception returned by EASTIN API:", data.exceptionMessage || data.exceptionMessages);
+                            }
+                            else if (error) {
+                                fluid.log("Error retrieving record:", error);
+                            }
+                            else if (data.Record) {
+                                fluid.log("Detailed record for '", data.Record.Database, ":", data.Record.ProductCode, "' retrieved...");
+                                that.originalRecords.push(data.Record);
+                            }
+                            else {
+                                fluid.log("Skipping empty record retrieved from '" + response.request.uri.href + "'...");
+                            }
                         }
-                        else if (error) {
-                            promise.reject(error);
+                        catch (e) {
+                            if (response && response.request) {
+                                // Ignore "junk" HTML records.
+                                fluid.log("Error retrieving record from '" + response.request.uri.href + "':\n", e);
+                            }
+                            else {
+                                fluid.log("Error retrieving record:\n", e);
+                            }
                         }
-                        else if (data) {
-                            that.originalRecords.push(data.Record);
-                            promise.resolve(data.Record);
-                        }
-                        else {
-                            fluid.log("Skipping empty record retrieved from '" + response.request.uri.href + "'...");
-                            promise.resolve();
-                        }
-                    }
-                    catch (e) {
-                        // Ignore "junk" HTML records.
-                        fluid.log("Error retrieving record from '" + response.request.uri.href + "':\n");
                         promise.resolve();
-                    }
+                    });
 
+                    return promise;
                 });
             }
         });
     });
 
-    fluid.promise.sequence(deferrals).then(function () {
-        that.applier.change("records", that.originalRecords);
-        that.events.onRecordsRetrieved.fire(that);
-    });
+    var queue = gpii.ul.imports.promiseQueue.createQueue(deferrals, that.options.maxRequests);
+    queue.then(
+        function () {
+            that.applier.change("records", that.originalRecords);
+            that.events.onRecordsRetrieved.fire(that);
+        },
+        function (error) {
+            fluid.log("Error retrieving detailed records...", error);
+        }
+    );
 };
 
 fluid.defaults("gpii.ul.imports.eastin.downloader", {
@@ -144,6 +159,8 @@ fluid.defaults("gpii.ul.imports.eastin.downloader", {
         isoRecordLists:     [],
         originalRecords:    []
     },
+    detailedRecordTimeout: 120000, // Timeout in milliseconds
+    maxRequests: 150,
     model: {
         records: []
     },

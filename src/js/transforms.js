@@ -130,15 +130,13 @@ fluid.defaults("gpii.ul.imports.transforms.flatten", {
 });
 
 
-// Strip null values from an Object.
+// Strip null, undefined, and empty string values from an Object.
 //
 // An object like: `{ foo: null, bar: "not null", baz: undefined }`
 //
 // Would become: `{ bar: "not null" }`
-//
-// Notably, this should not strip empty strings.
 gpii.ul.imports.transforms.stripNonValues = function (value) {
-    if (value === undefined || value === null) {
+    if (value === undefined || value === null || value === "") {
         return undefined;
     }
     else if (Array.isArray(value)) {
@@ -169,6 +167,40 @@ fluid.defaults("gpii.ul.imports.transforms.stripNonValues", {
     gradeNames: ["fluid.standardTransformFunction"]
 });
 
+gpii.ul.imports.transforms.prependProtocol = function (value) {
+    return (value && value.length > 0 && value.indexOf("http") === 0) ? value : "http://" + value;
+};
+
+fluid.defaults("gpii.ul.imports.transforms.prependProtocol", {
+    gradeNames: ["fluid.standardTransformFunction"]
+});
+
+gpii.ul.imports.transforms.prependProtocol = function (value) {
+    return (value && value.length > 0 && value.indexOf("http") === 0) ? value : "http://" + value;
+};
+
+fluid.defaults("gpii.ul.imports.transforms.prependProtocol", {
+    gradeNames: ["fluid.standardTransformFunction"]
+});
+
+/*
+
+    EASTIN provides wacko email addresses, including junk characters, multiples.  This transform looks for a single
+    email address at the beginning of the string.  If it can't find one, it returns `undefined`, so that the email
+    will be left blank in the "unified" record (it will still appear in the "sourceData" field).
+
+ */
+gpii.ul.imports.transforms.sanitizeEmail = function (value) {
+    if (!value || typeof value !== "string") { return undefined; }
+
+    var regex = /[\s]*([^ ;,]+@[^ ;,]*[a-zA-Z]+)[ ;,\.]*$/;
+    var matches = value.match(regex);
+    return matches ? matches[1] : undefined;
+};
+
+fluid.defaults("gpii.ul.imports.transforms.sanitizeEmail", {
+    gradeNames: ["fluid.standardTransformFunction"]
+});
 
 gpii.ul.imports.transforms.join = function (transformSpec, transformer) {
     if (!transformSpec.values || !transformSpec.values.length) {

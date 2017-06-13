@@ -11,8 +11,9 @@ fluid.registerNamespace("gpii.ul.imports.eastin.transformer");
 // Remap the data
 gpii.ul.imports.eastin.transformer.remapData = function (that) {
     var remappedJson = fluid.transform(that.model.rawJson, that.transformData);
+
     var strippedJson = gpii.ul.imports.transforms.stripNonValues(remappedJson);
-    that.applier.change("remappedJson", strippedJson);
+    that.applier.change("transformedJson", strippedJson);
 };
 
 // Transform to look up the predefined language for each EASTIN data source
@@ -46,8 +47,8 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
         description: "No description available."
     },
     model: {
-        rawJson:      {},
-        remappedJson: {}
+        rawJson:         {},
+        transformedJson: {}
     },
     mapRules: {
         source:      "Database",
@@ -59,33 +60,91 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
                 values: [
                     {
                         transform: {
-                            type:      "fluid.transforms.value",
+                            type:      "gpii.ul.imports.transforms.stripNonValues",
                             inputPath: "EnglishDescription"
                         }
                     },
-                    "{that}.options.defaultValues.description"
+                    {
+                        "transform": {
+                            "type":  "fluid.transforms.literalValue",
+                            "input": "{that}.options.defaultValues.description"
+                        }
+                    }
                 ]
             }
         },
         manufacturer: {
-            name:       "ManufacturerOriginalFullName",
-            url:        "ManufacturerWebSiteUrl",
-            country:    "ManufacturerCountry",
-            address:    "ManufacturerAddress",
-            postalCode: "ManufacturerPostalCode",
-            cityTown:   "ManufacturerTown",
-            phone:      "ManufacturerPhone",
-            email:      "ManufacturerEmail"
+            name: {
+                transform: {
+                    type: "fluid.transforms.firstValue",
+                    values: [
+                        {
+                            transform: {
+                                type:      "gpii.ul.imports.transforms.stripNonValues",
+                                inputPath: "ManufacturerOriginalFullName"
+                            }
+                        },
+                        {
+                            "transform": {
+                                "type":  "fluid.transforms.literalValue",
+                                "input": "Unknown Manufacturer"
+                            }
+                        }
+                    ]
+                }
+            },
+            url: {
+                transform: {
+                    type: "gpii.ul.imports.transforms.prependProtocol",
+                    input: {
+                        transform: {
+                            type:      "gpii.ul.imports.transforms.stripNonValues",
+                            inputPath: "ManufacturerWebSiteUrl"
+                        }
+                    }
+                }
+            },
+            country: {
+                transform: {
+                    type:      "gpii.ul.imports.transforms.stripNonValues",
+                    inputPath: "ManufacturerCountry"
+                }
+            },
+            address: {
+                transform: {
+                    type:      "gpii.ul.imports.transforms.stripNonValues",
+                    inputPath: "ManufacturerAddress"
+                }
+            },
+            postalCode: {
+                transform: {
+                    type:      "gpii.ul.imports.transforms.stripNonValues",
+                    inputPath: "ManufacturerPostalCode"
+                }
+            },
+            cityTown: {
+                transform: {
+                    type:      "gpii.ul.imports.transforms.stripNonValues",
+                    inputPath: "ManufacturerTown"
+                }
+            },
+            phone: {
+                transform: {
+                    type:      "gpii.ul.imports.transforms.stripNonValues",
+                    inputPath: "ManufacturerPhone"
+                }
+            },
+            email: {
+                transform: {
+                    type: "gpii.ul.imports.transforms.sanitizeEmail",
+                    inputPath: "ManufacturerEmail"
+                }
+            }
         },
         language: {
             transform: {
                 type:      "gpii.ul.imports.eastin.transformer.lookupLanguage",
-                value: {
-                    transform: {
-                        type:      "fluid.transforms.value",
-                        inputPath: "Database"
-                    }
-                },
+                inputPath: "Database",
                 databases: "{that}.options.databases"
             }
         },
@@ -98,12 +157,7 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
         updated: {
             transform: {
                 type: "fluid.transforms.dateToString",
-                value: {
-                    transform: {
-                        type:      "fluid.transforms.value",
-                        inputPath: "LastUpdateDate"
-                    }
-                }
+                inputPath: "LastUpdateDate"
             }
         },
         ontologies: {
