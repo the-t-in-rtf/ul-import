@@ -8,7 +8,7 @@
     "username": "importer",
     "password": "password",
     "urls": {
-      "sai": "http://staging.saa.gpii.net/api/v1/products"
+      "sai": "https://staging.saa.gpii.net/api/v1/products/all"
     }
   }
 }
