@@ -48,24 +48,31 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse = function
         // Content-Disposition →attachment; filename=product-id2330-v1.jpg
 
         var contentDisposition = headerResponse.headers["content-disposition"];
-        // https://xkcd.com/1171/
-        var matches = contentDisposition.match(/.+filename=(.+)/i);
-        if (matches) {
-            var extension = path.extname(matches[1]).substring(1).toLowerCase();
-            var mimeTypeFromExtension = fluid.keyForValue(gpii.ul.imports.images.extensions.extensionByMimeType, extension);
-            if (mimeTypeFromExtension) {
-                that.record.mime_type = mimeTypeFromExtension;
-                gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
+        if (contentDisposition) {
+            // https://xkcd.com/1171/
+            var matches = contentDisposition.match(/.+filename=(.+)/i);
+            if (matches) {
+                var extension = path.extname(matches[1]).substring(1).toLowerCase();
+                var mimeTypeFromExtension = fluid.keyForValue(gpii.ul.imports.images.extensions.extensionByMimeType, extension);
+                if (mimeTypeFromExtension) {
+                    that.record.mime_type = mimeTypeFromExtension;
+                    gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
+                }
+                else {
+                    fluid.log("Skipping image file with invalid mime type '" + contentType + "' (file extension '" + extension + "' cannot be handled)...");
+                    that.promise.resolve();
+                }
             }
             else {
-                fluid.log("Skipping image file with invalid mime type '" + contentType + "' (file extension '" + extension + "' cannot be handled)...");
+                fluid.log("Skipping image file with invalid mime type '" + contentType + "' (secondary strategy could not determine filename)...");
                 that.promise.resolve();
             }
         }
         else {
-            fluid.log("Skipping image file with invalid mime type '" + contentType + "' (secondary strategy could not determine filename)...");
+            fluid.log("Skipping image file with invalid mime type and no content-disposition headers...");
             that.promise.resolve();
         }
+
     }
     else {
         that.record.mime_type = contentType;
