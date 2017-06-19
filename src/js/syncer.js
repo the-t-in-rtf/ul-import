@@ -10,6 +10,7 @@ var path    = require("path");
 var request = require("request");
 
 require("./deepEq");
+require("./concurrent-promise-queue");
 
 fluid.registerNamespace("gpii.ul.imports.syncer");
 
@@ -112,7 +113,9 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
     }
     else {
         // Process the stack of tasks
-        fluid.promise.sequence(checkTasks).then(function () {
+        var queue = gpii.ul.imports.promiseQueue.createQueue(checkTasks, that.options.maxRequests);
+
+        queue.then(function () {
             fluid.log("Finished synchronizing " + checkTasks.length + " records...");
 
             // Fire an event so that we can chain in the "unifier" and other services
@@ -182,6 +185,7 @@ gpii.ul.imports.syncer.report = function (that) {
 
 fluid.defaults("gpii.ul.imports.syncer", {
     gradeNames:    ["fluid.modelComponent"],
+    maxRequests:   100,
     saveRecords: {
         existingRecords: false,
         createdRecords:  true,

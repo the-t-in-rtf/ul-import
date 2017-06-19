@@ -15,6 +15,7 @@ fluid.require("%ul-imports");
 
 require("../launcher");
 require("../dataSource");
+require("../concurrent-promise-queue");
 
 /*
 
@@ -203,9 +204,9 @@ gpii.ul.imports.unifier.handleOrphanResponse = function (that, response) {
         }
     });
 
-    var sequence = fluid.promise.sequence(promises);
+    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
 
-    sequence.then(function (results) {
+    queue.then(function (results) {
         fluid.log("Created unified records for " + results.length + " orphaned records...");
     }, that.handleError);
 };
@@ -228,6 +229,7 @@ gpii.ul.imports.unifier.handleError = function (that, errorResponse) {
 
 fluid.defaults("gpii.ul.imports.unifier", {
     gradeNames: ["fluid.component"],
+    maxRequests: 100,
     components: {
         orphanReader: {
             type: "gpii.ul.imports.dataSource",

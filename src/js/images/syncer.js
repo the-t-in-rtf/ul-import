@@ -4,6 +4,7 @@ var fluid = require("infusion");
 var gpii  = fluid.registerNamespace("gpii");
 
 require("./extensions");
+require("../concurrent-promise-queue");
 
 // TODO: Convert to using dataSource grades once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
 var request = require("request");
@@ -257,9 +258,9 @@ gpii.ul.imports.images.syncer.startSync = function (that) {
         }
     });
 
-    var sequence = fluid.promise.sequence(promises);
 
-    sequence.then(that.handleSuccess, that.handleError);
+    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
+    queue.then(that.handleSuccess, that.handleError);
 };
 
 gpii.ul.imports.images.syncer.handleSuccess = function (that, results) {
@@ -268,6 +269,7 @@ gpii.ul.imports.images.syncer.handleSuccess = function (that, results) {
 
 fluid.defaults("gpii.ul.imports.images.syncer", {
     gradeNames: ["fluid.modelComponent"],
+    maxRequests: 25,
     messages: {
         errorSavingRecords: "There was an error syncing one or more records.",
         savedRecords: "Successfully processed %length records."
