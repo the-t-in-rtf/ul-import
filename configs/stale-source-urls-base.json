@@ -1,0 +1,8 @@
+{
+  "type": "gpii.ul.imports.curation.urlChecker.baseConfig",
+  "options": {
+    "gradeNames": [
+      "gpii.ul.imports.curation.urlChecker"
+    ]
+  }
+}

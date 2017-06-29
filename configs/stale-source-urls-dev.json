@@ -1,0 +1,4 @@
+{
+  "type": "gpii.ul.imports.curation.urlChecker.devConfig",
+  "mergeConfigs": ["%ul-imports/configs/stale-source-urls-base.json", "%ul-imports/configs/base-dev.json"]
+}

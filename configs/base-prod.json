@@ -3,7 +3,7 @@
   "options": {
     "gradeNames": "fluid.component",
     "ports": {
-      "api":   4986,
+      "api":   4896,
       "couch": 5984
     },
     "couchAuthCreds": "admin:admin@",
