@@ -3,7 +3,7 @@
   "options": {
     "gradeNames": ["gpii.ul.imports.images.sai"],
     "sources": ["sai"],
-    "username": "importer",
+    "username":  "importer",
     "password": "password"
   }
 }

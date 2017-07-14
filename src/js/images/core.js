@@ -133,6 +133,7 @@ fluid.defaults("gpii.ul.imports.images.core.launcher", {
         "yargsOptions.demand": "nomerge"
     },
     yargsOptions: {
+        env: true,
         describe: {
             "ports.api": "The port on which the API server is running",
             "ports.couch": "The port on which CouchDB is running",

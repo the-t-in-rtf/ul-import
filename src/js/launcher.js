@@ -9,7 +9,10 @@ fluid.defaults("gpii.ul.imports.launcher", {
     optionsFile: "%ul-imports/configs/base-prod.json",
     filterKeys: false,
     yargsOptions: {
+        env: true,
         describe: {
+            "username":       "The username to use when adding/updating records.",
+            "password":       "The password to use when adding/updating records.",
             "ports.api":      "The port where the UL API is available.",
             "ports.couch":    "The port where CouchDB/PouchDB is available.",
             "couchAuthCreds": "The auth credentials to pass as part of CouchDB URLs"
