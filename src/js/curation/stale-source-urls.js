@@ -133,7 +133,7 @@ fluid.defaults("gpii.ul.imports.curation.urlChecker", {
 
 fluid.defaults("gpii.ul.imports.curation.urlChecker.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-imports/configs/stale-source-urls-dev.json",
+    optionsFile: "%ul-imports/configs/curation-source-urls-prod.json",
     "yargsOptions": {
         "describe": {
             "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",

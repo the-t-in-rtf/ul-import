@@ -6,7 +6,7 @@ fluid.require("%ul-imports");
 
 fluid.defaults("gpii.ul.imports.launcher", {
     gradeNames: ["gpii.launcher"],
-    optionsFile: "%ul-imports/configs/base-dev.json",
+    optionsFile: "%ul-imports/configs/base-prod.json",
     filterKeys: false,
     yargsOptions: {
         describe: {
@@ -15,6 +15,7 @@ fluid.defaults("gpii.ul.imports.launcher", {
             "couchAuthCreds": "The auth credentials to pass as part of CouchDB URLs"
         },
         defaults: {
+            "setLogging":  true,
             "optionsFile": "{that}.options.optionsFile"
         },
         help: true

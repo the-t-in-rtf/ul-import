@@ -89,7 +89,7 @@ fluid.defaults("gpii.ul.imports.images.gari", {
 
 fluid.defaults("gpii.ul.imports.images.gari.launcher", {
     gradeNames: ["gpii.ul.imports.images.core.launcher"],
-    optionsFile: "%ul-imports/configs/gari-image-sync-dev.json"
+    optionsFile: "%ul-imports/configs/gari-image-sync-prod.json"
 });
 
 gpii.ul.imports.images.gari.launcher();

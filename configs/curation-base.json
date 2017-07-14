@@ -1,0 +1,13 @@
+{
+  "type": "gpii.ul.imports.curation.baseConfig",
+  "options": {
+    "urls": {
+      "bulkImages": {
+        "expander": {
+          "funcName": "fluid.stringTemplate",
+          "args":     ["%imageDb/_bulk_docs", { "imageDb": "{that}.options.urls.imageDb"}]
+        }
+      }
+    }
+  }
+}

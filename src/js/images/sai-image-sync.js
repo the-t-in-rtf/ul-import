@@ -136,7 +136,7 @@ fluid.defaults("gpii.ul.imports.images.sai", {
 
 fluid.defaults("gpii.ul.imports.images.sai.launcher", {
     gradeNames: ["gpii.ul.imports.images.core.launcher"],
-    optionsFile: "%ul-imports/configs/sai-image-sync-dev.json"
+    optionsFile: "%ul-imports/configs/sai-image-sync-prod.json"
 });
 
 gpii.ul.imports.images.sai.launcher();

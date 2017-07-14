@@ -7,10 +7,11 @@ require("./extensions");
 require("../concurrent-promise-queue");
 
 // TODO: Convert to using dataSource grades once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
-var request = require("request");
-var path    = require("path");
-var fs      = require("fs");
-var mkdirp  = require("mkdirp");
+var request   = require("request");
+var path      = require("path");
+var fs        = require("fs");
+var mkdirp    = require("mkdirp");
+var md5File   = require("md5-file");
 
 fluid.registerNamespace("gpii.ul.imports.images.syncer.singleRecordSyncer");
 
@@ -207,8 +208,18 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
                             that.promise.resolve();
                         }
                         else {
-                            fluid.log("Saved image file for record '" +  that.record.image_id + "' to disk...");
-                            that.promise.resolve();
+                            md5File(filePath, function (error, hash) {
+                                if (error) {
+                                    fluid.log("Error calculating MD5 checksum:", error);
+                                    that.promise.resolve();
+                                }
+                                else {
+                                    that.record.md5 = hash;
+                                    // TODO:  Confirm whether this is a duplicate up front, for now we handle this in a "curation" script.
+                                    fluid.log("Saved image file for record '" +  that.record.image_id + "' to disk...");
+                                    that.promise.resolve();
+                                }
+                            });
                         }
                     });
             }

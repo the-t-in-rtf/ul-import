@@ -1,8 +1,8 @@
 {
-  "type": "gpii.ul.imports.curation.urlChecker.baseConfig",
   "options": {
     "gradeNames": [
       "gpii.ul.imports.curation.urlChecker"
     ]
-  }
+  },
+  "mergeConfigs": ["%ul-imports/configs/curation-base.json"]
 }

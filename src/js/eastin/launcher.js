@@ -12,7 +12,7 @@ require("./importer");
 
 fluid.defaults("gpii.ul.imports.eastin.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-imports/configs/eastin-dev.json",
+    optionsFile: "%ul-imports/configs/eastin-prod.json",
     "yargsOptions": {
         "describe": {
             "username":                "The username to use when writing records to the UL.",

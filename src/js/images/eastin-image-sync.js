@@ -106,7 +106,7 @@ fluid.defaults("gpii.ul.imports.images.eastin", {
 
 fluid.defaults("gpii.ul.imports.images.eastin.launcher", {
     gradeNames: ["gpii.ul.imports.images.core.launcher"],
-    optionsFile: "%ul-imports/configs/eastin-image-sync-dev.json"
+    optionsFile: "%ul-imports/configs/eastin-image-sync-prod.json"
 });
 
 gpii.ul.imports.images.eastin.launcher();

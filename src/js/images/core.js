@@ -146,7 +146,7 @@ fluid.defaults("gpii.ul.imports.images.core.launcher", {
         },
         coerce: {
             setLogging: JSON.parse,
-            sources:     JSON.parse
+            sources:    JSON.parse
         },
         defaults: {
             "optionsFile": "{that}.options.optionsFile"

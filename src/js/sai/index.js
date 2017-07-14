@@ -98,7 +98,7 @@ fluid.defaults("gpii.ul.imports.sai", {
 
 fluid.defaults("gpii.ul.imports.sai.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-imports/configs/sai-dev.json",
+    optionsFile: "%ul-imports/configs/sai-prod.json",
     "yargsOptions": {
         "describe": {
             "username":   "The username to use when writing records to the UL.",

@@ -58,7 +58,7 @@ fluid.defaults("gpii.ul.imports.gari", {
 
 fluid.defaults("gpii.ul.imports.gari.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-imports/configs/gari-dev.json",
+    optionsFile: "%ul-imports/configs/gari-prod.json",
     "yargsOptions": {
         "describe": {
             "username":   "The username to use when writing records to the UL.",
