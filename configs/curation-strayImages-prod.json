@@ -1,0 +1,3 @@
+{
+  "mergeConfigs": ["%ul-imports/configs/curation-strayImages-base.json", "%ul-imports/configs/base-prod.json"]
+}

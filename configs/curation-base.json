@@ -2,6 +2,12 @@
   "type": "gpii.ul.imports.curation.baseConfig",
   "options": {
     "urls": {
+      "md5": {
+        "expander": {
+          "funcName": "fluid.stringTemplate",
+          "args":     ["%imageDb/_design/md5/_view/byMd5", { "imageDb": "{that}.options.urls.imageDb"}]
+        }
+      },
       "bulkImages": {
         "expander": {
           "funcName": "fluid.stringTemplate",
