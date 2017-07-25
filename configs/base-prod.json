@@ -32,6 +32,18 @@
           "args":     ["%apiBaseUrl/products", { "apiBaseUrl": "{that}.options.urls.api"}]
         }
       },
+      "images": {
+        "expander": {
+          "funcName": "fluid.stringTemplate",
+          "args":     ["%apiBaseUrl/images/%source", { "apiBaseUrl": "{that}.options.urls.api"}]
+        }
+      },
+      "imageFiles": {
+        "expander": {
+          "funcName": "fluid.stringTemplate",
+          "args":     ["%apiBaseUrl/images/file/%uid/%source/%image_id", { "apiBaseUrl": "{that}.options.urls.api"}]
+        }
+      },
       "couch": {
         "expander": {
           "funcName": "fluid.stringTemplate",
