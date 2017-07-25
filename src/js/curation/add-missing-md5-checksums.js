@@ -22,11 +22,14 @@ fluid.require("path");
 fluid.require("%ul-api/src/js/images/file/file-helpers.js");
 fluid.registerNamespace("gpii.ul.imports.curation.md5");
 
-// TODO: Retrieve list of images with no checksum.
-
 gpii.ul.imports.curation.md5.retrieveIncompleteRecordReport = function (that) {
+    fluid.log("Retrieving ", that.options.updateAll ? "all records" : "records without a checksum", "...");
+    var url = that.options.urls.md5 + "?reduce=false";
+    if (!that.options.updateAll) {
+        url += "&key=null";
+    }
     var requestOptions = {
-        url: that.options.urls.md5 + "?reduce=false&key=null",
+        url: url,
         json: true
     };
     request.get(requestOptions, that.handleIncompleteRecordResults);
@@ -88,12 +91,13 @@ gpii.ul.imports.curation.md5.handleUpdateResults = function (that, error, respon
         fluid.fail(body);
     }
     else {
-        fluid.log("Found and processed ", that.recordsToUpdate.length, " records lacking a checksum...");
+        fluid.log("Updated checksums for ", that.recordsToUpdate.length, " records...");
     }
 };
 
 fluid.defaults("gpii.ul.imports.curation.md5", {
     gradeNames: ["fluid.component"],
+    updateAll: false,
     members: {
         recordsToUpdate: []
     },
@@ -128,6 +132,7 @@ fluid.defaults("gpii.ul.imports.curation.md5.launcher", {
     optionsFile: "%ul-imports/configs/curation-md5-prod.json",
     "yargsOptions": {
         "describe": {
+            "updateAll": "Set to true to update md5 checksums for all image records.  The default is to only update records that lack checksum data.",
             "setLogging": "The logging level to use.  Set to `true` by default."
         },
         "coerce": {

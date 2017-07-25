@@ -61,7 +61,7 @@ gpii.ul.imports.curation.imageRecordsMissingFiles.bulkDeleteImageRecords = funct
         fluid.log("No records found with missing images...");
     }
     else if (!that.options.deleteRecords) {
-        fluid.log("Found ", that.recordsMissingImages.length, " images missing an associate image file.  Run with--deleteRecords=true to remove these records.");
+        fluid.log("Found ", that.recordsMissingImages.length, " images missing an associated image file.  Run with --deleteRecords=true to remove these records.");
     }
     else {
         var deletePayload = fluid.transform(that.recordsMissingImages, function (originalRecord) { var record = fluid.copy(originalRecord); record._deleted = true; return record; });
