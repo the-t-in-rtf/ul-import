@@ -175,14 +175,6 @@ fluid.defaults("gpii.ul.imports.transforms.prependProtocol", {
     gradeNames: ["fluid.standardTransformFunction"]
 });
 
-gpii.ul.imports.transforms.prependProtocol = function (value) {
-    return (value && value.length > 0 && value.indexOf("http") === 0) ? value : "http://" + value;
-};
-
-fluid.defaults("gpii.ul.imports.transforms.prependProtocol", {
-    gradeNames: ["fluid.standardTransformFunction"]
-});
-
 /*
 
     EASTIN provides wacko email addresses, including junk characters, multiples.  This transform looks for a single

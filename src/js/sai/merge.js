@@ -29,7 +29,6 @@ gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
     var deletes = results[0];
     var allSaiRecords = results[1];
 
-
     var uidsByNid = {};
     fluid.each(allSaiRecords, function (row) {
         if (row.uid && row.nid) {
