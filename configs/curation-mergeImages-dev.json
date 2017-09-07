@@ -1,3 +1,0 @@
-{
-  "mergeConfigs": ["%ul-imports/configs/curation-mergeImages-base.json", "%ul-imports/configs/base-dev.json"]
-}

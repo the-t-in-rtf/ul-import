@@ -1,6 +1,0 @@
-{
-  "options": {
-    "gradeNames": ["gpii.ul.imports.curation.mergeImages"]
-  },
-  "mergeConfigs": ["%ul-imports/configs/curation-base.json"]
-}
