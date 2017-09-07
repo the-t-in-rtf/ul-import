@@ -17,7 +17,11 @@
     "all-image-imports": "npm run eastin-image-import && npm run sai-image-import && npm run gari-image-import",
     "eastin-image-import": "node src/js/images/eastin-image-sync.js --optionsFile %ul-imports/configs/eastin-image-sync-prod.json",
     "sai-image-import": "node src/js/images/sai-image-sync.js --optionsFile %ul-imports/configs/sai-image-sync-prod.json",
-    "gari-image-import": "node src/js/images/gari-image-sync.js --optionsFile %ul-imports/configs/gari-image-sync-prod.json"
+    "gari-image-import": "node src/js/images/gari-image-sync.js --optionsFile %ul-imports/configs/gari-image-sync-prod.json",
+    "sai-curation": "npm run sai-curation-delete && npm run sai-curation-merge && npm run sai-curation-metadata",
+    "sai-curation-delete": "node src/js/sai/delete.js",
+    "sai-curation-merge": "node src/js/sai/merge.js",
+    "sai-curation-metadata": "node src/js/sai/metadata.js"
   },
   "repository": {
     "type": "git",

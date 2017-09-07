@@ -1,6 +1,6 @@
 # Unified Listing Imports
 
-This package contains scripts that are used to import data from vendor databases.
+This package contains scripts that are used to import data from vendor databases, and to curate imported data.
 
 ## "Core" Imports
 
@@ -69,11 +69,11 @@ itself a federation of various partner databases ([see their website for details
 
 To import "core" data from EASTIN:
  1. In production: `npm run eastin-import`
- 2. In a development environment: `node src/js/eastin/launcher.js --optionsFile %ul-imports/configs/eastin-dev.json`
+ 2. In a development environment: `npm run eastin-import -- --optionsFile %ul-imports/configs/eastin-dev.json`
 
 To import "image" data from EASTIN:
  1. In production: `npm run eastin-image-import`
- 2. In a development environment: `node src/js/images/eastin-image-sync.js --optionsFile %ul-imports/configs/eastin-image-sync-dev.json`
+ 2. In a development environment: `npm run eastin-image-import -- --optionsFile %ul-imports/configs/eastin-image-sync-dev.json`
 
 
 ### GARI
@@ -81,12 +81,12 @@ To import "image" data from EASTIN:
 The Unified Listing pulls "source" records from [GARI](http://www.gari.info).  To import "core" data from GARI:
  
  1. In a production environment:  `npm run gari-import`
- 2. In a development environment: `node src/js/gari/index.js --optionsFile %ul-imports/configs/gari-dev.json`
+ 2. In a development environment: `npm run gari-import -- --optionsFile %ul-imports/configs/gari-dev.json`
 
 To import "image" data from GARI:
 
 1. In production: `npm run gari-image-import`
-2. In a development environment: `node src/js/images/gari-image-sync.js --optionsFile %ul-imports/configs/gari-image-sync-dev.json`
+2. In a development environment: `npm run gari-image-import -- --optionsFile %ul-imports/configs/gari-image-sync-dev.json`
 
 ### The SAI
 
@@ -94,12 +94,12 @@ The Shopping and Alerting Aid is a front-end to the Unified Listing to assist us
 needs.  To import "core" data from the SAI:
 
 1. In production: `npm run sai-import`
-2. In a development environment: `node src/js/sai/index.js --optionsFile %ul-imports/configs/sai-dev.json`
+2. In a development environment: `npm run sai-import -- --optionsFile %ul-imports/configs/sai-dev.json`
 
 To import "image" data from the SAI:
 
 1. In production: `npm run sai-image-import`
-2. In a development environment: `node src/js/images/sai-image-sync.js --optionsFile %ul-imports/configs/sai-image-sync-dev.json`
+2. In a development environment: `npm run sai-image-import -- --optionsFile %ul-imports/configs/sai-image-sync-dev.json`
 
 ### "Unifier"
 
@@ -107,4 +107,43 @@ See above for details regarding the "unifier".  To create a "unified" record for
 already associated with a "unified" record:
 
 1. In production: ```npm run unifier```
-2. In a development environment: ```node src/js/unifier/index.js --optionsFile %ul-imports/configs/unifier-dev.json```
+2. In a development environment: ```npm run unifier -- --optionsFile %ul-imports/configs/unifier-dev.json```
+
+# Curation Scripts
+
+This package includes scripts that can be used to detect and where possible clean up particular problems with imported
+data.  For details, look at the contents of the `src/js/curation` directory.
+
+## SAI
+
+This package includes scripts that make key updates to "unified" records based on data coming from the SAI:
+
+1. For each SAI record that has been flagged as `deleted` in the SAI, the unified record is updated to indicate that it has been deleted.
+2. For each SAI record that has been flagged as a "duplicate" of another ("original") record:
+    1. The associated unified record is updated to indicate that it has been deleted, and to redirect future requests to the "original" record.
+    2. All "child" records associated with a "duplicate" record are updated to be associated with the "original" record instead.
+3. For each SAI record that has an updated `name` or `description`, the associated unified record will have its `name` and `description` updated.
+
+Note that image data associated with "duplicate" records is not migrated.
+
+To run these scripts in production, use the command: ```npm run sai-curation```
+
+# Running Scripts with Custom Options
+
+The scripts in this package use the [`gpii-launcher`](https://github.com/the-t-in-rtf/gpii-launcher) package to allow
+you set options from the command-line or environment variable.  For example, let's say you want to run a "full sync"
+with a custom password.  You can do this using an argument, or an environment variable.  With an argument, you might
+use a command like:
+
+```npm run full-sync -- --password myPasswordValue```
+
+Note the `--` characters are required to help npm understand where its arguments end and where the script's arguments
+begin.
+
+Using an environment variable to set the same password, you might use a command like:
+
+```PASSWORD=myPasswordValue npm run full-sync```
+
+For more details about supported options, run any of the scripts in this package with the `--help` argument.  You can
+also create your own custom options files and use those instead of the included files.  For more details, see the
+`gpii-launcher` documentation.
