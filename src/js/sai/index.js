@@ -62,7 +62,7 @@ fluid.defaults("gpii.ul.imports.sai", {
     components: {
         downloader: {
             options: {
-                url: "{gpii.ul.imports.sai}.options.urls.sai"
+                url: "{gpii.ul.imports.sai}.options.urls.sai.records"
             }
         },
         transformer: {

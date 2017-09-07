@@ -4,11 +4,16 @@
     "gradeNames": [
       "gpii.ul.imports.sai"
     ],
-    "sources":   ["sai"],
+    "sources": [
+      "sai"
+    ],
     "username": "importer",
     "password": "password",
     "urls": {
-      "sai": "https://staging.saa.gpii.net/api/v1/products/all"
+      "sai": {
+        "records": "https://staging.ul.gpii.net/api/v1/products/all",
+        "deletes": "http://staging.ul.gpii.net/api/v1/deleted"
+      }
     }
   }
 }

@@ -1,0 +1,3 @@
+{
+  "mergeConfigs": ["%ul-imports/configs/sai-dev.json", "%ul-imports/configs/sai-deletes-base.json"]
+}

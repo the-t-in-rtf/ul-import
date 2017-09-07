@@ -20,6 +20,12 @@
           "args":     ["%apiBaseUrl/user/login", { "apiBaseUrl": "{that}.options.urls.api"}]
         }
       },
+      "merge": {
+        "expander": {
+          "funcName": "fluid.stringTemplate",
+          "args":     ["%apiBaseUrl/merge", { "apiBaseUrl": "{that}.options.urls.api"}]
+        }
+      },
       "product": {
         "expander": {
           "funcName": "fluid.stringTemplate",
