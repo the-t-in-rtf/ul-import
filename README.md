@@ -128,6 +128,10 @@ Note that image data associated with "duplicate" records is not migrated.
 
 To run these scripts in production, use the command: ```npm run sai-curation```
 
+Please note, the curation script does not directly reload the data from the SAI API.  Instead, it compares the SAI
+"source" records that have already been imported into the UL with their associated unified records.  To pick up new data,
+you will need to first run the SAI import or a full sync (see above for details on both).
+
 # Running Scripts with Custom Options
 
 The scripts in this package use the [`gpii-launcher`](https://github.com/the-t-in-rtf/gpii-launcher) package to allow

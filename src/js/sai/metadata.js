@@ -56,10 +56,11 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
     fluid.each(results.products, function (unifiedRecord) {
         var saiRecord = fluid.find(unifiedRecord.sources, function (sourceRecord) { return sourceRecord.source === "sai" ? sourceRecord : false; });
         if (saiRecord) {
-            if (saiRecord.name !== unifiedRecord.name || saiRecord.description !== unifiedRecord.description) {
+            if (saiRecord.name !== unifiedRecord.name || saiRecord.description !== unifiedRecord.description || saiRecord.status !== unifiedRecord.status) {
                 var updatedRecord = gpii.ul.imports.transforms.stripNonValues(fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true));
                 updatedRecord.name = saiRecord.name;
                 updatedRecord.description = saiRecord.description;
+                updatedRecord.status = saiRecord.status;
                 updatedRecord.updated = (new Date()).toISOString();
 
                 // TODO:  These clean up errors in legacy data and can eventually be removed.
@@ -119,7 +120,7 @@ gpii.ul.imports.sai.metadata.updateRecords = function (that, recordsToUpdate) {
                     fluid.each(body.fieldErrors, function (fieldError) {
                         var fieldPath = fieldError.dataPath.substring(1);
                         if (fieldError.keyword === "required") {
-                            fluid.log(fieldPath, " is required but was not provided...");
+                            fluid.log(fieldPath, fieldError.keyword, " is required but was not provided...");
                         }
                         else {
                             var actualValue = fluid.get(record, fieldPath);
@@ -149,7 +150,7 @@ gpii.ul.imports.sai.metadata.updateRecords = function (that, recordsToUpdate) {
             });
 
             if (updates) {
-                fluid.log("Updated " + updates + " unified records with newer titles/descriptions coming from the SAI...");
+                fluid.log("Updated " + updates + " unified records with newer metadata coming from the SAI...");
             }
             if (errors) {
                 fluid.log("There were " + errors + " errors while attempting to update records...");
