@@ -67,6 +67,18 @@
           "funcName": "fluid.stringTemplate",
           "args":     ["%couchBaseUrl/ul", { "couchBaseUrl": "{that}.options.urls.couch"}]
         }
+      },
+      "ulDbSourceView": {
+        "expander": {
+          "funcName": "fluid.stringTemplate",
+          "args":     ["%ulDb/_design/ul/_view/records_by_source", { "ulDb": "{that}.options.urls.ulDb"}]
+        }
+      },
+      "ulDbBulkUpdate": {
+        "expander": {
+          "funcName": "fluid.stringTemplate",
+          "args":     ["%ulDb/_bulk_docs", { "ulDb": "{that}.options.urls.ulDb"}]
+        }
       }
     }
   }
