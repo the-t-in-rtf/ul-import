@@ -11,11 +11,12 @@ fluid.defaults("gpii.ul.imports.launcher", {
     yargsOptions: {
         env: true,
         describe: {
-            "username":       "The username to use when adding/updating records.",
-            "password":       "The password to use when adding/updating records.",
-            "ports.api":      "The port where the UL API is available.",
-            "ports.couch":    "The port where CouchDB/PouchDB is available.",
-            "couchAuthCreds": "The auth credentials to pass as part of CouchDB URLs"
+            "username":       "The username to use when adding/updating records",
+            "password":       "The password to use when adding/updating records",
+            "ports.api":      "The port where the UL API is available",
+            "ports.couch":    "The port where CouchDB/PouchDB is available",
+            "couchAuthCreds": "The auth credentials to pass as part of CouchDB URLs",
+            "noCache":        "Pass this argument or set to a truthy value to force a download regardless of whether there is a cached copy available"
         },
         defaults: {
             "setLogging":  true,

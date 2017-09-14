@@ -11,8 +11,8 @@
     "password": "password",
     "urls": {
       "sai": {
-        "records": "https://staging.ul.gpii.net/api/v1/products/all",
-        "deletes": "http://staging.ul.gpii.net/api/v1/deleted"
+        "records": "https://ul.gpii.net/api/v1/products/all",
+        "deletes": "http://ul.gpii.net/api/v1/deleted"
       }
     }
   }

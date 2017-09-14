@@ -1,6 +1,7 @@
 /*
 
-    Look through the list of SAI records flagged for merger and merge them.
+    Look through the list of SAI records flagged for merge and merge them.  Note:  This script should be run after a
+    full sync with the SAI.
 
  */
 "use strict";
@@ -19,7 +20,34 @@ fluid.registerNamespace("gpii.ul.imports.sai.merge");
 gpii.ul.imports.sai.merge.retrieveRecords = function (that) {
     var promises = [];
     promises.push(function () { return that.deletesReader.get(); });
-    promises.push(function () { return that.saiRecordsReader.get(); });
+
+    // TODO:  This now requires a login, which means it should be a request instead of a dataSource.
+    promises.push(function () {
+        var recordReaderPromise = fluid.promise();
+        gpii.ul.imports.sai.merge.login(that).then(
+            function () {
+                var options = {
+                    jar: true,
+                    headers: {
+                        accept: "application/json"
+                    },
+                    json: true,
+                    url: that.options.urls.products + "?unified=false&limit=10000&sources=%22sai%22&status=[%22deleted%22,%22new%22,%22active%22,%22discontinued%22]"
+                };
+                request.get(options, function (error, response, body) {
+                    if (error) { recordReaderPromise.reject(error); }
+                    else if (response.statusCode !== 200) {
+                        recordReaderPromise.reject(body);
+                    }
+                    else {
+                        recordReaderPromise.resolve(body);
+                    }
+                });
+            },
+            recordReaderPromise.reject
+        );
+        return recordReaderPromise;
+    });
 
     var sequence = fluid.promise.sequence(promises);
     sequence.then(that.processSaiResults, fluid.fail);
@@ -30,19 +58,27 @@ gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
     var allSaiRecords = results[1];
 
     var uidsByNid = {};
-    fluid.each(allSaiRecords, function (row) {
-        if (row.uid && row.nid) {
-            uidsByNid[row.nid] = row.uid;
+    fluid.each(allSaiRecords.products, function (row) {
+        if (row.uid) {
+            uidsByNid[row.sid] = row.uid;
         }
     });
 
     var sourcesByTarget = {};
     fluid.each(deletes, function (row) {
         if (row.duplicate_nid) {
-            var uid = uidsByNid[row.duplicate_nid];
-            if (uid) {
-                if (!sourcesByTarget[uid]) { sourcesByTarget[uid] = [];}
-                sourcesByTarget[uid].push(row.uid);
+            var targetUid = uidsByNid[row.duplicate_nid];
+            if (targetUid) {
+                if (targetUid === row.uid) {
+                    fluid.log("Can't merge record '", targetUid, "' with itself, excluding from source list...");
+                }
+                else if (!row.uid || row.uid.length <= 0) {
+                    fluid.log("Can't merge source with empty uid, excluding from sources list...");
+                }
+                else {
+                    if (!sourcesByTarget[targetUid]) { sourcesByTarget[targetUid] = [];}
+                    sourcesByTarget[targetUid].push(row.uid);
+                }
             }
             else {
                 fluid.log("Can't work with bogus duplicate_nid '" + row.duplicate_nid + "'...");
@@ -55,14 +91,15 @@ gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
         fluid.log("No duplicate records to merge...");
     }
     else if (that.options.commit) {
-        gpii.ul.imports.sai.merge.loginAndMergeRecords(that, sourcesByTarget);
+        gpii.ul.imports.sai.merge.mergeRecords(that, sourcesByTarget);
     }
     else {
         fluid.log("Found " + recordsToUpdate + " unified records that should be merged, run with --commit to merge...");
     }
 };
 
-gpii.ul.imports.sai.merge.loginAndMergeRecords = function (that, sourcesByTarget) {
+gpii.ul.imports.sai.merge.login = function (that) {
+    var promise = fluid.promise();
     fluid.log("Logging in to UL API...");
     var options = {
         jar: true,
@@ -75,47 +112,62 @@ gpii.ul.imports.sai.merge.loginAndMergeRecords = function (that, sourcesByTarget
     request.post(that.options.urls.login, options, function (error, response, body) {
         if (error) {
             fluid.log("Login returned an error:" + error);
+            promise.reject(error);
         }
         else if (response.statusCode !== 200) {
             fluid.log("Login returned an error message:\n" + JSON.stringify(body, null, 2));
+            promise.reject(body);
         }
         else {
             fluid.log("Logged in...");
-            var promises = [];
-            fluid.each(sourcesByTarget, function (sources, target) {
-                promises.push(function () {
-                    var promise = fluid.promise();
-                    var mergeOptions = {
-                        jar: true,
-                        json: true,
-                        url: that.options.urls.merge + "?target=" + JSON.stringify(target) + "&sources=" + JSON.stringify(sources)
-                    };
-
-                    request.post(mergeOptions, function (error, response, body) {
-                        if (error) {
-                            fluid.log("Error merging record '" + target + "':", error);
-                        }
-                        else if (response.statusCode !== 200) {
-                            fluid.log("Error response merging record + '" + target + "':", body.message);
-                        }
-
-                        promise.resolve();
-                    });
-
-                    return promise;
-                });
-            });
-
-            var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
-
-            queue.then(
-                function (results) {
-                    fluid.log("Merged " + results.length + " unified records based on updates from the SAI...");
-                },
-                fluid.fail
-            );
+            promise.resolve();
         }
     });
+    return promise;
+};
+
+gpii.ul.imports.sai.merge.mergeRecords = function (that, sourcesByTarget) {
+    var promises = [];
+    fluid.each(sourcesByTarget, function (sources, target) {
+        if (sources && sources.length > 0) {
+            promises.push(function () {
+                var promise = fluid.promise();
+                var mergeOptions = {
+                    jar: true,
+                    json: true,
+                    url: that.options.urls.merge + "?target=" + JSON.stringify(target) + "&sources=" + JSON.stringify(sources)
+                };
+
+                request.post(mergeOptions, function (error, response, body) {
+                    if (error) {
+                        fluid.log("Error merging record '" + target + "':", error);
+                    }
+                    else if (response.statusCode !== 200) {
+                        fluid.log("Error response merging record + '" + target + "' with sources '" + JSON .stringify(sources) + "':", body.message);
+                        fluid.each(body.fieldErrors, function (fieldError) {
+                            fluid.log("\t- ", fieldError.message);
+                        });
+                    }
+
+                    promise.resolve();
+                });
+
+                return promise;
+            });
+        }
+        else {
+            fluid.log("Skipping empty source set, will not attempt to merge...");
+        }
+    });
+
+    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
+
+    queue.then(
+        function (results) {
+            fluid.log("Merged " + results.length + " unified records based on updates from the SAI...");
+        },
+        fluid.fail
+    );
 };
 
 fluid.defaults("gpii.ul.imports.sai.merge", {

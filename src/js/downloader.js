@@ -11,7 +11,10 @@ var os    = require("os");
 var path  = require("path");
 
 gpii.ul.imports.downloader.retrieveData = function (that) {
-    if (!fs.existsSync(that.options.cacheFile) || that.options.forceLoad) {
+    if (!fs.existsSync(that.options.cacheFile) || that.options.noCache) {
+        if (that.options.noCache) {
+            fluid.log("Cache disabled, forcing a refresh...");
+        }
         if (that.options.url) {
             request(that.options.url, that.saveData);
         }
@@ -35,7 +38,7 @@ fluid.defaults("gpii.ul.imports.downloader", {
     gradeNames: ["fluid.component"],
     url:         undefined,
     cacheFile:   cacheFile,
-    forceLoad:   false,
+    noCache:     false,
     events: {
         onCacheReady: null
     },

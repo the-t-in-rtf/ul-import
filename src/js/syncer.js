@@ -78,7 +78,9 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
     // Iterate through each record
     fluid.each(that.model.data, function (record) {
         var combinedRecord = fluid.copy(record);
-        combinedRecord.status = "new";
+        if (!combinedRecord.status) {
+            combinedRecord.status = "new";
+        }
 
         // Confirm whether we have existing data or not
         var key = record.source + ":" + record.sid;
@@ -95,15 +97,20 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
                 combinedRecord.uid = existingRecord.uid;
             }
 
-            // If the record is not identical to what we have, perform an update.
-            if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, ["status", "updated"], true)) {
-                var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
-                checkTasks.push(recordUpdatePromise);
-            }
-            // If the record is identical, skip it.
-            else {
-                that.skippedRecords.push(combinedRecord);
-            }
+            // TODO: Review this, which was disabled because records seem to be mistakenly screened out as not having changed.
+            var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
+            checkTasks.push(recordUpdatePromise);
+
+            // TODO: Review this, as we can no longer exclude "status", which is managed elsewhere in particular cases (the SAI).
+            // // If the record is not identical to what we have, perform an update.
+            // if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, ["status", "updated"], true)) {
+            //     var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
+            //     checkTasks.push(recordUpdatePromise);
+            // }
+            // // If the record is identical, skip it.
+            // else {
+            //     that.skippedRecords.push(combinedRecord);
+            // }
         }
     });
 

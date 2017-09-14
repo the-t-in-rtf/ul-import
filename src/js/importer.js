@@ -20,12 +20,15 @@ fluid.registerNamespace("gpii.ul.imports.importer");
 // Check to see if we have cached data.
 gpii.ul.imports.importer.checkCache = function (that) {
     // If so, require it and continue.
-    if (gpii.ul.imports.cacher.cacheFileExists(that)) {
+    if (gpii.ul.imports.cacher.cacheFileExists(that) && !that.options.noCache) {
         var cachedData = gpii.ul.imports.cacher.loadFromCache(that);
         that.applier.change("rawData", cachedData);
     }
     // Otherwise, download it.
     else {
+        if (that.options.noCache) {
+            fluid.log("Disabled loading from cache, vendor content will always be downloaded...");
+        }
         var promise = that.downloader.get();
         promise.then(that.saveData, fluid.fail);
     }
@@ -66,6 +69,7 @@ fluid.defaults("gpii.ul.imports.importer", {
         downloader: {
             type: "kettle.dataSource.URL",
             options: {
+                noCache: "{gpii.ul.imports.importer}.options.noCache",
                 url: "{gpii.ul.imports.importer}.options.urls.sai"
             }
         },
