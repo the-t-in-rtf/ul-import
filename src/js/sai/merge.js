@@ -14,6 +14,7 @@ fluid.require("%ul-imports");
 
 require("../launcher");
 require("../concurrent-promise-queue");
+require("../login");
 
 fluid.registerNamespace("gpii.ul.imports.sai.merge");
 
@@ -24,7 +25,7 @@ gpii.ul.imports.sai.merge.retrieveRecords = function (that) {
     // TODO:  This now requires a login, which means it should be a request instead of a dataSource.
     promises.push(function () {
         var recordReaderPromise = fluid.promise();
-        gpii.ul.imports.sai.merge.login(that).then(
+        gpii.ul.imports.login(that).then(
             function () {
                 var options = {
                     jar: true,
@@ -96,34 +97,6 @@ gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
     else {
         fluid.log("Found " + recordsToUpdate + " unified records that should be merged, run with --commit to merge...");
     }
-};
-
-gpii.ul.imports.sai.merge.login = function (that) {
-    var promise = fluid.promise();
-    fluid.log("Logging in to UL API...");
-    var options = {
-        jar: true,
-        json: true,
-        body: {
-            username: that.options.username,
-            password: that.options.password
-        }
-    };
-    request.post(that.options.urls.login, options, function (error, response, body) {
-        if (error) {
-            fluid.log("Login returned an error:" + error);
-            promise.reject(error);
-        }
-        else if (response.statusCode !== 200) {
-            fluid.log("Login returned an error message:\n" + JSON.stringify(body, null, 2));
-            promise.reject(body);
-        }
-        else {
-            fluid.log("Logged in...");
-            promise.resolve();
-        }
-    });
-    return promise;
 };
 
 gpii.ul.imports.sai.merge.mergeRecords = function (that, sourcesByTarget) {

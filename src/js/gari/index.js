@@ -32,12 +32,26 @@ require("../downloader");
 require("../syncer");
 require("./transformer");
 
+gpii.ul.imports.gari.displayDeprecationWarning = function (that) {
+    if (!that.options.overrideDeprecationWarning) {
+        fluid.fail("This script has been disabled for the time being.  Run with the --overrideDeprecationWarning option to run it anyway.");
+    }
+};
+
 fluid.defaults("gpii.ul.imports.gari", {
     gradeNames: ["gpii.ul.imports.importer"],
     cacheFilename: "gari.xml",
     model: {
         rawData:       "{transformer}.model.xml",
         processedData: "{transformer}.model.remappedJson"
+    },
+    overrideDeprecationWarning: false,
+    listeners: {
+        "onCreate.displayDeprecationWarning": {
+            priority: "first",
+            funcName: "gpii.ul.imports.gari.displayDeprecationWarning",
+            args:     ["{that}"]
+        }
     },
     components: {
         downloader: {
@@ -61,11 +75,12 @@ fluid.defaults("gpii.ul.imports.gari.launcher", {
     optionsFile: "%ul-imports/configs/gari-prod.json",
     "yargsOptions": {
         "describe": {
-            "username":   "The username to use when writing records to the UL.",
-            "password":   "The password to use when writing records to the UL.",
-            "source":     "The UL source to sync records with.",
+            "username": "The username to use when writing records to the UL.",
+            "password": "The password to use when writing records to the UL.",
+            "source": "The UL source to sync records with.",
             "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
-            "urls.gari":   "The URL to use when retrieving records from GARI."
+            "urls.gari": "The URL to use when retrieving records from GARI.",
+            "overrideDeprecationWarning": "Run this script, even though it's deprecated.  Set to `false` by default."
         },
         "coerce": {
             "setLogging": JSON.parse
