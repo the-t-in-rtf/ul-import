@@ -16,7 +16,8 @@ fluid.defaults("gpii.ul.imports.launcher", {
             "ports.api":      "The port where the UL API is available",
             "ports.couch":    "The port where CouchDB/PouchDB is available",
             "couchAuthCreds": "The auth credentials to pass as part of CouchDB URLs",
-            "noCache":        "Pass this argument or set to a truthy value to force a download regardless of whether there is a cached copy available"
+            "noCache":        "Pass this argument to force a download regardless of whether there is a cached copy available.",
+            "prune":          "Pass this argument to flag cached copies of records not found in a given source for deletion."
         },
         defaults: {
             "setLogging":  true,

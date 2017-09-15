@@ -71,11 +71,11 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
 };
 
 gpii.ul.imports.syncer.syncViaREST = function (that) {
-    var checkTasks = [];
+    var updateTasks = [];
 
     fluid.log("Syncing ", that.model.data.length, " records via the UL REST API...");
 
-    // Iterate through each record
+    // Iterate through each record we received from the source and update as needed.
     fluid.each(that.model.data, function (record) {
         var combinedRecord = fluid.copy(record);
         if (!combinedRecord.status) {
@@ -89,7 +89,7 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
         //  If there is no existing record, create one.
         if (!existingRecord) {
             var newRecordPromise = that.getRecordUpdatePromise(combinedRecord);
-            checkTasks.push(newRecordPromise);
+            updateTasks.push(newRecordPromise);
         }
         else {
             // Make sure that we include a uid, if this has been set in the existing record.
@@ -99,13 +99,13 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
 
             // TODO: Review this, which was disabled because records seem to be mistakenly screened out as not having changed.
             var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
-            checkTasks.push(recordUpdatePromise);
+            updateTasks.push(recordUpdatePromise);
 
             // TODO: Review this, as we can no longer exclude "status", which is managed elsewhere in particular cases (the SAI).
             // // If the record is not identical to what we have, perform an update.
             // if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, ["status", "updated"], true)) {
             //     var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
-            //     checkTasks.push(recordUpdatePromise);
+            //     updateTasks.push(recordUpdatePromise);
             // }
             // // If the record is identical, skip it.
             // else {
@@ -114,16 +114,41 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
         }
     });
 
-    if (checkTasks.length === 0) {
+    if (that.options.prune) {
+        var incomingRecordsByKey = {};
+        fluid.each(that.model.data, function (incomingRecord) {
+            var key = incomingRecord.source + ":" + incomingRecord.sid;
+            incomingRecordsByKey[key] = incomingRecord;
+        });
+        var recordsToPrune = [];
+        // For whatever reason, that.existingRecords is a map that appears to be an array at this point.  This workaround ensures we can work with it still.
+        fluid.each(Object.keys(that.existingRecords), function (key) {
+            if (!incomingRecordsByKey[key]) {
+                var existingRecord = that.existingRecords[key];
+                if (existingRecord.status !== "deleted") {
+                    var prunedRecord = fluid.copy(existingRecord);
+                    prunedRecord.status = "deleted";
+                    prunedRecord.updated = (new Date()).toISOString();
+                    var prunedRecordPromise = that.getRecordUpdatePromise(prunedRecord);
+                    updateTasks.push(prunedRecordPromise);
+                    recordsToPrune.push(prunedRecord);
+                }
+            }
+        });
+
+        fluid.log("Updating ", recordsToPrune.length, " cached records that need to be pruned..");
+    }
+
+    if (updateTasks.length === 0) {
         fluid.log("No records to sync (or all were skipped)...");
         that.events.onSyncComplete.fire(that);
     }
     else {
         // Process the stack of tasks
-        var queue = gpii.ul.imports.promiseQueue.createQueue(checkTasks, that.options.maxRequests);
+        var queue = gpii.ul.imports.promiseQueue.createQueue(updateTasks, that.options.maxRequests);
 
         queue.then(function () {
-            fluid.log("Finished synchronizing " + checkTasks.length + " records...");
+            fluid.log("Finished synchronizing " + updateTasks.length + " records...");
 
             // Fire an event so that we can chain in the "unifier" and other services
             that.events.onSyncComplete.fire(that);
@@ -200,6 +225,7 @@ fluid.defaults("gpii.ul.imports.syncer", {
         failedRecords:   true,
         skippedRecords:  false
     },
+    prune: false,
     displayReport: true,
     username: "admin",
     password: "admin",

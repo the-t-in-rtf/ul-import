@@ -30,7 +30,7 @@ gpii.ul.imports.gari.deleteAll.getProducts = function (that) {
         headers: {
             "accept": "application/json"
         },
-        url: that.options.urls.products + "?sources=%22GARI%22&limit=100000&status=[%22deleted%22,%22new%22,%22active%22,%22discontinued%22]"
+        url: that.options.urls.products + "?sources=[%22GARI%22,%22sai%22]&limit=100000&status=[%22deleted%22,%22new%22,%22active%22,%22discontinued%22]"
     };
     request.post(options, that.processProductsResults);
 };
@@ -56,12 +56,12 @@ gpii.ul.imports.gari.deleteAll.processProductsResults = function (that, error, r
                 originalRecord.status !== "deleted"
                 // Records that have a source other than "sai" or "GARI"
                 && !otherSourceRecord
-                // Records that have no GARI data
-                && gariSourceRecord
+                // There must be one or both source records from the SAI/GARI to continue
+                && (gariSourceRecord || saiSourceRecord)
                 // Records whose GARI record has not been deleted (avoids manual edit)
-                && gariSourceRecord.status === "deleted"
+                && (!gariSourceRecord || gariSourceRecord.status === "deleted")
                 // Records whose SAI record has not be deleted (avoids records intentionally kept in the SAI).
-                && (!saiSourceRecord || saiSourceRecord !== "deleted")
+                && (!saiSourceRecord || saiSourceRecord === "deleted")
             ) {
                 var updatedRecord = fluid.filterKeys(originalRecord, that.options.keysToStrip, true);
                 updatedRecord.updated = (new Date()).toISOString();
