@@ -97,47 +97,54 @@ gpii.ul.imports.curation.invalidRecords.handleRecordLookup = function (that, err
         }
 
         if (that.options.commit) {
-            // Save the automatic fixes to the "fixable" records.
-            var promises = [];
-            fluid.each(that.fixableRecords, function (fixableRecord) {
-                promises.push(function () {
-                    var promise = fluid.promise();
-                    var fixRequestOptions = {
-                        url: that.options.urls.product,
-                        body: fixableRecord,
-                        json: true,
-                        jar: true
-                    };
-                    request.put(fixRequestOptions, function (error, response, body) {
-                        if (error) {
-                            fluid.log("Error saving record:", error);
-                            that.errorRecords.push(fixableRecord);
-                        }
-                        else if (response.statusCode !== 200) {
-                            fluid.log("Error response saving record", body);
-                            that.errorRecords.push(fixableRecord);
-                        }
+            if (that.fixableRecords.length) {
+                fluid.log("Saving changes to ", that.fixableRecords.length, " records that can be fixed automatically...");
 
-                        promise.resolve();
+                // Save the automatic fixes to the "fixable" records.
+                var promises = [];
+                fluid.each(that.fixableRecords, function (fixableRecord) {
+                    promises.push(function () {
+                        var promise = fluid.promise();
+                        var fixRequestOptions = {
+                            url: that.options.urls.product,
+                            body: fixableRecord,
+                            json: true,
+                            jar: true
+                        };
+                        request.put(fixRequestOptions, function (error, response, body) {
+                            if (error) {
+                                fluid.log("Error saving record:", error);
+                                that.errorRecords.push(fixableRecord);
+                            }
+                            else if (response.statusCode !== 200) {
+                                fluid.log("Error response saving record", body);
+                                that.errorRecords.push(fixableRecord);
+                            }
+
+                            promise.resolve();
+                        });
+                        return promise;
                     });
-                    return promise;
                 });
-            });
-            var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
-            queue.then(
-                function (results) {
-                    if (that.errorRecords.length) {
-                        fluid.log(that.errorRecords.length, " errors updating records...");
-                        var errorRecordsPath = gpii.ul.imports.curation.invalidRecords.saveOutput(that, "error-records", that.errorRecords);
-                        fluid.log("Saved records that resulted in update errors to '", errorRecordsPath, "'...");
-                    }
-                    fluid.log("Saved changes to ", results.length - that.errorRecords.length, " records...");
-                },
-                fluid.fail
-            );
+                var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
+                queue.then(
+                    function (results) {
+                        if (that.errorRecords.length) {
+                            fluid.log(that.errorRecords.length, " errors updating records...");
+                            var errorRecordsPath = gpii.ul.imports.curation.invalidRecords.saveOutput(that, "error-records", that.errorRecords);
+                            fluid.log("Saved records that resulted in update errors to '", errorRecordsPath, "'...");
+                        }
+                        fluid.log("Saved changes to ", results.length - that.errorRecords.length, " records...");
+                    },
+                    fluid.fail
+                );
+            }
+
         }
         else {
-            fluid.log("Run with --commit to automatically update 'fixable' records...");
+            if (that.fixableRecords.length) {
+                fluid.log("Automatic fixes for invalid records are available.  Run with --commit to automatically update 'fixable' records...");
+            }
         }
     }
 };
