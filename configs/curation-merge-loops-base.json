@@ -1,0 +1,16 @@
+{
+  "options": {
+    "gradeNames": ["gpii.ul.imports.curation.mergeLoops"],
+    "username": "importer",
+    "password": "password",
+    "urls": {
+        "mergedView": {
+            "expander": {
+                "funcName": "fluid.stringTemplate",
+                "args":     ["%ulDbBaseUrl/_design/ul/_view/merged", { "ulDbBaseUrl": "{that}.options.urls.ulDb"}]
+            }
+        }
+    }
+  },
+  "mergeConfigs": ["%ul-imports/configs/curation-base.json"]
+}
