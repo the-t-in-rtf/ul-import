@@ -217,7 +217,7 @@ gpii.ul.imports.syncer.report = function (that) {
 
 fluid.defaults("gpii.ul.imports.syncer", {
     gradeNames:    ["fluid.modelComponent"],
-    maxRequests:   100,
+    maxRequests:   50,
     saveRecords: {
         existingRecords: false,
         createdRecords:  true,
