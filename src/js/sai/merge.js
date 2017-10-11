@@ -22,7 +22,6 @@ gpii.ul.imports.sai.merge.retrieveRecords = function (that) {
     var promises = [];
     promises.push(function () { return that.deletesReader.get(); });
 
-    // TODO:  This now requires a login, which means it should be a request instead of a dataSource.
     promises.push(function () {
         var recordReaderPromise = fluid.promise();
         gpii.ul.imports.login(that).then(
@@ -33,7 +32,7 @@ gpii.ul.imports.sai.merge.retrieveRecords = function (that) {
                         accept: "application/json"
                     },
                     json: true,
-                    url: that.options.urls.products + "?unified=false&limit=10000&sources=%22sai%22&status=[%22deleted%22,%22new%22,%22active%22,%22discontinued%22]"
+                    url: that.options.urls.products + "?unified=false&limit=10000&sources=[%22sai%22,%22unified%22]&status=[%22deleted%22,%22new%22,%22active%22,%22discontinued%22]"
                 };
                 request.get(options, function (error, response, body) {
                     if (error) { recordReaderPromise.reject(error); }
@@ -56,10 +55,12 @@ gpii.ul.imports.sai.merge.retrieveRecords = function (that) {
 
 gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
     var deletes = results[0];
-    var allSaiRecords = results[1];
+    var allSaiRecords  = results[1].products.filter(function (record) { return record.source === "sai"; });
+    var unifiedRecords = results[1].products.filter(function (record) { return record.source === "unified"; });
+    var alreadyMerged  = [];
 
     var uidsByNid = {};
-    fluid.each(allSaiRecords.products, function (row) {
+    fluid.each(allSaiRecords, function (row) {
         if (row.uid) {
             uidsByNid[row.sid] = row.uid;
         }
@@ -69,12 +70,18 @@ gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
     fluid.each(deletes, function (row) {
         if (row.duplicate_nid) {
             var targetUid = uidsByNid[row.duplicate_nid];
+            var unifiedRecord = fluid.find(unifiedRecords, function (record) {
+                if (record.sid === row.uid) { return record; }
+            });
             if (targetUid) {
                 if (targetUid === row.uid) {
                     fluid.log("Can't merge record '", targetUid, "' with itself, excluding from source list...");
                 }
                 else if (!row.uid || row.uid.length <= 0) {
                     fluid.log("Can't merge source with empty uid, excluding from sources list...");
+                }
+                else if (unifiedRecord && unifiedRecord.status === "deleted" && unifiedRecord.uid === targetUid) {
+                    alreadyMerged.push(unifiedRecord);
                 }
                 else {
                     if (!sourcesByTarget[targetUid]) { sourcesByTarget[targetUid] = [];}
@@ -87,15 +94,19 @@ gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
         }
     });
 
+    fluid.log(alreadyMerged.length, " records were already previously merged...");
     var recordsToUpdate = Object.keys(sourcesByTarget).length;
     if (!recordsToUpdate) {
-        fluid.log("No duplicate records to merge...");
-    }
-    else if (that.options.commit) {
-        gpii.ul.imports.sai.merge.mergeRecords(that, sourcesByTarget);
+        fluid.log("No duplicate records need to be merged...");
     }
     else {
-        fluid.log("Found " + recordsToUpdate + " unified records that should be merged, run with --commit to merge...");
+        fluid.log(recordsToUpdate, " unified records need to be merged...");
+        if (that.options.commit) {
+            gpii.ul.imports.sai.merge.mergeRecords(that, sourcesByTarget);
+        }
+        else {
+            fluid.log("Run with --commit to merge...");
+        }
     }
 };
 
