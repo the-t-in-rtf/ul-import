@@ -18,19 +18,20 @@ require("../concurrent-promise-queue");
 fluid.registerNamespace("gpii.ul.imports.sai.deletes");
 
 gpii.ul.imports.sai.deletes.retrieveRecords = function (that) {
-    // TODO: Retrieve the list of unified records so that we can report on how many to be changed and only
-    // change those that are not already deleted.
     var promises = [];
+    var loginPromise = gpii.ul.imports.login(that);
+    promises.push(loginPromise);
     promises.push(that.productReader.get());
 
     promises.push(function () {
         var unifiedReadPromise = fluid.promise();
         var unifiedReadOptions = {
+            jar: true,
             json: true,
             headers: {
                 "accept": "application/json"
             },
-            url: that.options.urls.products + "?sources=[%22unified%22]&limit=100000&status=[%22deleted%22]&unified=false"
+            url: that.options.urls.products + "?sources=[%22unified%22,%22sai%22]&limit=100000&status=[%22deleted%22]&unified=false"
         };
         request.get(unifiedReadOptions, function (error, response, body) {
             if (error) {
@@ -50,74 +51,92 @@ gpii.ul.imports.sai.deletes.retrieveRecords = function (that) {
 };
 
 gpii.ul.imports.sai.deletes.processSaiResults = function (that, results) {
-    var recordsToUpdate = {};
-    var saiRecordsFlaggedForDeletion = results[0];
-    var deletedUnifiedRecords = results[1].products;
-    var alreadyDeleted = [];
+    var unifiedRecordKeysToUpdate = {};
+    var saiRecordsToUpdate = [];
+    var saiRecordsFlaggedForDeletion = results[1];
+    var deletedUnifiedRecords = results[2].products;
+    var alreadyDeletedUnifiedRecords = [];
+    var alreadyDeletedSaiRecords = [];
     fluid.each(saiRecordsFlaggedForDeletion, function (saiRecord) {
-        var alreadyDeletedRecord = fluid.find(deletedUnifiedRecords, function (deletedUnifiedRecord) {
-            if (deletedUnifiedRecord.sid === saiRecord.uid) {
-                return deletedUnifiedRecord;
+        var deletedUnifiedRecord = fluid.find(deletedUnifiedRecords, function (deletedRecord) {
+            if (deletedRecord.source === "unified" && deletedRecord.sid === saiRecord.uid) {
+                return deletedRecord;
             }
         });
-        if (alreadyDeletedRecord) {
-            alreadyDeleted.push(alreadyDeletedRecord);
+        if (deletedUnifiedRecord) {
+            alreadyDeletedUnifiedRecords.push(deletedUnifiedRecord);
         }
         else {
-            recordsToUpdate[saiRecord.uid] = true;
+            unifiedRecordKeysToUpdate[saiRecord.uid] = true;
+        }
+        var deletedSaiRecord = fluid.find(deletedUnifiedRecords, function (deletedRecord) {
+            if (deletedRecord.source === "sai" && deletedRecord.sid === saiRecord.nid) {
+                return deletedRecord;
+            }
+        });
+        if (deletedSaiRecord) {
+            alreadyDeletedSaiRecords.push(deletedSaiRecord);
+        }
+        else {
+            saiRecordsToUpdate.push(deletedSaiRecord);
         }
     });
 
-    var distinctUidsToDelete = Object.keys(recordsToUpdate);
+    var unifiedRecordUidsToUpdate = Object.keys(unifiedRecordKeysToUpdate);
 
-    fluid.log("Found " + alreadyDeleted.length + " unified records that have already been flagged as deleted...");
-    fluid.log("Found " + distinctUidsToDelete.length + " unified records that need to be flagged as deleted...");
+    fluid.log("Found " + alreadyDeletedUnifiedRecords.length + " unified records that have already been flagged as deleted...");
+    fluid.log("Found " + unifiedRecordUidsToUpdate.length + " unified records that need to be flagged as deleted...");
+    fluid.log("Found " + alreadyDeletedSaiRecords.length + " SAI records that have already been flagged as deleted...");
+    fluid.log("Found " + saiRecordsToUpdate.length + " SAI records that need to be flagges as deleted...");
 
-    if (distinctUidsToDelete.length) {
+    if (unifiedRecordUidsToUpdate.length || saiRecordsToUpdate.length) {
         if (that.options.commit) {
-            gpii.ul.imports.sai.deletes.loginAndDeleteRecords(that, distinctUidsToDelete);
+            var unifiedRecordsToUpdate = fluid.transform(unifiedRecordUidsToUpdate, function (uid) { return { sid: uid, source: "unified" }; });
+            var combinedRecordsToUpdate = saiRecordsToUpdate.concat(unifiedRecordsToUpdate);
+            gpii.ul.imports.sai.deletes.loginAndDeleteRecords(that, combinedRecordsToUpdate);
         }
         else {
-            fluid.log("Run with --commit to delete these records...");
+            fluid.log("Run with --commit to flag unified records as deleted...");
         }
     }
+
 };
 
-gpii.ul.imports.sai.deletes.loginAndDeleteRecords = function (that, distinctUids) {
-    gpii.ul.imports.login(that).then(function () {
-        var promises = fluid.transform(distinctUids, function (uid) {
-            return function () {
-                var promise = fluid.promise();
-                var deleteOptions = {
-                    jar: true,
-                    json: true,
-                    url: that.options.urls.product + "/unified/" + uid
-                };
-
-                request.del(deleteOptions, function (error, response, body) {
-                    if (error) {
-                        fluid.log("Error deleting record '" + uid + "':", error);
-                    }
-                    else if (response.statusCode !== 200) {
-                        fluid.log("Error response deleting record + '" + uid + "':", body.message);
-                    }
-
-                    promise.resolve(body);
-                });
-
-                return promise;
+gpii.ul.imports.sai.deletes.loginAndDeleteRecords = function (that, recordsToUpdate) {
+    var promises = fluid.transform(recordsToUpdate, function (recordToUpdate) {
+        return function () {
+            var promise = fluid.promise();
+            var deleteOptions = {
+                jar: true,
+                json: true,
+                url: that.options.urls.product + "/" + recordToUpdate.source + "/" + recordToUpdate.sid
             };
-        });
 
-        var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
+            request.del(deleteOptions, function (error, response, body) {
+                if (error) {
+                    fluid.log("Error deleting ", recordToUpdate.source, " record '",  recordToUpdate.sid, "':", error);
+                }
+                else if (response.statusCode !== 200) {
+                    fluid.log("Error response deleting ", recordToUpdate.source, " record '", recordToUpdate.sid, "':", body.message);
+                }
 
-        queue.then(
-            function (results) {
-                fluid.log("Updated " + results.length + " unified records flagged as deleted in the SAI...");
-            },
-            fluid.fail
-        );
+                promise.resolve(body);
+            });
+
+            return promise;
+        };
     });
+
+    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
+
+    queue.then(
+        function (results) {
+            var savedRecords = results.filter(function (result) { return !result.isError;});
+            var errors = results.filter(function (result) { return result.isError;});
+            fluid.log("Updated", savedRecords.length, " records with ", errors, " errors...");
+        },
+        fluid.fail
+    );
 };
 
 fluid.defaults("gpii.ul.imports.sai.deletes", {
