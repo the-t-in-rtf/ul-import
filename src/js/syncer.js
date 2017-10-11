@@ -78,9 +78,6 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
     // Iterate through each record we received from the source and update as needed.
     fluid.each(that.model.data, function (record) {
         var combinedRecord = fluid.copy(record);
-        if (!combinedRecord.status) {
-            combinedRecord.status = "new";
-        }
 
         // Confirm whether we have existing data or not
         var key = record.source + ":" + record.sid;
@@ -88,29 +85,33 @@ gpii.ul.imports.syncer.syncViaREST = function (that) {
 
         //  If there is no existing record, create one.
         if (!existingRecord) {
+            if (!combinedRecord.status) {
+                combinedRecord.status = "new";
+            }
             var newRecordPromise = that.getRecordUpdatePromise(combinedRecord);
             updateTasks.push(newRecordPromise);
         }
         else {
-            // Make sure that we include a uid, if this has been set in the existing record.
-            if (existingRecord.uid) {
-                combinedRecord.uid = existingRecord.uid;
+            // Some required fields may be managed within the UL if they can't be derived from the source record...
+            fluid.each(that.options.fieldsToPreserve, function (field) {
+                if (!combinedRecord[field]) {
+                    combinedRecord[field] = existingRecord[field];
+                }
+            });
+
+            // // TODO: Review this, which was disabled because records seem to be mistakenly screened out as not having changed.
+            // var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
+            // updateTasks.push(recordUpdatePromise);
+
+            // If the record is not identical to what we have, perform an update.
+            if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, that.options.fieldsNotToCompare, true)) {
+                var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
+                updateTasks.push(recordUpdatePromise);
             }
-
-            // TODO: Review this, which was disabled because records seem to be mistakenly screened out as not having changed.
-            var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
-            updateTasks.push(recordUpdatePromise);
-
-            // TODO: Review this, as we can no longer exclude "status", which is managed elsewhere in particular cases (the SAI).
-            // // If the record is not identical to what we have, perform an update.
-            // if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, ["status", "updated"], true)) {
-            //     var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
-            //     updateTasks.push(recordUpdatePromise);
-            // }
-            // // If the record is identical, skip it.
-            // else {
-            //     that.skippedRecords.push(combinedRecord);
-            // }
+            // If the record is identical, skip it.
+            else {
+                that.skippedRecords.push(combinedRecord);
+            }
         }
     });
 
@@ -225,6 +226,8 @@ fluid.defaults("gpii.ul.imports.syncer", {
         failedRecords:   true,
         skippedRecords:  false
     },
+    fieldsToPreserve: ["status", "uid"],
+    fieldsNotToCompare: ["updated"],
     prune: false,
     displayReport: true,
     username: "admin",

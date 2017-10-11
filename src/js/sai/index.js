@@ -81,7 +81,6 @@ fluid.defaults("gpii.ul.imports.sai", {
                             values: [ "body", "title" ]
                         }
                     },
-                    "status": "ul_status",
                     "source": { literalValue: "sai" },
                     "sid": "nid",
                     "manufacturer": {

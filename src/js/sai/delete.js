@@ -52,13 +52,13 @@ gpii.ul.imports.sai.deletes.retrieveRecords = function (that) {
 
 gpii.ul.imports.sai.deletes.processSaiResults = function (that, results) {
     var unifiedRecordKeysToUpdate = {};
-    var saiRecordsToUpdate = [];
+    var saiNidsToUpdate = [];
     var saiRecordsFlaggedForDeletion = results[1];
-    var deletedUnifiedRecords = results[2].products;
+    var deletedRecords = results[2].products;
     var alreadyDeletedUnifiedRecords = [];
     var alreadyDeletedSaiRecords = [];
     fluid.each(saiRecordsFlaggedForDeletion, function (saiRecord) {
-        var deletedUnifiedRecord = fluid.find(deletedUnifiedRecords, function (deletedRecord) {
+        var deletedUnifiedRecord = fluid.find(deletedRecords, function (deletedRecord) {
             if (deletedRecord.source === "unified" && deletedRecord.sid === saiRecord.uid) {
                 return deletedRecord;
             }
@@ -69,16 +69,20 @@ gpii.ul.imports.sai.deletes.processSaiResults = function (that, results) {
         else {
             unifiedRecordKeysToUpdate[saiRecord.uid] = true;
         }
-        var deletedSaiRecord = fluid.find(deletedUnifiedRecords, function (deletedRecord) {
-            if (deletedRecord.source === "sai" && deletedRecord.sid === saiRecord.nid) {
-                return deletedRecord;
+
+        // We also need to delete an associated duplicate SAI record.
+        if (saiRecord.duplicate_nid) {
+            var deletedSaiRecord = fluid.find(deletedRecords, function (deletedRecord) {
+                if (deletedRecord.source === "sai" && deletedRecord.sid === saiRecord.duplicate_nid) {
+                    return deletedRecord;
+                }
+            });
+            if (deletedSaiRecord) {
+                alreadyDeletedSaiRecords.push(deletedSaiRecord);
             }
-        });
-        if (deletedSaiRecord) {
-            alreadyDeletedSaiRecords.push(deletedSaiRecord);
-        }
-        else {
-            saiRecordsToUpdate.push(deletedSaiRecord);
+            else {
+                saiNidsToUpdate.push(saiRecord.duplicate_nid);
+            }
         }
     });
 
@@ -87,10 +91,11 @@ gpii.ul.imports.sai.deletes.processSaiResults = function (that, results) {
     fluid.log("Found " + alreadyDeletedUnifiedRecords.length + " unified records that have already been flagged as deleted...");
     fluid.log("Found " + unifiedRecordUidsToUpdate.length + " unified records that need to be flagged as deleted...");
     fluid.log("Found " + alreadyDeletedSaiRecords.length + " SAI records that have already been flagged as deleted...");
-    fluid.log("Found " + saiRecordsToUpdate.length + " SAI records that need to be flagged as deleted...");
+    fluid.log("Found " + saiNidsToUpdate.length + " SAI records that need to be flagged as deleted...");
 
-    if (unifiedRecordUidsToUpdate.length || saiRecordsToUpdate.length) {
+    if (unifiedRecordUidsToUpdate.length || saiNidsToUpdate.length) {
         if (that.options.commit) {
+            var saiRecordsToUpdate = fluid.transform(saiNidsToUpdate, function (nid) { return { sid: nid, source: "sai"}; });
             var unifiedRecordsToUpdate = fluid.transform(unifiedRecordUidsToUpdate, function (uid) { return { sid: uid, source: "unified" }; });
             var combinedRecordsToUpdate = saiRecordsToUpdate.concat(unifiedRecordsToUpdate);
             gpii.ul.imports.sai.deletes.loginAndDeleteRecords(that, combinedRecordsToUpdate);
