@@ -87,7 +87,7 @@ gpii.ul.imports.sai.deletes.processSaiResults = function (that, results) {
     fluid.log("Found " + alreadyDeletedUnifiedRecords.length + " unified records that have already been flagged as deleted...");
     fluid.log("Found " + unifiedRecordUidsToUpdate.length + " unified records that need to be flagged as deleted...");
     fluid.log("Found " + alreadyDeletedSaiRecords.length + " SAI records that have already been flagged as deleted...");
-    fluid.log("Found " + saiRecordsToUpdate.length + " SAI records that need to be flagges as deleted...");
+    fluid.log("Found " + saiRecordsToUpdate.length + " SAI records that need to be flagged as deleted...");
 
     if (unifiedRecordUidsToUpdate.length || saiRecordsToUpdate.length) {
         if (that.options.commit) {
@@ -133,7 +133,7 @@ gpii.ul.imports.sai.deletes.loginAndDeleteRecords = function (that, recordsToUpd
         function (results) {
             var savedRecords = results.filter(function (result) { return !result.isError;});
             var errors = results.filter(function (result) { return result.isError;});
-            fluid.log("Updated", savedRecords.length, " records with ", errors, " errors...");
+            fluid.log("Updated ", savedRecords.length, " records with ", errors.length, " errors...");
         },
         fluid.fail
     );
