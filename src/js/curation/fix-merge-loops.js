@@ -115,7 +115,6 @@ fluid.defaults("gpii.ul.imports.curation.mergeLoops.launcher", {
     optionsFile: "%ul-imports/configs/curation-merge-loops-prod.json",
     "yargsOptions": {
         "describe": {
-            "outputPath": "The full path to save the output to.   By default, a file named stale-source-urls.json is saved to the operating system's temporary directory.",
             "commit": "Whether to fix problems detected.  Set to `false` by default."
         }
     }
