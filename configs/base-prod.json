@@ -68,6 +68,12 @@
           "args":     ["%couchBaseUrl/ul", { "couchBaseUrl": "{that}.options.urls.couch"}]
         }
       },
+      "ulDbUidView": {
+        "expander": {
+          "funcName": "fluid.stringTemplate",
+          "args":     ["%ulDb/_design/ul/_view/records_by_uid", { "ulDb": "{that}.options.urls.ulDb"}]
+        }
+      },
       "ulDbSourceView": {
         "expander": {
           "funcName": "fluid.stringTemplate",
