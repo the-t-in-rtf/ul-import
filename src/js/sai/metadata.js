@@ -63,24 +63,24 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
                 updatedRecord.status = saiRecord.status;
                 updatedRecord.updated = (new Date()).toISOString();
 
-                // TODO:  These clean up errors in legacy data and can eventually be removed.
-                if (updatedRecord.manufacturer) {
-                    if (updatedRecord.manufacturer.url) {
-                        updatedRecord.manufacturer.url = gpii.ul.imports.transforms.prependProtocol(updatedRecord.manufacturer.url);
-                    }
-                }
-                else {
-                    updatedRecord.manufacturer = {};
-                }
-
-                if (!updatedRecord.manufacturer.name) {
-                    updatedRecord.manufacturer.name = "Unknown";
-                }
-
-                if (updatedRecord.manufacturer.email) {
-                    updatedRecord.manufacturer.email = gpii.ul.imports.transforms.sanitizeEmail(updatedRecord.manufacturer.email);
-                }
-                // End "legacy" cleanup.
+                // // TODO:  These clean up errors in legacy data and can eventually be removed.
+                // if (updatedRecord.manufacturer) {
+                //     if (updatedRecord.manufacturer.url) {
+                //         updatedRecord.manufacturer.url = gpii.ul.imports.transforms.prependProtocol(updatedRecord.manufacturer.url);
+                //     }
+                // }
+                // else {
+                //     updatedRecord.manufacturer = {};
+                // }
+                //
+                // if (!updatedRecord.manufacturer.name) {
+                //     updatedRecord.manufacturer.name = "Unknown";
+                // }
+                //
+                // if (updatedRecord.manufacturer.email) {
+                //     updatedRecord.manufacturer.email = gpii.ul.imports.transforms.sanitizeEmail(updatedRecord.manufacturer.email);
+                // }
+                // // End "legacy" cleanup.
 
                 recordsToUpdate.push(updatedRecord);
             }
