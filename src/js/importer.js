@@ -87,11 +87,13 @@ fluid.defaults("gpii.ul.imports.importer", {
         syncer: {
             type: "gpii.ul.imports.syncer",
             options: {
-                prune:    "{gpii.ul.imports.importer}.options.prune",
-                sources:  "{gpii.ul.imports.importer}.options.sources",
-                username: "{gpii.ul.imports.importer}.options.username",
-                password: "{gpii.ul.imports.importer}.options.password",
-                urls:     "{gpii.ul.imports.importer}.options.urls",
+                jobKey:    "{gpii.ul.imports.importer}.options.jobKey",
+                prune:     "{gpii.ul.imports.importer}.options.prune",
+                sources:   "{gpii.ul.imports.importer}.options.sources",
+                username:  "{gpii.ul.imports.importer}.options.username",
+                password:  "{gpii.ul.imports.importer}.options.password",
+                outputDir: "{gpii.ul.imports.importer}.options.outputDir",
+                urls:      "{gpii.ul.imports.importer}.options.urls",
                 model: {
                     data: "{gpii.ul.imports.importer}.model.processedData"
                 }

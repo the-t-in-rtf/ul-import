@@ -1,7 +1,12 @@
 // This script is designed to synchronise data in the UL format with an existing CouchDb instance
-
+//
+// NOTE:  If there are a lot of changes from a given feed, you may need to run this with additional v8 memory, as in:
+//
+// node --max_old_space_size=8192 src/js/eastin/launcher -- --optionsFile configs/eastin-prod.json
 "use strict";
 var fluid   = require("infusion");
+fluid.logObjectRenderChars = 409600;
+
 var gpii    = fluid.registerNamespace("gpii");
 var os      = require("os");
 var fs      = require("fs");
@@ -11,6 +16,9 @@ var request = require("request");
 
 require("./deepEq");
 require("./concurrent-promise-queue");
+
+fluid.require("%gpii-diff");
+gpii.diff.loadMarkdownSupport();
 
 fluid.registerNamespace("gpii.ul.imports.syncer");
 
@@ -57,108 +65,102 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
             fluid.log("Error messsage returned when retrieving existing records:\n" + JSON.stringify(body, null, 2));
         }
         else {
-            // I considered using a transform and indexArrayByKey here, but didn't want to remove the key from the results.
-            // http://docs.fluidproject.org/infusion/development/ModelTransformationAPI.html#creates-an-object-indexed-with-keys-from-array-entries-fluid-transforms-indexarraybykey-
-            fluid.each(body.products, function (record) {
-                var key = record.source + ":" + record.sid;
-                that.existingRecords[key] = record;
+            that.existingRecordCount = body.products.length;
+
+            fluid.log("Retrieved data regarding ", body.products.length + " existing records...");
+            var updateTasks = [];
+
+            // Loook for records to be pruned
+            fluid.each(body.products, function (existingRecord) {
+                var incomingRecord = fluid.find(that.model.data, function (incomingRecord) {
+                    if (incomingRecord.source === existingRecord.source && incomingRecord.sid === existingRecord.sid) {
+                        return incomingRecord;
+                    }
+                });
+
+                if (!incomingRecord) {
+                    that.recordsToPrune.push(existingRecord); // This one may need to be pruned...
+                }
             });
 
-            fluid.log("Retrieved existing records...");
-            gpii.ul.imports.syncer.syncViaREST(that);
+            // Take a pass through the "incoming" records and add any that do not already exist.
+            fluid.each(that.model.data, function (incomingRecord) {
+                var existingRecord = fluid.find(body.products, function (product) {
+                    if (incomingRecord.source === product.source && incomingRecord.sid === product.sid) { return product; }
+                });
+
+                var combinedRecord = fluid.copy(incomingRecord);
+                if (existingRecord) {
+                    // Some required fields may be managed within the UL if they can't be derived from the source record...
+                    fluid.each(that.options.fieldsToPreserve, function (field) {
+                        if (!combinedRecord[field]) {
+                            combinedRecord[field] = existingRecord[field];
+                        }
+                    });
+                    if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, that.options.fieldsNotToCompare, true)) {
+                        var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord, existingRecord);
+                        updateTasks.push(recordUpdatePromise);
+                    }
+                    else {
+                        that.skippedRecordsCount++;
+                    }
+                }
+                else {
+                    that.newRecordCount++;
+                    if (!combinedRecord.status) {
+                        combinedRecord.status = "new";
+                    }
+                    var newRecordPromise = that.getRecordUpdatePromise(combinedRecord);
+                    updateTasks.push(newRecordPromise);
+                }
+            });
+
+            if (updateTasks.length === 0) {
+                fluid.log("No records to sync (or all were skipped)...");
+                that.events.onSyncComplete.fire(that);
+            }
+            else {
+                // Process the stack of tasks
+                var queue = gpii.ul.imports.promiseQueue.createQueue(updateTasks, that.options.maxRequests);
+                queue.then(function () {
+                    gpii.ul.imports.syncer.pruneRecords(that);
+                }, fluid.fail);
+            }
         }
     });
 };
 
-gpii.ul.imports.syncer.syncViaREST = function (that) {
-    var updateTasks = [];
-
-    fluid.log("Syncing ", that.model.data.length, " records via the UL REST API...");
-
-    // Iterate through each record we received from the source and update as needed.
-    fluid.each(that.model.data, function (record) {
-        var combinedRecord = fluid.copy(record);
-
-        // Confirm whether we have existing data or not
-        var key = record.source + ":" + record.sid;
-        var existingRecord = that.existingRecords[key];
-
-        //  If there is no existing record, create one.
-        if (!existingRecord) {
-            if (!combinedRecord.status) {
-                combinedRecord.status = "new";
-            }
-            var newRecordPromise = that.getRecordUpdatePromise(combinedRecord);
-            updateTasks.push(newRecordPromise);
-        }
-        else {
-            // Some required fields may be managed within the UL if they can't be derived from the source record...
-            fluid.each(that.options.fieldsToPreserve, function (field) {
-                if (!combinedRecord[field]) {
-                    combinedRecord[field] = existingRecord[field];
-                }
-            });
-
-            // // TODO: Review this, which was disabled because records seem to be mistakenly screened out as not having changed.
-            // var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
-            // updateTasks.push(recordUpdatePromise);
-
-            // If the record is not identical to what we have, perform an update.
-            if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, that.options.fieldsNotToCompare, true)) {
-                var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord);
-                updateTasks.push(recordUpdatePromise);
-            }
-            // If the record is identical, skip it.
-            else {
-                that.skippedRecords.push(combinedRecord);
-            }
-        }
-    });
+gpii.ul.imports.syncer.pruneRecords = function (that) {
+    var pruneTasks = [];
 
     if (that.options.prune) {
-        var incomingRecordsByKey = {};
-        fluid.each(that.model.data, function (incomingRecord) {
-            var key = incomingRecord.source + ":" + incomingRecord.sid;
-            incomingRecordsByKey[key] = incomingRecord;
-        });
-        var recordsToPrune = [];
-        // For whatever reason, that.existingRecords is a map that appears to be an array at this point.  This workaround ensures we can work with it still.
-        fluid.each(Object.keys(that.existingRecords), function (key) {
-            if (!incomingRecordsByKey[key]) {
-                var existingRecord = that.existingRecords[key];
-                if (existingRecord.status !== "deleted") {
-                    var prunedRecord = fluid.copy(existingRecord);
-                    prunedRecord.status = "deleted";
-                    prunedRecord.updated = (new Date()).toISOString();
-                    var prunedRecordPromise = that.getRecordUpdatePromise(prunedRecord);
-                    updateTasks.push(prunedRecordPromise);
-                    recordsToPrune.push(prunedRecord);
-                }
+        fluid.log("Updating ", that.recordsToPrune.length, " stale records that need to be pruned..");
+
+        fluid.each(that.recordsToPrune, function (recordToPrune) {
+            if (recordToPrune.status !== "deleted") {
+                var prunedRecord = fluid.copy(recordToPrune);
+                prunedRecord.status = "deleted";
+                prunedRecord.updated = (new Date()).toISOString();
+                var prunedRecordPromise = that.getRecordUpdatePromise(prunedRecord, recordToPrune);
+                pruneTasks.push(prunedRecordPromise);
             }
         });
-
-        fluid.log("Updating ", recordsToPrune.length, " cached records that need to be pruned..");
     }
 
-    if (updateTasks.length === 0) {
-        fluid.log("No records to sync (or all were skipped)...");
-        that.events.onSyncComplete.fire(that);
-    }
-    else {
-        // Process the stack of tasks
-        var queue = gpii.ul.imports.promiseQueue.createQueue(updateTasks, that.options.maxRequests);
-
-        queue.then(function () {
-            fluid.log("Finished synchronizing " + updateTasks.length + " records...");
+    var pruneSequence = fluid.promise.sequence(pruneTasks);
+    pruneSequence.then(
+        function () {
+            fluid.log("Finished synchronisation...");
 
             // Fire an event so that we can chain in the "unifier" and other services
             that.events.onSyncComplete.fire(that);
-        }, fluid.fail);
-    }
+        },
+        fluid.fail
+    );
 };
 
 // generate a response parser for an individual record
-gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord) {
+gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, originalRecord) {
     return function () {
         var promise = fluid.promise();
 
@@ -173,11 +175,15 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord) {
                 fluid.log("Record update returned an error:\n" + error);
                 that.failedRecords.push(updatedRecord);
             }
-            else if (response.statusCode === 200) {
-                that.updatedRecords.push(updatedRecord);
-            }
-            else if (response.statusCode === 201) {
-                that.createdRecords.push(updatedRecord);
+            else if (response.statusCode === 200 || response.statusCode === 201) { // Updated
+                if (originalRecord && !gpii.ul.imports.filteredDeepEq(originalRecord, updatedRecord, that.options.diffFieldsToCompare)) {
+                    fluid.log("diffing ", originalRecord.source, ":", originalRecord.sid);
+                    var diff = gpii.diff.compare(fluid.filterKeys(originalRecord, that.options.diffFieldsToCompare), fluid.filterKeys(updatedRecord, that.options.diffFieldsToCompare), true, { html: true });
+                    that.updatedRecordDiffs.push(diff);
+                }
+                else {
+                    that.createdRecordCount++;
+                }
             }
             // There was an error processing our request
             else {
@@ -193,10 +199,12 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord) {
 };
 
 gpii.ul.imports.syncer.saveRecords = function (that) {
-    fluid.each(["existingRecords", "createdRecords", "updatedRecords", "failedRecords", "skippedRecords"], function (key) {
-        if (that.options.saveRecords[key] && that[key] && that[key].length) {
-            var filename   = key + "-" + that.id + ".json";
-            var outputPath = path.resolve(os.tmpdir(), filename);
+    fluid.each(["failedRecords", "updatedRecordDiffs"], function (key) {
+        if (that[key] && that[key].length) {
+            var timestamp  = (new Date()).toISOString();
+
+            var filename   = timestamp + "-" + that.options.jobKey + "-" + key + "-" + that.id + ".json";
+            var outputPath = path.resolve(that.options.outputDir, filename);
 
             fs.writeFileSync(outputPath, JSON.stringify(that[key], null, 2), { encoding: "utf8"});
 
@@ -207,27 +215,24 @@ gpii.ul.imports.syncer.saveRecords = function (that) {
 
 gpii.ul.imports.syncer.report = function (that) {
     if (that.options.displayReport) {
-        fluid.log("Evaluated " + that.model.data.length + " source records...");
-        fluid.log("Compared with " + Object.keys(that.existingRecords).length + " existing records for this source...");
-        fluid.log("Skipped " + that.skippedRecords.length + " records that had not been updated...");
-        fluid.log("Created " + that.createdRecords.length + " new records...");
-        fluid.log("Updated " + that.updatedRecords.length + " existing records...");
-        fluid.log("Encountered " + that.failedRecords.length + " failures while saving the data...");
+        fluid.log("Evaluated " + that.model.data.length + " incoming records.");
+        fluid.log("Compared with " + that.existingRecordCount + " existing records for this source.");
+        fluid.log("Found " + that.newRecordCount + " new records.");
+        fluid.log("Skipped " + that.skippedRecordsCount + " records that had not been updated.");
+        fluid.log("Created " + that.createdRecordCount + " new records.");
+        fluid.log("Updated " + that.updatedRecordDiffs.length + " existing records...");
+        fluid.log("Encountered " + that.failedRecords.length + " failures while saving the data.");
+        fluid.log("Found ", that.staleRecordCount + " existing records that were not a part of the incoming feed.");
     }
 };
 
 fluid.defaults("gpii.ul.imports.syncer", {
     gradeNames:    ["fluid.modelComponent"],
     maxRequests:   50,
-    saveRecords: {
-        existingRecords: false,
-        createdRecords:  true,
-        updatedRecords:  true,
-        failedRecords:   true,
-        skippedRecords:  false
-    },
     fieldsToPreserve: ["status", "uid"],
     fieldsNotToCompare: ["updated"],
+    diffFieldsToCompare: ["manufacturer", "description", "name", "status", "uid", "sid", "source", "sourceUrl"],
+    outputDir: os.tmpdir(),
     prune: false,
     displayReport: true,
     username: "admin",
@@ -240,15 +245,18 @@ fluid.defaults("gpii.ul.imports.syncer", {
     invokers: {
         getRecordUpdatePromise: {
             funcName: "gpii.ul.imports.syncer.getRecordUpdatePromise",
-            args: ["{that}", "{arguments}.0"]
+            args: ["{that}", "{arguments}.0", "{arguments}.1"] // updatedRecord, originalRecord
         }
     },
     members: {
-        existingRecords: [],
-        createdRecords:  [],
-        updatedRecords:  [],
-        failedRecords:   [],
-        skippedRecords:  []
+        createdRecordCount:  0,
+        newRecordCount:      0,
+        existingRecordCount: 0,
+        failedRecords:       [],
+        recordsToPrune:      [],
+        skippedRecordsCount: 0,
+        staleRecordCount:    0,
+        updatedRecordDiffs:  []
     },
     model: {
         data: []

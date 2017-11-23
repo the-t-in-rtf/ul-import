@@ -4,6 +4,7 @@
     "gradeNames": [
       "gpii.ul.imports.eastin"
     ],
+    "jobKey": "eastin",
     "username": "importer",
     "password": "password",
     "sources": ["Handicat", "Vlibank", "Siva", "EASTIN Admin", "Hjælpemiddelbasen", "Rehadat", "Hulpmiddelenwijzer", "Oaeg", "Dlf data", "ATAust"],

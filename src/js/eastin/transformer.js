@@ -142,29 +142,10 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
                 }
             }
         },
-        language: {
-            transform: {
-                type:      "gpii.ul.imports.eastin.transformer.lookupLanguage",
-                inputPath: "Database",
-                databases: "{that}.options.databases"
-            }
-        },
-        images: [
-            {
-                url:         "ImageUrl",
-                description: "EnglishDescription"
-            }
-        ],
         updated: {
             transform: {
                 type: "fluid.transforms.dateToString",
                 inputPath: "LastUpdateDate"
-            }
-        },
-        ontologies: {
-            iso9999: {
-                IsoCodePrimary:    "IsoCodePrimary",
-                IsoCodesSecondary: "IsoCodesSecondary"
             }
         },
         sourceData: ""

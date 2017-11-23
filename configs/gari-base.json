@@ -4,6 +4,7 @@
     "gradeNames": [
       "gpii.ul.imports.gari"
     ],
+    "jobKey": "gari",
     "sources":   ["GARI"],
     "username": "importer",
     "password": "password",

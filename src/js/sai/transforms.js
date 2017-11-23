@@ -2,7 +2,7 @@
 var fluid = require("infusion");
 var gpii  = fluid.registerNamespace("gpii");
 
-require("../deepEq");
+fluid.require("%gpii-diff");
 
 fluid.defaults("gpii.ul.imports.sai.transformer.firstSaneValue", {
     gradeNames: "fluid.standardOutputTransformFunction"
@@ -17,7 +17,7 @@ gpii.ul.imports.sai.transformer.firstSaneValue = function (transformSpec, transf
     sanitizedTransformSpec.values = fluid.transform(sanitizedTransformSpec.values, function (value) {
         var expanded = transformer.expand(value);
 
-        if (expanded === "" || gpii.ul.imports.deepEq([], expanded)) {
+        if (expanded === "" || gpii.diff.equals([], expanded)) {
             return "notfound";
         }
         else {

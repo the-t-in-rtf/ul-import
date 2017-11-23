@@ -72,7 +72,7 @@ gpii.ul.imports.curation.invalidRecords.handleRecordLookup = function (that, err
 
                 // If the autofixed record is invalid, add it to the "unfixable" pile.
                 if (autofixValidationErrors) {
-                    that.unfixableRecords.push(autofixedRecord);
+                    that.unfixableRecords.push({ errors: autofixValidationErrors, record: autofixedRecord});
                 }
                 // If the record is valid, add it to the "fixable" pile
                 else {
@@ -160,6 +160,36 @@ fluid.defaults("gpii.ul.imports.curation.invalidRecords", {
                 transform: {
                     type: "gpii.ul.imports.transforms.stripNonValues",
                     inputPath: ""
+                }
+            },
+            "images": {
+                transform: {
+                    type: "fluid.transforms.delete",
+                    outputPath: ""
+                }
+            },
+            "lang": {
+                transform: {
+                    type: "fluid.transforms.delete",
+                    outputPath: ""
+                }
+            },
+            "language": {
+                transform: {
+                    type: "fluid.transforms.delete",
+                    outputPath: ""
+                }
+            },
+            "ontologies": {
+                transform: {
+                    type: "fluid.transforms.delete",
+                    outputPath: ""
+                }
+            },
+            "sources": {
+                transform: {
+                    type: "fluid.transforms.delete",
+                    outputPath: ""
                 }
             },
             "description": {

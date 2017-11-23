@@ -68,13 +68,13 @@ fluid.defaults("gpii.ul.imports.sai", {
         transformer: {
             options: {
                 rules: {
-                    // TODO: Remove once we confirm everything working.
-                    // "uid": {
-                    //     transform: {
-                    //         type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
-                    //         values: [ "uid"]
-                    //     }
-                    // },
+                    // TODO: Confirm that this works as expected
+                    "uid": {
+                        transform: {
+                            type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
+                            values: [ "uid"]
+                        }
+                    },
                     "name": "title",
                     "description": {
                         transform: {

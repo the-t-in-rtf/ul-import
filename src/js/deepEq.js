@@ -3,22 +3,8 @@
 var fluid = require("infusion");
 var gpii  = fluid.registerNamespace("gpii");
 
-var deepEqual = require("deep-equal");
-
+fluid.require("%gpii-diff");
 fluid.registerNamespace("gpii.ul.imports");
-
-/**
- *
- * A function that wraps deep-equal (equivalent to assert.deepEqual in node) to deeply compare two objects.
- *
- * @param a The first object to compare.
- * @param b The second object to compare
- * @returns true if the objects are deeply equal, false otherwise.
- *
- */
-gpii.ul.imports.deepEq = function (a, b) {
-    return deepEqual(a, b, { strict: true});
-};
 
 /**
  *
@@ -35,5 +21,5 @@ gpii.ul.imports.filteredDeepEq = function (a, b, keys, exclude) {
     var filteredA = fluid.filterKeys(a, keys, exclude);
     var filteredB = fluid.filterKeys(b, keys, exclude);
 
-    return gpii.ul.imports.deepEq(filteredA, filteredB);
+    return gpii.diff.equals(filteredA, filteredB);
 };

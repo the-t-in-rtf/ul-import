@@ -1,0 +1,50 @@
+<table>
+    <caption>Summary of record changes since last version.</caption>
+    <tbody>
+    <tr>
+        <th scope="row">Source</th>
+        <td>{{>diff source}}</td>
+    </tr>
+    <tr>
+        <th scope="row">SID</th>
+        <td>{{>diff sid}}</td>
+    </tr>
+    {{#if sourceUrl}}
+        <tr>
+            <th scope="row">Source URL</th>
+            <td>
+                {{>diff sourceUrl}}<br/>
+                <a href="{{>diff-new sourceUrl}}" target="_blank">Open the latest source URL in a new window.</a>
+            </td>
+        </tr>
+    {{/if}}
+    <tr>
+        <th scope="row">Name</th>
+        <td>{{>diff name}}</td>
+    </tr>
+    <tr>
+        <th scope="row">Description</th>
+        <td>
+            {{>diff description}}
+        </td>
+    </tr>
+    <tr>
+        <th scope="row">Manufacturer</th>
+        <td>
+            {{>manufacturer-diff manufacturer}}
+        </td>
+    </tr>
+    <tr>
+        <th scope="row">Status</th>
+        <td>{{>diff status}}</td>
+    </tr>
+    {{#if uid}}
+        <tr>
+            <th>Unified Listing API Entry</th>
+            <td>
+                <a href="https://api.ul.gpii.net/api/product/unified/{{>diff-new-text uid}}" target="_blank">{{>diff-new-text uid}}</a>
+            </td>
+        </tr>
+    {{/if}}
+    </tbody>
+</table>
