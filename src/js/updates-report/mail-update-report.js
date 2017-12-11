@@ -87,7 +87,7 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     gradeNames: ["fluid.component"],
     textTemplateKey: "single-update-email-text",
     htmlTemplateKey: "single-update-email-html",
-    smtpPort:   "8025",
+    smtpPort:   25,
     cssFiles: ["%gpii-diff/src/css/gpii-diff.css", "%ul-imports/src/css/ul-imports.css"],
     transportOptions: {
         ignoreTLS: true,
@@ -119,7 +119,8 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport.launcher", {
         "describe": {
             "diffsAndUpdatesPath": "The path (absolute or package-relative) to the 'diffs and updates' JSON file generated for a given import.",
             "outputDir":           "The path (absolute or package-relative) to the directory where the output from this run will be saved.",
-            "setLogging":          "Whether to display verbose log messages.  Set to `true` by default."
+            "setLogging":          "Whether to display verbose log messages.  Set to `true` by default.",
+            "smtpPort":            "The mail server port to use when sending outgoing messages."
         },
         required: ["diffsAndUpdatesPath", "outputDir"],
         defaults: {
