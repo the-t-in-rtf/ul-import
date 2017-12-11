@@ -88,7 +88,8 @@ fluid.defaults("gpii.ul.imports.diffImportResults.launcher", {
         "describe": {
             "updatesPath":   "The path (absolute or package-relative) to the updated versions of records that were updated in a given import.",
             "originalsPath": "The path (absolute or package-relative) to the original versions of records that were updated in a given import.",
-            "outputPath":    "The path (absolute or package-relative) where the output from this run will be saved.",
+            "outputDir":     "The directory in which we should save our output.  A unique filename will be generated for this run.",
+            "outputPath":    "The full path (absolute or package-relative) to use when saving the output from this run.",
             "setLogging":    "Whether to display verbose log messages.  Set to `true` by default."
         },
         required: ["updatesPath", "originalsPath", "outputPath"],
