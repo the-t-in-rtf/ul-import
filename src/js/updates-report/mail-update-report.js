@@ -1,6 +1,6 @@
 /*
 
-    Generate an email reporting on a single change to a record in the Unified Listing.
+    Generate an email reporting on a single change to a record in the Unified Listing.  Requires an "updates and diff" file, such as the one generated using the `diffImportResults.js` script provided by this package.
 
 */
 "use strict";
@@ -9,8 +9,10 @@ var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%gpii-handlebars");
 fluid.require("%gpii-diff");
+fluid.require("%gpii-launcher");
 
-require("./resolvePath-helper");
+require("./jsonLoader");
+require("./renderer");
 
 var fs            = require("fs");
 var juice         = require("juice");
@@ -20,15 +22,15 @@ var smtpTransport = require("nodemailer-smtp-transport");
 fluid.registerNamespace("gpii.ul.imports.mailUpdateReport");
 
 gpii.ul.imports.mailUpdateReport.processQueue = function (that) {
-    var diffRecords = require(that.options.file);
+    var diffsAndUpdates = gpii.ul.imports.resolveAndLoadJsonFromPath(that.options.diffsAndUpdatesPath);
 
     var promises = [];
 
-    var justBigEnough = fluid.find(diffRecords, function (diffRecord) {
-        if (diffRecord.description.length > 50) { return diffRecord; }
-    });
-    promises.push(function () {
-        return gpii.ul.imports.mailUpdateReport.mailSingleRecord(that, justBigEnough);
+    var startingPoint = Math.round(Math.random() * (diffsAndUpdates.length - 20));
+    fluid.each(diffsAndUpdates.slice(startingPoint, startingPoint + 20), function (diffAndUpdate) {
+        promises.push(function () {
+            return gpii.ul.imports.mailUpdateReport.mailSingleRecord(that, diffAndUpdate);
+        });
     });
 
     var sequence = fluid.promise.sequence(promises);
@@ -52,14 +54,14 @@ gpii.ul.imports.mailUpdateReport.processQueue = function (that) {
 // Note that the `to` and `cc` elements can also be passed an array of email addresses.  The full syntax available for
 // `mailOptions` can be found in [the nodemailer documentation](https://github.com/andris9/Nodemailer).
 //
-gpii.ul.imports.mailUpdateReport.mailSingleRecord = function (that, diffRecord) {
+gpii.ul.imports.mailUpdateReport.mailSingleRecord = function (that, diffAndUpdate) {
     var promise = fluid.promise();
     var transport = nodemailer.createTransport(smtpTransport(that.options.transportOptions));
     var mailOptions = fluid.copy(that.options.baseMailOptions);
 
-    mailOptions.text = that.renderer.render(that.options.textTemplateKey, { options: that.options, diff: diffRecord});
+    mailOptions.text = that.renderer.render(that.options.textTemplateKey, { options: that.options, diff: diffAndUpdate.diff, update: diffAndUpdate.update});
 
-    var rawHtml = that.renderer.render(that.options.htmlTemplateKey, { options: that.options, diff: diffRecord});
+    var rawHtml = that.renderer.render(that.options.htmlTemplateKey, { options: that.options, diff: diffAndUpdate.diff, update: diffAndUpdate.update});
     var allCssContent = "";
     fluid.each(fluid.makeArray(that.options.cssFiles), function (cssFile) {
         var resolvedCssPath = fluid.module.resolvePath(cssFile);
@@ -87,8 +89,6 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     htmlTemplateKey: "single-update-email-html",
     smtpPort:   "8025",
     cssFiles: ["%gpii-diff/src/css/gpii-diff.css", "%ul-imports/src/css/ul-imports.css"],
-    // TODO: Make this configurable
-    file: "/srv/ul-logs/2017-11-08T18:33:44.191Z-eastin-updatedRecordDiffs-377zhh7i-151.json",
     transportOptions: {
         ignoreTLS: true,
         secure:    false,
@@ -97,29 +97,12 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     baseMailOptions: {
         from:    "noreply@ul.gpii.net",
         to:      "tony@raisingthefloor.org",
-        subject: "Update report for a Unified Listing vendor record." // TODO: Make this dynamic
+        // to: "ul-fed-db-update@raisingthefloor.org",
+        subject: "Update report for a Unified Listing vendor record."
     },
     components: {
         renderer: {
-            type: "gpii.handlebars.standaloneRenderer",
-            options: {
-                templateDirs: ["%ul-imports/src/templates", "%gpii-diff/src/templates"],
-                components: {
-                    isDiffArray: {
-                        type: "gpii.diff.helper.isDiffArray"
-                    },
-                    resolvePath: {
-                        type: "gpii.ul.imports.helpers.resolvePath"
-                    },
-                    md: {
-                        options: {
-                            markdownitOptions: {
-                                html: true
-                            }
-                        }
-                    }
-                }
-            }
+            type: "gpii.ul.imports.renderer"
         }
     },
     listeners: {
@@ -130,5 +113,26 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     }
 });
 
-// TODO: Write a launcher or provide another means to run this.
-gpii.ul.imports.mailUpdateReport();
+fluid.defaults("gpii.ul.imports.mailUpdateReport.launcher", {
+    gradeNames: ["gpii.launcher"],
+    optionsFile: "%ul-imports/configs/updates-email.json",
+    "yargsOptions": {
+        "describe": {
+            "diffsAndUpdatesPath": "The path (absolute or package-relative) to the 'diffs and updates' JSON file generated for a given import.",
+            "outputDir":           "The path (absolute or package-relative) to the directory where the output from this run will be saved.",
+            "setLogging":          "Whether to display verbose log messages.  Set to `true` by default."
+        },
+        required: ["diffsAndUpdatesPath", "outputDir"],
+        defaults: {
+            "optionsFile": "{that}.options.optionsFile",
+            "outputDir":   "{that}.options.outputDir",
+            "setLogging":  true
+        },
+        coerce: {
+            "setLogging": JSON.parse
+        },
+        help: true
+    }
+});
+
+gpii.ul.imports.mailUpdateReport.launcher();

@@ -13,7 +13,14 @@
     version appears in red.  Insertions and deletions will be announced by most screen readers.
 </p>
 
-{{>single-update-table diff}}
+{{>single-update-table}}
+
+{{#if diff.uid}}
+    <p>
+        <a href="https://api.ul.gpii.net/api/product/unified/{{rightValue diff.uid}}" target="_blank">View the Unified Listing API entry associated with this record.</a>
+    </p>
+{{/if}}
+
 
 <p>Regards,</p>
 <br/>

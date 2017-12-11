@@ -1,6 +1,6 @@
 <html lang="en">
     <head>
-        <title>Displaying updates for record {{>diff diff.source}}:{{>diff diff.sid}}</title>
+        <title>Displaying updates for record {{>diff diffAndUpdate.diff.source}}:{{>diff diffAndUpdate.diff.sid}}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         {{>deps ".."}}
     </head>
@@ -14,13 +14,13 @@
                 </p>
             </div>
             <div class="cell small-10 small-offset-1">
-                {{>single-update-table diff}}
+                {{>single-update-table diffAndUpdate}}
             </div>
             <div class="cell small-10 medium-5 small-offset-1">
                 <a class="button expanded large" href="../index.html">Return to overall summary.</a>
             </div>
             <div class="cell small-10 medium-5 small-offset-1 medium-offset-0">
-                <a class="button expanded large" href="index.html">View all updates from this source.</a>
+                <a class="button expanded large" href="summary.html">View all updates from this source.</a>
             </div>
             <div class="cell small-10 small-offset-1">
                 <p>Generated at {{dateStamp}}.</p>

@@ -21,6 +21,12 @@ Manufacturer:
 
 Status:     {{>diff-text diff.status}}
 
+{{#if diff.uid}}
+The Unified Listing API entry associated with this record can be found at:
+
+https://api.ul.gpii.net/api/product/unified/{{rightValue diff.uid}}
+{{/if}}
+
 
 Regards,
 

@@ -13,18 +13,21 @@
                     This page summarises changes to vendor information provided by the source "{{source}}". Click an individual record below for details.
                 </p>
 
-                <p>There are {{diffs.length}} records that have been updated.</p>
+                <p>There are {{diffsAndUpdates.length}} records that have been updated.</p>
             </div>
 
-            {{#if diffs}}
+            {{#if diffsAndUpdates}}
             <div class="cell small-10 small-offset-1">
                 <table>
                     <thead>
                         <tr><th>SID</th><th>Name</th></tr>
                     </thead>
                     <tbody>
-                        {{#each diffs as |diff|}}
-                            <tr><td>{{diff.sid.0.value}}</td><td><a href="{{../source}}-{{urlEncode diff.sid.0.value}}.html">{{diff.name.0.value}}</a></td></tr>
+                        {{#each diffsAndUpdates as |diffAndUpdate|}}
+                            <tr>
+                                <td>{{rightValue diffAndUpdate.diff.sid}}</td>
+                                <td><a href="{{../source}}-{{urlEncode diffAndUpdate.diff.sid.0.value}}.html">{{rightValue diffAndUpdate.diff.name}}</a></td>
+                            </tr>
                         {{/each}}
                     </tbody>
                 </table>

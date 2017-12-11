@@ -1,30 +1,29 @@
 /*
 
-    Generate an email reporting on a single change to a record in the Unified Listing.
+    Generate an email reporting on a single change to a record in the Unified Listing.  Requires an "updates and diff"
+    file, such as the one generated using the `diffImportResults.js` script provided by this package.
 
 */
 "use strict";
 var fluid  = require("infusion");
-// TODO: configure this and everything else through a launcher.
-fluid.setLogging(true);
 var gpii   = fluid.registerNamespace("gpii");
 
 var mkdirp = require("mkdirp");
 var fs     = require("fs");
 var path   = require("path");
 
-fluid.require("%gpii-handlebars");
-fluid.require("%gpii-diff");
+require("./renderer");
+require("./jsonLoader");
 
-require("./urlEncode-helper");
+fluid.require("%gpii-launcher");
 
 fluid.registerNamespace("gpii.ul.imports.updateReport");
 
 gpii.ul.imports.updateReport.createSummary = function (that) {
     var dateStamp = (new Date()).toISOString();
 
-    var diffs = require(fluid.module.resolvePath(that.options.inputFile));
-    var diffsBySource = gpii.ul.imports.updateReport.sortDiffsBySource(diffs);
+    var diffsAndUpdates = gpii.ul.imports.resolveAndLoadJsonFromPath(that.options.diffsAndUpdatesPath);
+    var diffsAndUpdatesBySource = gpii.ul.imports.updateReport.diffsAndUpdatesBySource(diffsAndUpdates);
     // Create our output directory
     var resolvedOutputPath = fluid.module.resolvePath(that.options.outputDir);
     mkdirp(resolvedOutputPath, function (err) {
@@ -37,15 +36,20 @@ gpii.ul.imports.updateReport.createSummary = function (that) {
             dependencyPromise.then(function () {
                 // Generate an index.html summary page with links to source pages
                 var recordCountBySource = {};
-                fluid.each(Object.keys(diffsBySource), function (sourceKey) {
-                    recordCountBySource[sourceKey] = diffsBySource[sourceKey].length;
+                fluid.each(Object.keys(diffsAndUpdatesBySource), function (sourceKey) {
+                    recordCountBySource[sourceKey] = diffsAndUpdatesBySource[sourceKey].length;
                 });
-                var overallSummaryHtml = that.renderer.render(that.options.templateKeys.overallSummary, { options: that.options, sources: Object.keys(diffsBySource).sort(), recordCountBySource: recordCountBySource, totalRecords: diffs.length, dateStamp: dateStamp});
+                var overallSummaryHtml = that.renderer.render(that.options.templateKeys.overallSummary, { options: that.options, sources: Object.keys(diffsAndUpdatesBySource).sort(), recordCountBySource: recordCountBySource, totalRecords: diffsAndUpdates.length, dateStamp: dateStamp});
                 var overallSummaryPath = path.resolve(resolvedOutputPath, "index.html");
                 fs.writeFileSync(overallSummaryPath, overallSummaryHtml, { encoding: "utf8" });
                 fluid.log("Saved overall summary.");
 
-                gpii.ul.imports.updateReport.createSourceReports(that, diffsBySource, dateStamp);
+                var overallAllUpdatesHtml = that.renderer.render(that.options.templateKeys.overallAllUpdates, { options: that.options, diffsAndUpdates: diffsAndUpdates, dateStamp: dateStamp});
+                var overallAllUpdatesPath = path.resolve(resolvedOutputPath, "all-updates.html");
+                fs.writeFileSync(overallAllUpdatesPath, overallAllUpdatesHtml, { encoding: "utf8" });
+                fluid.log("Saved overall summary.");
+
+                gpii.ul.imports.updateReport.createSourceReports(that, diffsAndUpdatesBySource, dateStamp);
             }, fluid.fail);
         }
     });
@@ -91,9 +95,10 @@ gpii.ul.imports.updateReport.copyDependencies = function (that) {
     return emptyPromise;
 };
 
-gpii.ul.imports.updateReport.createSourceReports = function (that, diffsBySource, dateStamp) {
+gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdatesBySource, dateStamp) {
     var resolvedOutputPath = fluid.module.resolvePath(that.options.outputDir);
-    fluid.each(Object.keys(diffsBySource), function (source) {
+    fluid.each(Object.keys(diffsAndUpdatesBySource), function (source) {
+        var diffsAndUpdates = diffsAndUpdatesBySource[source];
         var sourceOutputPath = path.resolve(resolvedOutputPath, source);
         // Create a subdirectory for this source.
         mkdirp(sourceOutputPath, function (err) {
@@ -101,26 +106,27 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsBySource
                 fluid.fail(err);
             }
             else {
-                // Create an summary page for this source.
-                var sourceSummaryHtml = that.renderer.render(that.options.templateKeys.sourceSummary, { options: that.options, source: source, diffs: diffsBySource[source], dateStamp: dateStamp });
+                // Create an summary page for this source.  As we don't need access to the updated description, we can work with just the diffs for this source.
+                var sourceSummaryHtml = that.renderer.render(that.options.templateKeys.sourceSummary, { options: that.options, source: source, diffsAndUpdates: diffsAndUpdates, dateStamp: dateStamp });
                 var sourceSummaryPath = path.resolve(sourceOutputPath, "summary.html");
                 fs.writeFileSync(sourceSummaryPath, sourceSummaryHtml, "utf8");
                 fluid.log("Saved source summary for source '", source, "'.");
 
-                var sourceAllUpdatesHtml = that.renderer.render(that.options.templateKeys.sourceAllUpdates, { options: that.options, source: source, diffs: diffsBySource[source], dateStamp: dateStamp });
+                // Create a rollup page that includes (hidden) full records.  Requires both the diff and the full updated record.
+                var sourceAllUpdatesHtml = that.renderer.render(that.options.templateKeys.sourceAllUpdates, { options: that.options, source: source, diffsAndUpdates: diffsAndUpdates, dateStamp: dateStamp });
                 var sourceAllUpdatesPath = path.resolve(sourceOutputPath, "all-updates.html");
                 fs.writeFileSync(sourceAllUpdatesPath, sourceAllUpdatesHtml, "utf8");
                 fluid.log("Saved combined 'all updates' report for source '", source, "'.");
 
-                // Create a page for each record that links back to the source and overall summaries.
-                fluid.each(diffsBySource[source], function (diff) {
-                    var sid = diff.sid[0].value;
+                // Create a page for each record that links back to the source and overall summaries.  Requires both the diff and the full updated record.s
+                fluid.each(diffsAndUpdates, function (diffAndUpdate) {
+                    var sid = gpii.diff.rightValue(diffAndUpdate.diff.sid);
                     var individualdiffFilename = source + "-" + encodeURIComponent(sid) + ".html";
-                    var individualDiffHtml     = that.renderer.render(that.options.templateKeys.singleRecord, { options: that.options, diff: diff, dateStamp: dateStamp });
+                    var individualDiffHtml     = that.renderer.render(that.options.templateKeys.singleRecord, { options: that.options, diffAndUpdate: diffAndUpdate, dateStamp: dateStamp });
                     var individualDiffPath     = path.resolve(sourceOutputPath, individualdiffFilename);
                     fs.writeFileSync(individualDiffPath, individualDiffHtml, "utf8");
                 });
-                fluid.log("Saved ", diffsBySource[source].length, " individual records for source '", source, "'.");
+                fluid.log("Saved ", diffsAndUpdates.length, " individual records for source '", source, "'.");
             }
 
             fluid.log("Finished generating updates report, output saved to '", resolvedOutputPath, "'.");
@@ -128,14 +134,14 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsBySource
     });
 };
 
-gpii.ul.imports.updateReport.sortDiffsBySource = function (diffs) {
-    var diffsBySource = {};
-    fluid.each(diffs, function (diff) {
-        var source = diff.source[0].value;
-        if (!diffsBySource[source]) { diffsBySource[source] = []; }
-        diffsBySource[source].push(diff);
+gpii.ul.imports.updateReport.diffsAndUpdatesBySource = function (diffsAndUpdates) {
+    var diffsAndUpdatesBySource = {};
+    fluid.each(diffsAndUpdates, function (diffAndUpdate) {
+        var source = gpii.diff.rightValue(diffAndUpdate.diff.source);
+        if (!diffsAndUpdatesBySource[source]) { diffsAndUpdatesBySource[source] = []; }
+        diffsAndUpdatesBySource[source].push(diffAndUpdate);
     });
-    return diffsBySource;
+    return diffsAndUpdatesBySource;
 };
 
 gpii.ul.imports.updateReport.generateUniqueSubdir = function (that, baseOutputDir) {
@@ -145,11 +151,11 @@ gpii.ul.imports.updateReport.generateUniqueSubdir = function (that, baseOutputDi
 
 fluid.defaults("gpii.ul.imports.updateReport", {
     gradeNames: ["fluid.component"],
-    // TODO: Make these configurable via a launcher
     templateKeys: {
+        overallAllUpdates: "overall-all-updates",
         overallSummary:    "overall-updates-summary",
-        sourceSummary:     "source-updates-summary",
         sourceAllUpdates:  "source-all-updates",
+        sourceSummary:     "source-updates-summary",
         singleRecord:      "single-update-page"
     },
     depsToBundle: {
@@ -158,28 +164,9 @@ fluid.defaults("gpii.ul.imports.updateReport", {
     },
     baseOutputDir: "/tmp",
     outputDir: "@expand:gpii.ul.imports.updateReport.generateUniqueSubdir({that}, {that}.options.baseOutputDir)",
-    inputFile: "/srv/ul-logs/2017-11-22T10:58:49.857Z-eastin-updatedRecordDiffs-7pcxclrx-151.json",
     components: {
         renderer: {
-            type: "gpii.handlebars.standaloneRenderer",
-            options: {
-                templateDirs: ["%ul-imports/src/templates", "%gpii-diff/src/templates"],
-                components: {
-                    isDiffArray: {
-                        type: "gpii.diff.helper.isDiffArray"
-                    },
-                    urlEncode: {
-                        type: "gpii.ul.imports.helpers.urlEncode"
-                    },
-                    md: {
-                        options: {
-                            markdownitOptions: {
-                                html: true
-                            }
-                        }
-                    }
-                }
-            }
+            type: "gpii.ul.imports.renderer"
         }
     },
     listeners: {
@@ -190,5 +177,26 @@ fluid.defaults("gpii.ul.imports.updateReport", {
     }
 });
 
-// TODO: Write a launcher or provide another means to run this.
-gpii.ul.imports.updateReport();
+fluid.defaults("gpii.ul.imports.updateReport.launcher", {
+    gradeNames: ["gpii.launcher"],
+    optionsFile: "%ul-imports/configs/updates-report-prod.json",
+    "yargsOptions": {
+        "describe": {
+            "diffsAndUpdatesPath": "The path (absolute or package-relative) to the 'diffs and updates' JSON file generated for a given import.",
+            "outputDir":           "The path (absolute or package-relative) to the directory where the output from this run will be saved.",
+            "setLogging":          "Whether to display verbose log messages.  Set to `true` by default."
+        },
+        required: ["diffsAndUpdatesPath", "outputDir"],
+        defaults: {
+            "optionsFile": "{that}.options.optionsFile",
+            "outputDir":   "{that}.options.outputDir",
+            "setLogging":  true
+        },
+        coerce: {
+            "setLogging": JSON.parse
+        },
+        help: true
+    }
+});
+
+gpii.ul.imports.updateReport.launcher();

@@ -37,7 +37,7 @@
   "dependencies": {
     "cheerio": "1.0.0-rc.2",
     "foundation-sites": "6.4.4-rc1",
-    "gpii-diff": "1.0.0-dev.20171122T093604Z.15c4ecb",
+    "gpii-diff": "1.0.0-dev.20171128T134233Z.8584f1c",
     "gpii-express": "1.0.9",
     "gpii-express-user": "1.0.0-dev.20170420T094715Z.667e69a",
     "gpii-launcher": "1.0.0-dev.20170712T140305Z.aa60d4a",

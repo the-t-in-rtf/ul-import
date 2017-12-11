@@ -17,9 +17,6 @@ var request = require("request");
 require("./deepEq");
 require("./concurrent-promise-queue");
 
-fluid.require("%gpii-diff");
-gpii.diff.loadMarkdownSupport();
-
 fluid.registerNamespace("gpii.ul.imports.syncer");
 
 gpii.ul.imports.syncer.LoginAndStartSync = function (that) {
@@ -177,9 +174,8 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, o
             }
             else if (response.statusCode === 200 || response.statusCode === 201) { // Updated
                 if (originalRecord && !gpii.ul.imports.filteredDeepEq(originalRecord, updatedRecord, that.options.diffFieldsToCompare)) {
-                    fluid.log("diffing ", originalRecord.source, ":", originalRecord.sid);
-                    var diff = gpii.diff.compare(fluid.filterKeys(originalRecord, that.options.diffFieldsToCompare), fluid.filterKeys(updatedRecord, that.options.diffFieldsToCompare), true, { html: true });
-                    that.updatedRecordDiffs.push(diff);
+                    that.preupdateOriginals.push(originalRecord);
+                    that.updatedRecords.push(updatedRecord);
                 }
                 else {
                     that.createdRecordCount++;
@@ -199,7 +195,7 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, o
 };
 
 gpii.ul.imports.syncer.saveRecords = function (that) {
-    fluid.each(["failedRecords", "updatedRecordDiffs"], function (key) {
+    fluid.each(["failedRecords", "preupdateOriginals", "updatedRecords"], function (key) {
         if (that[key] && that[key].length) {
             var timestamp  = (new Date()).toISOString();
 
@@ -220,7 +216,7 @@ gpii.ul.imports.syncer.report = function (that) {
         fluid.log("Found " + that.newRecordCount + " new records.");
         fluid.log("Skipped " + that.skippedRecordsCount + " records that had not been updated.");
         fluid.log("Created " + that.createdRecordCount + " new records.");
-        fluid.log("Updated " + that.updatedRecordDiffs.length + " existing records...");
+        fluid.log("Updated " + that.updatedRecords.length + " existing records...");
         fluid.log("Encountered " + that.failedRecords.length + " failures while saving the data.");
         fluid.log("Found ", that.staleRecordCount + " existing records that were not a part of the incoming feed.");
     }
@@ -256,7 +252,8 @@ fluid.defaults("gpii.ul.imports.syncer", {
         recordsToPrune:      [],
         skippedRecordsCount: 0,
         staleRecordCount:    0,
-        updatedRecordDiffs:  []
+        updatedRecords:      [],
+        preupdateOriginals:  []
     },
     model: {
         data: []

@@ -1,0 +1,6 @@
+{
+    "options": {
+        "baseOutputDir": "/srv/ul-updates-reports"
+    },
+    "mergeConfigs": ["%ul-imports/configs/updates-report-dev.json"]
+}
