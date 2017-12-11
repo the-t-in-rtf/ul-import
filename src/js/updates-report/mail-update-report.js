@@ -26,8 +26,7 @@ gpii.ul.imports.mailUpdateReport.processQueue = function (that) {
 
     var promises = [];
 
-    var startingPoint = Math.round(Math.random() * (diffsAndUpdates.length - 20));
-    fluid.each(diffsAndUpdates.slice(startingPoint, startingPoint + 20), function (diffAndUpdate) {
+    fluid.each(diffsAndUpdates, function (diffAndUpdate) {
         promises.push(function () {
             return gpii.ul.imports.mailUpdateReport.mailSingleRecord(that, diffAndUpdate);
         });
@@ -60,6 +59,7 @@ gpii.ul.imports.mailUpdateReport.mailSingleRecord = function (that, diffAndUpdat
     var mailOptions = fluid.copy(that.options.baseMailOptions);
 
     mailOptions.text = that.renderer.render(that.options.textTemplateKey, { options: that.options, diff: diffAndUpdate.diff, update: diffAndUpdate.update});
+    mailOptions.subject = fluid.stringTemplate(that.options.subjectTemplate, diffAndUpdate.update);
 
     var rawHtml = that.renderer.render(that.options.htmlTemplateKey, { options: that.options, diff: diffAndUpdate.diff, update: diffAndUpdate.update});
     var allCssContent = "";
@@ -94,11 +94,10 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
         secure:    false,
         port:      "{that}.options.smtpPort"
     },
+    subjectTemplate: "Update report for Unified Listing vendor record '%source:%sid'.",
     baseMailOptions: {
         from:    "noreply@ul.gpii.net",
-        to:      "tony@raisingthefloor.org",
-        // to: "ul-fed-db-update@raisingthefloor.org",
-        subject: "Update report for a Unified Listing vendor record."
+        to:      "ul-fed-db-update@raisingthefloor.org"
     },
     components: {
         renderer: {
