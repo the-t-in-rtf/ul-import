@@ -49,18 +49,16 @@
             }
         },
         listeners: {
-            "onCreate.wireControls": [
-                {
-                    "this": "{that}.dom.toggle",
-                    method: "keydown",
-                    args:   "{that}.filterKeyPress"
-                },
-                {
-                    "this": "{that}.dom.toggle",
-                    method: "click",
-                    args:   "{that}.performToggle"
-                }
-            ]
+            "onCreate.wireToggleKeyPress": {
+                "this": "{that}.dom.toggle",
+                method: "keydown",
+                args:   "{that}.filterKeyPress"
+            },
+            "onCreate.wireToggleClick": {
+                "this": "{that}.dom.toggle",
+                method: "click",
+                args:   "{that}.performToggle"
+            }
         }
     });
 })(fluid, jQuery);
