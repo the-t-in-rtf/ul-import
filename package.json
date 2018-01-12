@@ -1,68 +1,69 @@
 {
-  "name": "ul-imports",
-  "version": "1.0.0",
-  "description": "The scripts used to import data into the Unified Listing.",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "node node_modules/istanbul/lib/cli.js cover tests/all-tests.js",
-    "full-sync": "npm run all-imports && npm run unifier && npm run all-image-imports && npm run sai-curation",
-    "sai-sync": "npm run sai-import && npm run unifier && npm run sai-image-import && npm run sai-curation",
-    "all-imports": "npm run eastin-import && npm run sai-import",
-    "eastin-import": "node src/js/eastin/launcher.js -- --noCache",
-    "sai-import": "node src/js/sai/index.js -- --noCache",
-    "gari-import": "node src/js/gari/index.js -- --noCache",
-    "unifier": "node src/js/unifier/index.js -- --optionsFile %ul-imports/configs/unifier-prod.json",
-    "all-image-imports": "npm run eastin-image-import && npm run sai-image-import",
-    "eastin-image-import": "node src/js/images/eastin-image-sync.js",
-    "sai-image-import": "node src/js/images/sai-image-sync.js",
-    "gari-image-import": "node src/js/images/gari-image-sync.js",
-    "sai-curation": "npm run sai-curation-merge && npm run sai-curation-metadata && npm run sai-curation-delete",
-    "sai-curation-delete": "node src/js/sai/delete.js",
-    "sai-curation-merge": "node src/js/sai/merge.js",
-    "sai-curation-metadata": "node src/js/sai/metadata.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/the-t-in-rtf/ul-import.git"
-  },
-  "author": "Tony Atkins <tony@raisingthefloor.org>",
-  "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://github.com/the-t-in-rtf/ul-import/issues"
-  },
-  "homepage": "https://github.com/the-t-in-rtf/ul-import#readme",
-  "dependencies": {
-    "cheerio": "1.0.0-rc.2",
-    "foundation-sites": "6.4.4-rc1",
-    "gpii-diff": "1.0.0-dev.20171128T134233Z.8584f1c",
-    "gpii-express": "1.0.9",
-    "gpii-express-user": "1.0.0-dev.20170420T094715Z.667e69a",
-    "gpii-launcher": "1.0.0-dev.20170712T140305Z.aa60d4a",
-    "gpii-pouchdb-lucene": "0.1.0-dev.20170523T095210Z.7508cd5",
-    "gpii-sort": "1.0.0-dev.20170420T114825Z.804ac19",
-    "infusion": "3.0.0-dev.20170322T234120Z.278de35",
-    "juice": "4.2.2",
-    "markdown-it": "8.4.0",
-    "md5-file": "3.2.2",
-    "mkdirp": "0.5.1",
-    "nodemailer": "4.3.1",
-    "nodemailer-smtp-transport": "2.7.4",
-    "ul-api": "1.0.0-dev.20171208T132321Z.264fbd0",
-    "universal": "GPII/universal#88aec55cd2cafb2cab914978b11c5e1bc7926260"
-  },
-  "devDependencies": {
-    "eslint": "4.6.1",
-    "eslint-config-fluid": "1.1.0",
-    "fluid-grunt-eslint": "18.1.2",
-    "grunt": "1.0.1",
-    "grunt-jsonlint": "1.1.0",
-    "istanbul": "0.4.5",
-    "kettle": "1.7.0",
-    "node-jqunit": "1.1.7",
-    "request": "2.81.0",
-    "rimraf": "2.6.1"
-  }
+    "name": "ul-imports",
+    "version": "1.0.0",
+    "description": "The scripts used to import data into the Unified Listing.",
+    "main": "index.js",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "node node_modules/istanbul/lib/cli.js cover tests/all-tests.js",
+        "full-sync": "npm run all-imports && npm run unifier && npm run all-image-imports && npm run sai-curation",
+        "sai-sync": "npm run sai-import && npm run unifier && npm run sai-image-import && npm run sai-curation",
+        "all-imports": "npm run eastin-import && npm run sai-import",
+        "eastin-import": "node src/js/eastin/launcher.js -- --noCache",
+        "sai-import": "node src/js/sai/index.js -- --noCache",
+        "gari-import": "node src/js/gari/index.js -- --noCache",
+        "unifier": "node src/js/unifier/index.js -- --optionsFile %ul-imports/configs/unifier-prod.json",
+        "all-image-imports": "npm run eastin-image-import && npm run sai-image-import",
+        "eastin-image-import": "node src/js/images/eastin-image-sync.js",
+        "sai-image-import": "node src/js/images/sai-image-sync.js",
+        "gari-image-import": "node src/js/images/gari-image-sync.js",
+        "sai-curation": "npm run sai-curation-merge && npm run sai-curation-metadata && npm run sai-curation-delete",
+        "sai-curation-delete": "node src/js/sai/delete.js",
+        "sai-curation-merge": "node src/js/sai/merge.js",
+        "sai-curation-metadata": "node src/js/sai/metadata.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/the-t-in-rtf/ul-import.git"
+    },
+    "author": "Tony Atkins <tony@raisingthefloor.org>",
+    "license": "BSD-3-Clause",
+    "bugs": {
+        "url": "https://github.com/the-t-in-rtf/ul-import/issues"
+    },
+    "homepage": "https://github.com/the-t-in-rtf/ul-import#readme",
+    "dependencies": {
+        "cheerio": "1.0.0-rc.2",
+        "foundation-sites": "6.4.4-rc1",
+        "gpii-diff": "1.0.0-dev.20171128T134233Z.8584f1c",
+        "gpii-express": "1.0.9",
+        "gpii-express-user": "1.0.0-dev.20170420T094715Z.667e69a",
+        "gpii-launcher": "1.0.0-dev.20171221T122035Z.edade23",
+        "gpii-pouchdb-lucene": "0.1.0-dev.20170523T095210Z.7508cd5",
+        "gpii-sort": "1.0.0-dev.20170420T114825Z.804ac19",
+        "infusion": "3.0.0-dev.20170322T234120Z.278de35",
+        "juice": "4.2.2",
+        "markdown-it": "8.4.0",
+        "md5-file": "3.2.2",
+        "mkdirp": "0.5.1",
+        "nodemailer": "4.3.1",
+        "nodemailer-smtp-transport": "2.7.4",
+        "pako": "1.0.6",
+        "ul-api": "1.0.0-dev.20171208T132321Z.264fbd0",
+        "universal": "GPII/universal#88aec55cd2cafb2cab914978b11c5e1bc7926260"
+    },
+    "devDependencies": {
+        "eslint": "4.6.1",
+        "eslint-config-fluid": "1.1.0",
+        "fluid-grunt-eslint": "18.1.2",
+        "grunt": "1.0.1",
+        "grunt-jsonlint": "1.1.0",
+        "istanbul": "0.4.5",
+        "kettle": "1.7.0",
+        "node-jqunit": "1.1.7",
+        "request": "2.81.0",
+        "rimraf": "2.6.1"
+    }
 }

@@ -20,7 +20,6 @@ var fs   = require("fs");
 var os   = require("os");
 var path = require("path");
 
-fluid.require("%gpii-launcher");
 fluid.require("%gpii-diff");
 gpii.diff.loadMarkdownSupport();
 
@@ -29,21 +28,21 @@ gpii.ul.imports.diffImportResults.generateOutputPath = function (that, baseDir) 
     return path.resolve(baseDir, (new Date()).toISOString() + "-diffsAndUpdates-" + that.id + ".json");
 };
 
-gpii.ul.imports.diffImportResults.generateDiff = function (that) {
+gpii.ul.imports.diffImportResults.generateDiff = function (originalsPath, updatesPath, diffFieldsToCompare, outputPath) {
     var diffsAndUpdates = [];
-    var originals = require(fluid.module.resolvePath(that.options.originalsPath));
+    var originals = require(fluid.module.resolvePath(originalsPath));
     var originalsBySourceAndSid = {};
     fluid.each(originals, function (originalRecord) {
         fluid.set(originalsBySourceAndSid, originalRecord.source + "." + originalRecord.sid, originalRecord);
     });
 
-    var updates   = require(fluid.module.resolvePath(that.options.updatesPath));
+    var updates   = require(fluid.module.resolvePath(updatesPath));
     fluid.each(updates, function (updatedRecord) {
         var originalRecord = fluid.get(originalsBySourceAndSid, updatedRecord.source + "." + updatedRecord.sid);
         if (originalRecord !== undefined) {
             fluid.log("diffing ", originalRecord.source, ":", originalRecord.sid);
-            var filteredOriginalRecord = fluid.filterKeys(originalRecord, that.options.diffFieldsToCompare);
-            var filteredUpdatedRecord = fluid.filterKeys(updatedRecord, that.options.diffFieldsToCompare);
+            var filteredOriginalRecord = fluid.filterKeys(originalRecord, diffFieldsToCompare);
+            var filteredUpdatedRecord = fluid.filterKeys(updatedRecord, diffFieldsToCompare);
             if (!gpii.diff.equals(filteredOriginalRecord, filteredUpdatedRecord)) {
                 var diff = gpii.diff.compare(
                     filteredOriginalRecord,
@@ -56,11 +55,11 @@ gpii.ul.imports.diffImportResults.generateDiff = function (that) {
     });
 
     if (diffsAndUpdates.length) {
-        var outputPath = fluid.module.resolvePath(that.options.outputPath);
+        var resolvedOutputPath = fluid.module.resolvePath(outputPath);
 
-        fs.writeFileSync(outputPath, JSON.stringify(diffsAndUpdates, null, 2), { encoding: "utf8"});
+        fs.writeFileSync(resolvedOutputPath, JSON.stringify(diffsAndUpdates, null, 2), { encoding: "utf8"});
 
-        fluid.log("Saved " + diffsAndUpdates.length + " diffs and updated records to '" + outputPath + "'...");
+        fluid.log("Saved " + diffsAndUpdates.length + " diffs and updated records to '" + resolvedOutputPath + "'...");
     }
     else {
         fluid.log("No updates to process.");
@@ -68,41 +67,18 @@ gpii.ul.imports.diffImportResults.generateDiff = function (that) {
 
 };
 
+gpii.ul.imports.diffImportResults.defaultFieldsToCompare = ["manufacturer", "description", "name", "status", "uid", "sid", "source", "sourceUrl"];
+
 fluid.defaults("gpii.ul.imports.diffImportResults", {
     gradeNames: ["fluid.component"],
     outputDir:   os.tmpdir(),
     outputPath:  "@expand:gpii.ul.imports.diffImportResults.generateOutputPath({that}, {that}.options.outputDir)",
-    diffFieldsToCompare: ["manufacturer", "description", "name", "status", "uid", "sid", "source", "sourceUrl"],
+    diffFieldsToCompare: gpii.ul.imports.diffImportResults.defaultFieldsToCompare,
     listeners: {
         "onCreate.generateDiff": {
             funcName: "gpii.ul.imports.diffImportResults.generateDiff",
-            args:     ["{that}"]
+            args:     ["{that}.options.originalsPath", "{that}.options.updatesPath", "{that}.options.diffFieldsToCompare", "{that}.options.outputPath"] // originalsPath, updatesPath, diffFieldsToCompare, outputPath
         }
     }
 });
 
-fluid.defaults("gpii.ul.imports.diffImportResults.launcher", {
-    gradeNames:  ["gpii.launcher"],
-    optionsFile: "%ul-imports/configs/updates-diff.json",
-    "yargsOptions": {
-        "describe": {
-            "updatesPath":   "The path (absolute or package-relative) to the updated versions of records that were updated in a given import.",
-            "originalsPath": "The path (absolute or package-relative) to the original versions of records that were updated in a given import.",
-            "outputDir":     "The directory in which we should save our output.  A unique filename will be generated for this run.",
-            "outputPath":    "The full path (absolute or package-relative) to use when saving the output from this run.",
-            "setLogging":    "Whether to display verbose log messages.  Set to `true` by default."
-        },
-        required: ["updatesPath", "originalsPath", "outputPath"],
-        defaults: {
-            "optionsFile": "{that}.options.optionsFile",
-            "outputPath": "{that}.options.outputPath",
-            "setLogging":  true
-        },
-        coerce: {
-            "setLogging": JSON.parse
-        },
-        help: true
-    }
-});
-
-gpii.ul.imports.diffImportResults.launcher();

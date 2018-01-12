@@ -9,10 +9,9 @@ var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%gpii-handlebars");
 fluid.require("%gpii-diff");
-fluid.require("%gpii-launcher");
 
-require("./jsonLoader");
-require("./renderer");
+require("./lib/jsonLoader");
+require("./lib/renderer");
 
 var fs            = require("fs");
 var juice         = require("juice");
@@ -34,8 +33,13 @@ gpii.ul.imports.mailUpdateReport.processQueue = function (that) {
 
     var sequence = fluid.promise.sequence(promises);
     sequence.then(
-        function (results) { fluid.log("Sent ", results.length, " update emails...");},
-        fluid.fail
+        function (results) {
+            fluid.log("Sent ", results.length, " update emails...");
+            that.queuePromise.resolve();
+        },
+        function (error) {
+            that.queuePromise.reject(error);
+        }
     );
 };
 
@@ -88,6 +92,9 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     textTemplateKey: "single-update-email-text",
     htmlTemplateKey: "single-update-email-html",
     smtpPort:   25,
+    members: {
+        queuePromise: fluid.promise()
+    },
     cssFiles: ["%gpii-diff/src/css/gpii-diff.css", "%ul-imports/src/css/ul-imports.css"],
     transportOptions: {
         ignoreTLS: true,
@@ -112,27 +119,3 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     }
 });
 
-fluid.defaults("gpii.ul.imports.mailUpdateReport.launcher", {
-    gradeNames: ["gpii.launcher"],
-    optionsFile: "%ul-imports/configs/updates-email.json",
-    "yargsOptions": {
-        "describe": {
-            "diffsAndUpdatesPath": "The path (absolute or package-relative) to the 'diffs and updates' JSON file generated for a given import.",
-            "outputDir":           "The path (absolute or package-relative) to the directory where the output from this run will be saved.",
-            "setLogging":          "Whether to display verbose log messages.  Set to `true` by default.",
-            "smtpPort":            "The mail server port to use when sending outgoing messages."
-        },
-        required: ["diffsAndUpdatesPath", "outputDir"],
-        defaults: {
-            "optionsFile": "{that}.options.optionsFile",
-            "outputDir":   "{that}.options.outputDir",
-            "setLogging":  true
-        },
-        coerce: {
-            "setLogging": JSON.parse
-        },
-        help: true
-    }
-});
-
-gpii.ul.imports.mailUpdateReport.launcher();

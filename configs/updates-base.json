@@ -1,5 +1,10 @@
 {
     "options": {
-        "gradeNames": "fluid.component"
+        "gradeNames": "fluid.component",
+        "incomingImportOutputDir": "/srv/ul-import-output/incoming",
+        "archivedImportOutputDir": "/srv/ul-import-output/archived",
+        "incomingDiffsDir": "/srv/ul-diffs/incoming",
+        "archivedDiffsDir": "/srv/ul-diffs/archived",
+        "reportDir": "/srv/ul-updates-reports"
     }
 }
