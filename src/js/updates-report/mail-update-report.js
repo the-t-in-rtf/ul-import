@@ -92,8 +92,9 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     textTemplateKey: "single-update-email-text",
     htmlTemplateKey: "single-update-email-html",
     smtpPort:   25,
+    queuePromise: fluid.promise(),
     members: {
-        queuePromise: fluid.promise()
+        queuePromise: "{that}.options.queuePromise"
     },
     cssFiles: ["%gpii-diff/src/css/gpii-diff.css", "%ul-imports/src/css/ul-imports.css"],
     transportOptions: {

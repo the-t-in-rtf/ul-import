@@ -131,6 +131,7 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
                     reportPromise.resolve();
                 }
             });
+            return reportPromise;
         });
     });
     var reportSequence = fluid.promise.sequence(reportPromises);
@@ -160,8 +161,9 @@ gpii.ul.imports.updateReport.generateUniqueSubdir = function (that, baseOutputDi
 
 fluid.defaults("gpii.ul.imports.updateReport", {
     gradeNames: ["fluid.component"],
+    queuePromise: fluid.promise(),
     members: {
-        queuePromise: fluid.promise()
+        queuePromise: "{that}.options.queuePromise"
     },
     templateKeys: {
         overallAllUpdates: "overall-all-updates",

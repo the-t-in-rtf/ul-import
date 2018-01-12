@@ -40,12 +40,12 @@ gpii.ul.imports.reportsFromDiffs.processQueue = function (that) {
                 fluid.log("Processing batch '", batchId, "'...");
 
                 var batchPromises = [];
-                //// Emails
-                //batchPromises.push(function () {
-                //    var createEmailPromise = fluid.promise();
-                //    that.events.createEmailReporter.fire(diffFilePath, createEmailPromise);
-                //    return createEmailPromise;
-                //});
+                // Emails
+                batchPromises.push(function () {
+                    var createEmailPromise = fluid.promise();
+                    that.events.createEmailReporter.fire(diffFilePath, createEmailPromise);
+                    return createEmailPromise;
+                });
 
                 // Diff Report
                 batchPromises.push(function () {
@@ -56,16 +56,23 @@ gpii.ul.imports.reportsFromDiffs.processQueue = function (that) {
 
                 // Archive
                 batchPromises.push(function () {
+                    var emptyPromise = fluid.promise();
                     var originalFilename = path.basename(diffFilePath);
                     var destPath = path.resolve(resolvedArchiveDir, originalFilename + ".gz");
-                    gpii.ul.imports.zipper(diffFilePath, destPath, false); // TODO: Update to `true` once we confirm everything working to our liking.
+                    gpii.ul.imports.zipper(diffFilePath, destPath, true);
+                    emptyPromise.resolve();
+                    return emptyPromise;
                 });
 
-                return fluid.promise.sequence(batchPromises);
+                var batchSequence = fluid.promise.sequence(batchPromises);
+                batchSequence.then(function () {
+                    fluid.log("Finished processing batch '", batchId, "'.");
+                });
+                return batchSequence;
             });
         });
-        var batchSequence = fluid.promise.sequence(allBatchPromises);
-        batchSequence.then(
+        var allBatchesSequence = fluid.promise.sequence(allBatchPromises);
+        allBatchesSequence.then(
             function () {
                 fluid.log("Finished processing incoming diff results.");
             },
@@ -89,17 +96,15 @@ fluid.defaults("gpii.ul.imports.reportsFromDiffs", {
             args:     ["{that}"]
         }
     },
-    components: {
+    dynamicComponents: {
         // https://docs.fluidproject.org/infusion/development/SubcomponentDeclaration.html#dynamic-subcomponents-with-a-source-event
         htmlReporter: {
             createOnEvent: "createHtmlReporter",
             type: "gpii.ul.imports.updateReport",
             options: {
                 diffsAndUpdatesPath: "{arguments}.0",
-                queuePromise:        "{arguments}.1",
-                members: {
-                    baseOutputDir:       "{gpii.ul.imports.reportsFromDiffs}.options.reportDir"
-                }
+                baseOutputDir:       "{gpii.ul.imports.reportsFromDiffs}.options.reportDir",
+                queuePromise:        "{arguments}.1"
             }
         },
         emailReporter: {
