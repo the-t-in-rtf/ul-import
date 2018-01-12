@@ -47,6 +47,8 @@ This package has a few `npm` scripts defined to cover each part of the above.  T
 For individual commands, see the `package.json` file.  Note that all of the npm scripts are hard-coded to use the
 "production" configuration settings.  To run in a dev environment, you will need to run the direct commands (see below).
 
+__NOTE:__ The GARI imports are no longer included in a "full" sync.
+
 ## Syncing Using Direct Commands
 
 This package provides a range of scripts that use [`gpii-launcher`](https://www.npmjs.com/package/gpii-launcher) to
@@ -151,3 +153,18 @@ Using an environment variable to set the same password, you might use a command 
 For more details about supported options, run any of the scripts in this package with the `--help` argument.  You can
 also create your own custom options files and use those instead of the included files.  For more details, see the
 `gpii-launcher` documentation.
+
+
+## Generating "Updates" Reports
+
+Each import that is run saves data on updated records to a file.  These files can be used to generate emails describing
+each updated record, and also a rollup HTML report that summarises all the changes for a given import.   This process
+involves two steps:
+
+1. Look for unprocessed import output.  Compare the raw updates for a given source to the original records and produce a "diff" data file.  Import output is gzipped and archived at the end of this process.
+2. Look for unprocessed "diff" data files.  Generate emails and an HTML report for each file.  Incoming "diff" data
+   files are then gzipped and archive the file.
+
+There are npm scripts provided in this package to handle both steps.  There is a rollup script to run these in order, 
+which is run using a command like `npm run updates-report`.  You can also run the steps individually, see the
+`package.json` file for details.

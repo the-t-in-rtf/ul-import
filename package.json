@@ -22,7 +22,10 @@
         "sai-curation": "npm run sai-curation-merge && npm run sai-curation-metadata && npm run sai-curation-delete",
         "sai-curation-delete": "node src/js/sai/delete.js",
         "sai-curation-merge": "node src/js/sai/merge.js",
-        "sai-curation-metadata": "node src/js/sai/metadata.js"
+        "sai-curation-metadata": "node src/js/sai/metadata.js",
+        "updates-report": "npm run updates-report:diffs && npm run updates-report:reports",
+        "updates-report:diffs": "node src/js/updates-report/process-incoming-import-results.js",
+        "updates-report:reports": "node src/js/updates-report/process-incoming-diff-results.js"
     },
     "repository": {
         "type": "git",
