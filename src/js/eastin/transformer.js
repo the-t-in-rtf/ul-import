@@ -23,7 +23,6 @@ gpii.ul.imports.eastin.transformer.lookupLanguage = function (rawValue, transfor
         fluid.fail("You must pass a databases option to use this transform.");
     }
 
-    // TODO:  Remove this once we are sure we are no longer storing null records when communication fails.
     if (!transformSpec.databases[rawValue]) {
         fluid.log("No configuration found for database '" + rawValue + "', defaulting to US english...");
         return null;
@@ -72,6 +71,13 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
                         }
                     }
                 ]
+            }
+        },
+        language: {
+            transform: {
+                type:      "gpii.ul.imports.eastin.transformer.lookupLanguage",
+                inputPath: "Database",
+                databases: "{that}.options.databases"
             }
         },
         manufacturer: {

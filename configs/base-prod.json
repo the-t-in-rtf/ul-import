@@ -2,7 +2,7 @@
     "type": "ul.imports.prodConfig",
     "options": {
         "gradeNames": "fluid.component",
-        "outputDir": "/srv/ul-logs",
+        "outputDir": "/srv/ul-import-output/incoming",
         "ports": {
             "api": 4896,
             "couch": 5984

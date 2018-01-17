@@ -5,6 +5,6 @@
     "%ul-imports/configs/sai-base.json"
   ],
   "options": {
-    "outputDir": "/srv/ul-logs/archived"
+    "outputDir": "/srv/ul-import-output/archived"
   }
 }

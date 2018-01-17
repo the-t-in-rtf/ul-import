@@ -227,7 +227,7 @@ fluid.defaults("gpii.ul.imports.syncer", {
     maxRequests:   50,
     fieldsToPreserve: ["status", "uid"],
     fieldsNotToCompare: ["updated"],
-    diffFieldsToCompare: ["manufacturer", "description", "name", "status", "uid", "sid", "source", "sourceUrl"],
+    diffFieldsToCompare: ["manufacturer", "description", "name", "status", "uid", "sid", "source", "sourceUrl", "language"],
     outputDir: os.tmpdir(),
     prune: false,
     displayReport: true,

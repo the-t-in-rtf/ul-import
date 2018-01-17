@@ -2,6 +2,6 @@
   "type": "ul.imports.eastin.prodConfig",
   "mergeConfigs": ["%ul-imports/configs/base-prod.json", "%ul-imports/configs/eastin-base.json"],
   "options": {
-    "outputDir": "/srv/ul-logs/incoming"
+    "outputDir": "/srv/ul-import-output/incoming"
   }
 }
