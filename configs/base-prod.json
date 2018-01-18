@@ -152,6 +152,17 @@
                         }
                     ]
                 }
+            },
+            "ulDbAllDocs": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%ulDb/_all_docs",
+                        {
+                            "ulDb": "{that}.options.urls.ulDb"
+                        }
+                    ]
+                }
             }
         }
     }

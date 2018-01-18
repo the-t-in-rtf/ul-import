@@ -1,7 +1,16 @@
 /*
 
     A script to retrieve the full list of "source" records and attempt to retrieve each of their "sourceURL" targets.
+    Prepares two output files:
 
+    1. A file that contains records flagged as deleted that are still retrievable.
+    2. A file that contains records flagged as active that cannot be retrieved.
+
+    Each of these are structured as JSON files that can be used with CouchDB's bulk update features, as in this example:
+
+    ```
+    curl -H "Content-Type: application/json" -X POST -d @/srv/ul-import-output/incoming/fix-deleted-but-found.json http://admin:admin@localhost:5984/ul/_bulk_docs
+    ```
  */
 "use strict";
 var fluid = require("infusion");
@@ -9,16 +18,16 @@ fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 
+var fs      = require("fs");
+var os      = require("os");
+var path    = require("path");
 var request = require("request");
-var fs = require("fs");
 
 require("../dataSource");
 require("../concurrent-promise-queue");
 
 require("../launcher");
 
-fluid.require("path");
-var os = require("os");
 
 fluid.registerNamespace("gpii.ul.imports.curation.urlChecker");
 
@@ -36,9 +45,10 @@ gpii.ul.imports.curation.urlChecker.checkSourceUrls = function (that, results) {
 
     // For each product with a source URL, check it with a raw request.  We have to do this because dataSources only deal
     // in results, and not in things like headers and status codes.
-    fluid.log("Examining ", results.products.length, " total products...");
-    fluid.each(results.products, function (record) {
-        if (record.sourceUrl) {
+    fluid.log("Examining ", results.rows.length, " total records...");
+    fluid.each(results.rows, function (couchRecord) {
+        var record = couchRecord.doc;
+        if (record.source !== "unified" && record.sourceUrl) {
             promises.push(function () {
                 var promise = fluid.promise();
                 var requestOptions = fluid.merge({}, requestBaseOptions, { url: record.sourceUrl});
@@ -71,36 +81,71 @@ gpii.ul.imports.curation.urlChecker.checkSourceUrls = function (that, results) {
 };
 
 gpii.ul.imports.curation.urlChecker.processSourceUrlResults = function (that, results) {
-    var filteredResults = [];
+    var activeButNotFound = [];
+    var deletedButFound = [];
     fluid.each(results, function (singleResult) {
-        if (singleResult.isError) {
-            filteredResults.push(singleResult);
+        var updatedRecord = fluid.copy(singleResult.record);
+        updatedRecord.updated = (new Date()).toISOString();
+        if (singleResult.isError && singleResult.record.status !== "deleted") {
+            updatedRecord.status = "deleted";
+            activeButNotFound.push(updatedRecord);
+        }
+        else if (!singleResult.isError && singleResult.record.status === "deleted") {
+            updatedRecord.status = "new";
+            deletedButFound.push(updatedRecord);
         }
     });
 
-    // TODO: Write logic to handle failures.
-    fluid.log("Found ", filteredResults.length, " records whose source URL cannot be retrieved.");
-    fs.writeFile(that.options.outputPath, JSON.stringify(filteredResults, null, 2), function (error) {
-        if (error) {
-            fluid.log("Error saving results: ", error);
-        }
-        else {
-            fluid.log("Saved results to ", that.options.outputPath);
-        }
-    });
+    if (activeButNotFound.length) {
+        var activeButNotFoundReportPath = path.resolve(that.options.outputDir, that.options.filenames.activeButMissing);
+        fluid.log("Found ", activeButNotFound.length, " active records whose source URL cannot be retrieved.");
+        fs.writeFile(activeButNotFoundReportPath, JSON.stringify({ docs: activeButNotFound }, null, 2), function (error) {
+            if (error) {
+                fluid.log("Error saving irretrievable active records: ", error);
+            }
+            else {
+                fluid.log("Saved active records that could not be retrieved as a bulk update at ", activeButNotFoundReportPath);
+            }
+        });
+    }
+    else {
+        fluid.log("No active records were found whose source record could not be retrieved.");
+    }
+
+    if (deletedButFound.length) {
+        var deletedButFoundReportPath = path.resolve(that.options.outputDir, that.options.filenames.deletedButFound);
+        fluid.log("Found ", deletedButFound.length, " deleted records whose source URL is still active.");
+        fs.writeFile(deletedButFoundReportPath, JSON.stringify({ docs: deletedButFound }, null, 2), function (error) {
+            if (error) {
+                fluid.log("Error saving deleted records with active source URLs: ", error);
+            }
+            else {
+                fluid.log("Saved deleted records with active source URLs as a bulk json update at ", deletedButFoundReportPath);
+            }
+        });
+    }
+    else {
+        fluid.log("No deleted records with active Source URLs were found.");
+    }
+
+    if (activeButNotFound.length || deletedButFound.length) {
+        fluid.log("To bulk update records, POST one of the fix files to: http://username:password@hostname:port/db/_bulk_docs");
+    }
 };
 
 fluid.defaults("gpii.ul.imports.curation.urlChecker", {
     gradeNames: ["fluid.component"],
     maxRequests: 100,
     outputDir: os.tmpdir(),
-    outputFilename: "stale-source-urls.json",
-    outputPath: "@expand:path.resolve({that}.options.outputDir, {that}.options.outputFilename)",
+    filenames: {
+        activeButMissing: "fix-active-but-missing.json",
+        deletedButFound: "fix-deleted-but-found.json"
+    },
     urls: {
         allRecords: {
             expander: {
                 funcName: "fluid.stringTemplate",
-                args:     ["%productsUrl?unified=false&limit=100000" , { productsUrl: "{that}.options.urls.products"}]
+                args:     ["%allDocsUrl?include_docs=true" , { allDocsUrl: "{that}.options.urls.ulDbAllDocs"}]
             }
         }
     },
@@ -137,7 +182,7 @@ fluid.defaults("gpii.ul.imports.curation.urlChecker.launcher", {
     "yargsOptions": {
         "describe": {
             "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
-            "outputPath": "The full path to save the output to.   By default, a file named stale-source-urls.json is saved to the operating system's temporary directory."
+            "outputDir":  "The directory to save the output to.   By default, the operating system's temporary directory is used."
         },
         "coerce": {
             "setLogging": JSON.parse
