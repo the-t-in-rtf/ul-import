@@ -67,7 +67,7 @@ gpii.ul.imports.diffImportResults.generateDiff = function (originalsPath, update
 
 };
 
-gpii.ul.imports.diffImportResults.defaultFieldsToCompare = ["manufacturer", "description", "name", "status", "uid", "sid", "source", "sourceUrl"];
+gpii.ul.imports.diffImportResults.defaultFieldsToCompare = ["manufacturer", "description", "name", "uid", "sid", "source", "sourceUrl"];
 
 fluid.defaults("gpii.ul.imports.diffImportResults", {
     gradeNames: ["fluid.component"],
