@@ -41,7 +41,6 @@ gpii.ul.imports.eastin.sourceDataMiner.downloader.retrieveCachedRecords = functi
                 }
                 else {
                     var sourceDataOnly = body.products.filter(function (cachedRecord) { return cachedRecord.sourceData; }).map(function (cachedRecord) { return cachedRecord.sourceData; });
-                    fluid.log(JSON.stringify(sourceDataOnly[0], null, 2));
                     wrappedPromise.resolve(sourceDataOnly);
                 }
             });
