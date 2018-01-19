@@ -1,9 +1,6 @@
 {
   "type": "ul.imports.eastin.baseConfig",
   "options": {
-    "gradeNames": [
-      "gpii.ul.imports.eastin"
-    ],
     "jobKey": "eastin",
     "username": "importer",
     "password": "password",
