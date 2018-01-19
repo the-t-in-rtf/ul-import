@@ -1,4 +1,0 @@
-{
-  "type": "gpii.ul.imports.curation.sourceUrls.devConfig",
-  "mergeConfigs": ["%ul-imports/configs/curation-source-urls-base.json", "%ul-imports/configs/base-dev.json"]
-}
