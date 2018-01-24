@@ -12,8 +12,9 @@ var mkdirp = require("mkdirp");
 var fs     = require("fs");
 var path   = require("path");
 
-require("./lib/renderer");
 require("./lib/jsonLoader");
+require("./lib/renderer");
+require("./lib/sanitize-filename");
 
 fluid.registerNamespace("gpii.ul.imports.updateReport");
 
@@ -122,7 +123,7 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
                     // Create a page for each record that links back to the source and overall summaries.  Requires both the diff and the full updated record.s
                     fluid.each(diffsAndUpdates, function (diffAndUpdate) {
                         var sid = gpii.diff.rightValue(diffAndUpdate.diff.sid);
-                        var individualdiffFilename = source + "-" + encodeURIComponent(sid) + ".html";
+                        var individualdiffFilename = source + "-" +  gpii.ul.imports.sanitizeFilename(sid) + ".html";
                         var individualDiffHtml     = that.renderer.render(that.options.templateKeys.singleRecord, { options: that.options, diffAndUpdate: diffAndUpdate, dateStamp: dateStamp });
                         var individualDiffPath     = path.resolve(sourceOutputPath, individualdiffFilename);
                         fs.writeFileSync(individualDiffPath, individualDiffHtml, "utf8");

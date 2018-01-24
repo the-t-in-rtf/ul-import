@@ -4,7 +4,7 @@ var fluid = require("infusion");
 fluid.require("%gpii-handlebars");
 fluid.require("%gpii-diff");
 
-require("./urlEncode-helper");
+require("./sanitize-filename-helper");
 require("./resolvePath-helper");
 
 fluid.defaults("gpii.ul.imports.renderer", {
@@ -33,8 +33,8 @@ fluid.defaults("gpii.ul.imports.renderer", {
         rightValue: {
             type: "gpii.diff.helper.rightValue"
         },
-        urlEncode: {
-            type: "gpii.ul.imports.helpers.urlEncode"
+        sanitizeFilename: {
+            type: "gpii.ul.imports.helpers.sanitizeFilename"
         }
     }
 });

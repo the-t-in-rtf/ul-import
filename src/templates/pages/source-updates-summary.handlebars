@@ -26,7 +26,7 @@
                         {{#each diffsAndUpdates as |diffAndUpdate|}}
                             <tr>
                                 <td>{{rightValue diffAndUpdate.diff.sid}}</td>
-                                <td><a href="{{../source}}-{{urlEncode diffAndUpdate.diff.sid.0.value}}.html">{{rightValue diffAndUpdate.diff.name}}</a></td>
+                                <td><a href="{{../source}}-{{sanitizeFilename diffAndUpdate.diff.sid.0.value}}.html">{{rightValue diffAndUpdate.diff.name}}</a></td>
                             </tr>
                         {{/each}}
                     </tbody>
