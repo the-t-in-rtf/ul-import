@@ -19,8 +19,8 @@ fluid.registerNamespace("gpii.ul.imports");
  *
  * Function to gzip a file and save it to a new location.
  *
- * @param `srcPath` `{String}` - The path to the original file.
- * @param `destPath` `{String}` - The path to save the compressed output to.
+ * @param srcPath {String} - The path to the original file.
+ * @param destPath {String} - The path to save the compressed output to.
  */
 gpii.ul.imports.zipper = function (srcPath, destPath, deleteOriginal) {
     if (fs.existsSync(srcPath)) {
