@@ -255,15 +255,14 @@ gpii.ul.imports.images.syncer.startSync = function (that) {
         else {
             promises.push(function () {
                 // TODO: Convert to using dynamic components once we confirm that we can do so without the next one clobbering the previous.
-                var syncer = gpii.ul.imports.images.syncer.singleRecordSyncer(
-                    {
-                        imageDir: that.options.imageDir,
-                        urls: that.options.urls,
-                        username: that.options.username,
-                        password: that.options.password,
-                        source: that.options.source,
-                        members: { record: record } }
-                    );
+                var syncer = gpii.ul.imports.images.syncer.singleRecordSyncer({
+                    imageDir: that.options.imageDir,
+                    urls: that.options.urls,
+                    username: that.options.username,
+                    password: that.options.password,
+                    source: that.options.source,
+                    members: { record: record }
+                });
                 return syncer.promise;
             });
         }
@@ -299,6 +298,10 @@ fluid.defaults("gpii.ul.imports.images.syncer", {
         handleSuccess: {
             funcName: "gpii.ul.imports.images.syncer.handleSuccess",
             args:     ["{that}", "{arguments}.0"]
+        },
+        handleError: {
+            funcName: "fluid.fail",
+            args:     ["{that}.options.messages.errorSavingRecords", "{arguments}.0"]
         }
     }
 });

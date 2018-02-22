@@ -83,7 +83,7 @@ fluid.defaults("gpii.ul.imports.images.core", {
             "": "products"
         }
     },
-    setLogging: false,
+    setLogging: true,
     messages: {
         errorLoadingImageData: "There was an error loading the source image data:"
     },
