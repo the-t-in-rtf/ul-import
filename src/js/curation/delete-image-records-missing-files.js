@@ -60,7 +60,7 @@ gpii.ul.imports.curation.imageRecordsMissingFiles.bulkDeleteImageRecords = funct
     if (that.recordsMissingImages.length === 0 ) {
         fluid.log("No records found with missing images...");
     }
-    else if (!that.options.deleteRecords) {
+    else if (!that.options.commit) {
         fluid.log("Found ", that.recordsMissingImages.length, " images missing an associated image file.  Run with --deleteRecords=true to remove these records.");
     }
     else {
@@ -90,7 +90,7 @@ gpii.ul.imports.curation.imageRecordsMissingFiles.handleBulkUpdateResults = func
 
 fluid.defaults("gpii.ul.imports.curation.imageRecordsMissingFiles", {
     gradeNames: ["fluid.component"],
-    deleteRecords: false,
+    commit: false,
     simultaneousRequests: 100,
     members: {
         recordsMissingImages: []
@@ -122,7 +122,7 @@ fluid.defaults("gpii.ul.imports.curation.imageRecordsMissingFiles.launcher", {
     optionsFile: "%ul-imports/configs/curation-imageRecordsMissingFiles-prod.json",
     "yargsOptions": {
         "describe": {
-            "deleteRecords": "Whether to delete the image records found.",
+            "commit": "If true, actually delete the image records missing file data. Otherwise, report on them and exit.",
             "setLogging": "The logging level to use.  Set to `true` by default."
         },
         "defaults": {
