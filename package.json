@@ -54,7 +54,7 @@
         "nodemailer": "4.3.1",
         "nodemailer-smtp-transport": "2.7.4",
         "pako": "1.0.6",
-        "ul-api": "1.0.0-dev.20180117T095754Z.a6a5d5f",
+        "ul-api": "1.0.0-dev.20180228T095459Z.1141757",
         "universal": "GPII/universal#88aec55cd2cafb2cab914978b11c5e1bc7926260"
     },
     "devDependencies": {
