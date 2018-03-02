@@ -40,6 +40,17 @@ gpii.ul.imports.missingProductsBySource.retrieveUnifiedRecords = function (that)
     request.get(requestOptions, that.processUnifiedRecords);
 };
 
+gpii.ul.imports.missingProductsBySource.sortByUnifiedOnlyThenName = function (a, b) {
+    if (a.onlyInUL === b.onlyInUL) {
+        // Sort by name.
+        return a.name.localeCompare(b.name);
+    }
+    else {
+        // Reverse sort, i.e. "true", "false"
+        return b.onlyInUL.toString().localeCompare(a.onlyInUL.toString());
+    }
+};
+
 gpii.ul.imports.missingProductsBySource.processUnifiedRecords = function (that, error, response, body) {
     var runTimestamp = (new Date()).toISOString();
     var records = fluid.get(body, "products");
@@ -97,6 +108,8 @@ gpii.ul.imports.missingProductsBySource.processUnifiedRecords = function (that, 
 
             return fluid.merge({}, missingRecord, { onlyInUL: !hasNonSaiRecord });
         });
+        taggedRecords.sort(gpii.ul.imports.missingProductsBySource.sortByUnifiedOnlyThenName);
+
         missingRecordCountsAllSources[sourceKey] = recordCountBySource;
 
         var promise = fluid.promise();
