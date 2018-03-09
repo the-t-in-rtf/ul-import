@@ -1,5 +1,7 @@
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 var request = require("request");
@@ -14,7 +16,7 @@ gpii.ul.imports.curation.mergeLoops.login = function (that) {
 };
 
 gpii.ul.imports.curation.mergeLoops.getMergedRecords = function (that) {
-    fluid.log("Looking up all merged products...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Looking up all merged products...");
     var requestOptions = {
         url:  that.options.urls.mergedView,
         json: true,
@@ -47,10 +49,10 @@ gpii.ul.imports.curation.mergeLoops.handleMergedRecordLookup = function (that, e
         });
 
         if (!duplicateSourceSids.length) {
-            fluid.log("No merge loops found...");
+            fluid.log(fluid.logLevel.IMPORTANT, "No merge loops found...");
         }
         else if (!that.options.commit) {
-            fluid.log(duplicateSourceSids.length, " merge loops found, run with --commit to fix...");
+            fluid.log(fluid.logLevel.IMPORTANT, duplicateSourceSids.length, " merge loops found, run with --commit to fix...");
         }
         else {
             var updatedRecords = fluid.transform(duplicateSourceSids, function (duplicateSourceSid) {
@@ -82,7 +84,7 @@ gpii.ul.imports.curation.mergeLoops.handleBulkUpdateResults = function (that, er
         fluid.fail(error);
     }
     else {
-        fluid.log(body);
+        fluid.log(fluid.logLevel.TRACE, body);
     }
 };
 

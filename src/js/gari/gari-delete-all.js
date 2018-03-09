@@ -5,6 +5,8 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii = fluid.registerNamespace("gpii");
 
 // Needed because we have to log in and have a session cookie for use in later requests.
@@ -74,24 +76,24 @@ gpii.ul.imports.gari.deleteAll.processProductsResults = function (that, error, r
             }
         });
 
-        fluid.log("Skipped ", skippedRecords.length, " records that did not need to be updated...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Skipped ", skippedRecords.length, " records that did not need to be updated...");
 
         var skipFileName = "skipped-" + that.id + ".json";
         var skipPath = path.resolve(os.tmpDir(), skipFileName);
         fs.writeFileSync(skipPath, JSON.stringify(skippedRecords, null, 2));
-        fluid.log("Saved skipped records to '", skipPath, "'...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Saved skipped records to '", skipPath, "'...");
 
-        fluid.log(unifiedRecordsToUpdate.length, " records ready to be updated...");
+        fluid.log(fluid.logLevel.IMPORTANT, unifiedRecordsToUpdate.length, " records ready to be updated...");
         var updatesFilename = "updated-" + that.id + ".json";
         var updatesPath = path.resolve(os.tmpDir(), updatesFilename);
         fs.writeFileSync(updatesPath, JSON.stringify(unifiedRecordsToUpdate, null, 2));
 
-        fluid.log("Saved proposed updated records to '", updatesPath, "'...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Saved proposed updated records to '", updatesPath, "'...");
         if (that.options.commit) {
             gpii.ul.imports.gari.deleteAll.performUpdate(that, unifiedRecordsToUpdate);
         }
         else {
-            fluid.log("No changes will be made.  Run with the `--commit` option to save changes.");
+            fluid.log(fluid.logLevel.IMPORTANT, "No changes will be made.  Run with the `--commit` option to save changes.");
         }
     }
 
@@ -129,7 +131,7 @@ gpii.ul.imports.gari.deleteAll.performUpdate = function (that, unifiedRecordsToU
     var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
     queue.then(
         function (results) {
-            fluid.log("Saved ", results.length, " records to the UL API...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Saved ", results.length, " records to the UL API...");
         },
         fluid.fail
     );

@@ -64,10 +64,10 @@ gpii.ul.imports.curation.strayImages.handleImageLookupResults = function (that, 
         });
 
         if (strays.length === 0) {
-            fluid.log("No stray image records found...");
+            fluid.log(fluid.logLevel.IMPORTANT, "No stray image records found...");
         }
         else {
-            fluid.log("Found ", strays.length , " stray image records...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Found ", strays.length , " stray image records...");
             // Construct a bulk update
             var recordsFlaggedForDelete = fluid.transform(strays, function (originalRecord) {
                 var updatedRecord = fluid.copy(originalRecord);
@@ -92,7 +92,7 @@ gpii.ul.imports.curation.strayImages.handleBulkUpdateResults = function (that, e
         fluid.fail(error);
     }
     else {
-        fluid.log(body);
+        fluid.log(fluid.logLevel.TRACE, body);
     }
 };
 

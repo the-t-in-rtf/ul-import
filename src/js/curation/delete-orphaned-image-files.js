@@ -5,7 +5,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -49,10 +48,10 @@ gpii.ul.imports.curation.orphanedImageFiles.checkImageDir = function (that) {
     });
 
     if (staleSubdirs.length === 0) {
-        fluid.log("No stale image subdirectories found...");
+        fluid.log(fluid.logLevel.IMPORTANT, "No stale image subdirectories found...");
     }
     else {
-        fluid.log("Found ", staleSubdirs.length, " stale image subdirectories...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found ", staleSubdirs.length, " stale image subdirectories...");
 
         var promises = [];
         fluid.each(staleSubdirs, function (staleSubDir) {
@@ -74,7 +73,7 @@ gpii.ul.imports.curation.orphanedImageFiles.checkImageDir = function (that) {
         var sequence = fluid.promise.sequence(promises);
         sequence.then(
             function (results) {
-                fluid.log("Removed ", results.length, " stale image subdirectories...");
+                fluid.log(fluid.logLevel.IMPORTANT, "Removed ", results.length, " stale image subdirectories...");
             },
             fluid.fail
         );
@@ -108,7 +107,7 @@ fluid.defaults("gpii.ul.imports.curation.orphanedImageFiles.launcher", {
             "setLogging": "The logging level to use.  Set to `true` by default."
         },
         "defaults": {
-            setLogging: true
+            setLogging: fluid.logLevel.IMPORTANT
         },
         "coerce": {
             "setLogging": JSON.parse

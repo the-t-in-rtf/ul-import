@@ -34,6 +34,8 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii = fluid.registerNamespace("gpii");
 
 fluid.require("%ul-imports");

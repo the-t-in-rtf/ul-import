@@ -13,7 +13,7 @@ var path  = require("path");
 gpii.ul.imports.downloader.retrieveData = function (that) {
     if (!fs.existsSync(that.options.cacheFile) || that.options.noCache) {
         if (that.options.noCache) {
-            fluid.log("Cache disabled, forcing a refresh...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Cache disabled, forcing a refresh...");
         }
         if (that.options.url) {
             request(that.options.url, that.saveData);

@@ -6,6 +6,8 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 var request = require("request");
@@ -20,7 +22,7 @@ gpii.ul.imports.curation.fixDuplicateChildren.login = function (that) {
 };
 
 gpii.ul.imports.curation.fixDuplicateChildren.getMergedRecords = function (that) {
-    fluid.log("Looking up all merged products...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Looking up all merged products...");
     var requestOptions = {
         url:  that.options.urls.mergedView,
         json: true,
@@ -45,7 +47,7 @@ gpii.ul.imports.curation.fixDuplicateChildren.handleMergedRecordLookup = functio
         var duplicateUids = Object.keys(that.targetBySource);
 
         if (duplicateUids.length) {
-            fluid.log("Looking up child records for ", duplicateUids.length, " merged records...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Looking up child records for ", duplicateUids.length, " merged records...");
             var promises = [];
             for (var a = 0; a < duplicateUids.length; a += that.options.childrenToLookupPerRequest) {
                 var subset = duplicateUids.slice(a, that.options.childrenToLookupPerRequest);
@@ -63,7 +65,7 @@ gpii.ul.imports.curation.fixDuplicateChildren.handleMergedRecordLookup = functio
             sequence.then(that.processAllChildData, fluid.fail);
         }
         else {
-            fluid.log("No merged records found...");
+            fluid.log(fluid.logLevel.IMPORTANT, "No merged records found...");
         }
     }
 };
@@ -113,7 +115,7 @@ gpii.ul.imports.curation.fixDuplicateChildren.processAllChildData = function (th
     });
 
     if (duplicateChildRecords.length) {
-        fluid.log(duplicateChildRecords.length, " child records found that are incorrectly associated with a duplicate record...");
+        fluid.log(fluid.logLevel.IMPORTANT, duplicateChildRecords.length, " child records found that are incorrectly associated with a duplicate record...");
         if (that.options.commit) {
             var updatedRecords = fluid.transform(duplicateChildRecords, function (childRecord) {
                 var updatedRecord = fluid.copy(childRecord);
@@ -130,11 +132,11 @@ gpii.ul.imports.curation.fixDuplicateChildren.processAllChildData = function (th
             request.post(requestOptions, that.handleBulkUpdateResults);
         }
         else {
-            fluid.log("Run with --commit to fix these records.");
+            fluid.log(fluid.logLevel.IMPORTANT, "Run with --commit to fix these records.");
         }
     }
     else {
-        fluid.log("No duplicate child records found...");
+        fluid.log(fluid.logLevel.IMPORTANT, "No duplicate child records found...");
     }
 };
 
@@ -143,7 +145,7 @@ gpii.ul.imports.curation.fixDuplicateChildren.handleBulkUpdateResults = function
         fluid.fail(error);
     }
     else {
-        fluid.log(body);
+        fluid.log(fluid.logLevel.TRACE, body);
     }
 };
 

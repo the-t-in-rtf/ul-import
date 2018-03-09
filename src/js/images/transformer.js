@@ -20,6 +20,8 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 require("../transformer");
@@ -37,7 +39,7 @@ gpii.ul.imports.images.transformer.transformAndSave = function (that) {
         fluid.each(intermediateRecord.images, function (singleImage) {
             var singleRecord = fluid.model.transformWithRules({ singleImage: singleImage, intermediateRecord: intermediateRecord}, that.options.rules.intermediateToFinal);
             if (that.options.imagesToExclude && singleRecord.image_id.match(that.options.imagesToExclude)) {
-                fluid.log("Excluding blacklisted record...");
+                fluid.log(fluid.logLevel.INFO, "Excluding blacklisted record...");
             }
             else {
                 transformedRecords.push(singleRecord);

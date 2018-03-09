@@ -9,7 +9,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 var fs = require("fs");
@@ -49,18 +48,18 @@ gpii.ul.imports.curation.transformAndBulkUpdate.handleRecordLookupResults = func
 
 gpii.ul.imports.curation.transformAndBulkUpdate.bulkDeleteImageRecords = function (that, updatedRecords) {
     if (updatedRecords.length === 0 ) {
-        fluid.log("No records found to update...");
+        fluid.log(fluid.logLevel.IMPORTANT, "No records found to update...");
     }
     else if (!that.options.commit) {
-        fluid.log("Found and transformed " + updatedRecords.length + " records.  Run with --commit=true to save the updated records.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found and transformed " + updatedRecords.length + " records.  Run with --commit=true to save the updated records.");
         var filename = "updates-" + that.id + ".json";
         var fullPath = path.join(os.tmpDir(), filename);
         fs.writeFile(fullPath, JSON.stringify(updatedRecords, null, 2), function (error) {
             if (error) {
-                fluid.fail("Error saving temporary results:", error);
+                fluid.fail(fluid.logLevel.WARN, "Error saving temporary results:", error);
             }
             else {
-                fluid.log("Temporary results saved to '", fullPath, "'...");
+                fluid.log(fluid.logLevel.IMPORTANT, "Temporary results saved to '", fullPath, "'...");
             }
         });
     }
@@ -81,11 +80,11 @@ gpii.ul.imports.curation.transformAndBulkUpdate.handleBulkUpdateResults = functi
         fluid.fail(error);
     }
     else if (response.statusCode !== 201) {
-        fluid.log("Update returned a status code of ", response.statusCode, "\n", body);
+        fluid.log(fluid.logLevel.WARN, "Update returned a status code of ", response.statusCode, "\n", body);
     }
     else {
         var data = JSON.parse(body);
-        fluid.log(data.length, " records updated...");
+        fluid.log(fluid.logLevel.IMPORTANT, data.length, " records updated...");
     }
 };
 
@@ -130,7 +129,7 @@ fluid.defaults("gpii.ul.imports.curation.transformAndBulkUpdate.launcher", {
             "setLogging": "The logging level to use.  Set to `true` by default."
         },
         "defaults": {
-            setLogging: true
+            setLogging: false
         },
         "coerce": {
             "setLogging": JSON.parse

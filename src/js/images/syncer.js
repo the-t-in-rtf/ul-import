@@ -26,8 +26,8 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.initAndStartSync = function (th
         // Get the HEAD information for the original image as a precursor to doing anything else.
         request.head({ url: that.record.uri, timeout: 1500 }, function (error, response, body) {
             if (error) {
-                fluid.log("Error downloading image file:", error);
-                fluid.log("Skipping record...");
+                fluid.log(fluid.logLevel.WARN, "Error downloading image file:", error);
+                fluid.log(fluid.logLevel.WARN, "Skipping record...");
                 that.promise.resolve();
             }
             else {
@@ -40,7 +40,7 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.initAndStartSync = function (th
 gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse = function (that, headerResponse) {
     var contentType = headerResponse.headers["content-type"];
     if (headerResponse.statusCode !== 200) {
-        fluid.log("Skipping image file that cannot be downloaded...");
+        fluid.log(fluid.logLevel.WARN, "Skipping image file that cannot be downloaded...");
         that.promise.resolve();
     }
     else if (!gpii.ul.imports.images.extensions.extensionByMimeType[contentType]) {
@@ -61,17 +61,17 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse = function
                     gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
                 }
                 else {
-                    fluid.log("Skipping image file with invalid mime type '" + contentType + "' (file extension '" + extension + "' cannot be handled)...");
+                    fluid.log(fluid.logLevel.WARN, "Skipping image file with invalid mime type '" + contentType + "' (file extension '" + extension + "' cannot be handled)...");
                     that.promise.resolve();
                 }
             }
             else {
-                fluid.log("Skipping image file with invalid mime type '" + contentType + "' (secondary strategy could not determine filename)...");
+                fluid.log(fluid.logLevel.WARN, "Skipping image file with invalid mime type '" + contentType + "' (secondary strategy could not determine filename)...");
                 that.promise.resolve();
             }
         }
         else {
-            fluid.log("Skipping image file with invalid mime type and no content-disposition headers...");
+            fluid.log(fluid.logLevel.WARN, "Skipping image file with invalid mime type and no content-disposition headers...");
             that.promise.resolve();
         }
 
@@ -137,14 +137,14 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.readApiRecord = function (that)
             that.promise.reject(error);
         }
         else if (response.statusCode === 404 || body.rows.length === 0) {
-            fluid.log("No image metadata found for record '" +  that.record.image_id + "', creating it now...");
+            fluid.log(fluid.logLevel.TRACE, "No image metadata found for record '" +  that.record.image_id + "', creating it now...");
             gpii.ul.imports.images.syncer.singleRecordSyncer.createRecord(that);
         }
         else if (response.statusCode !== 200) {
             that.promise.reject({isError: true, message: "Error downloading image metadata", body: body});
         }
         else {
-            fluid.log("image metadata already exists for record '" +  that.record.image_id + "', checking to see if image content has been downloaded...");
+            fluid.log(fluid.logLevel.TRACE, "image metadata already exists for record '" +  that.record.image_id + "', checking to see if image content has been downloaded...");
             gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse(that);
         }
     });
@@ -169,7 +169,7 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.createRecord = function (that) 
             that.promise.reject({isError: true, statusCode: response.statusCode, message: body });
         }
         else {
-            fluid.log("Image metadata saved for record '" +  that.record.image_id + "'...");
+            fluid.log(fluid.logLevel.TRACE, "Image metadata saved for record '" +  that.record.image_id + "'...");
             gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse(that);
         }
     });
@@ -183,7 +183,7 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
     var filePath = path.resolve(dirPath, that.record.image_id);
 
     if (fs.existsSync(filePath)) {
-        fluid.log("Image file already exists for record '" +  that.record.image_id + "', skipping download...");
+        fluid.log(fluid.logLevel.TRACE, "Image file already exists for record '" +  that.record.image_id + "', skipping download...");
         that.promise.resolve();
     }
     else {
@@ -197,26 +197,26 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
                 request(that.record.uri)
                     .on("error", function (error) {
                         // that.promise.reject(error);
-                        fluid.log("Error downloading file:", error);
+                        fluid.log(fluid.logLevel.WARN, "Error downloading file:", error);
                         that.promise.resolve();
                     })
                     .pipe(fs.createWriteStream(filePath))
                     .on("close", function (error) {
                         if (error) {
                             // that.promise.reject(error);
-                            fluid.log("Error downloading file:", error);
+                            fluid.log(fluid.logLevel.WARN, "Error downloading file:", error);
                             that.promise.resolve();
                         }
                         else {
                             md5File(filePath, function (error, hash) {
                                 if (error) {
-                                    fluid.log("Error calculating MD5 checksum:", error);
+                                    fluid.log(fluid.logLevel.WARN, "Error calculating MD5 checksum:", error);
                                     that.promise.resolve();
                                 }
                                 else {
                                     that.record.md5 = hash;
                                     // TODO:  Confirm whether this is a duplicate up front, for now we handle this in a "curation" script.
-                                    fluid.log("Saved image file for record '" +  that.record.image_id + "' to disk...");
+                                    fluid.log(fluid.logLevel.TRACE, "Saved image file for record '" +  that.record.image_id + "' to disk...");
                                     that.promise.resolve();
                                 }
                             });
@@ -243,14 +243,14 @@ fluid.defaults("gpii.ul.imports.images.syncer.singleRecordSyncer", {
 
 gpii.ul.imports.images.syncer.startSync = function (that) {
     var promises = [];
-    fluid.log("Starting sync of " + that.model.recordsToSync.length + " records...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Starting sync of " + that.model.recordsToSync.length + " records...");
     fluid.each(that.model.recordsToSync, function (record) {
         // Only records with a uid and URI can be synced.
         if (!record.uid) {
-            fluid.log("skipping record '" +  record.image_id + "' that lacks a UID...");
+            fluid.log(fluid.logLevel.TRACE, "Skipping record '" +  record.image_id + "' that lacks a UID...");
         }
         else if (!record.uri) {
-            fluid.log("skipping record '" +  record.image_id + "' that lacks an image URI...");
+            fluid.log(fluid.logLevel.TRACE, "Skipping record '" +  record.image_id + "' that lacks an image URI...");
         }
         else {
             promises.push(function () {

@@ -5,6 +5,8 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 require("./mail-update-report");
@@ -25,7 +27,7 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport.launcher", {
         defaults: {
             "optionsFile": "{that}.options.optionsFile",
             "outputDir":   "{that}.options.outputDir",
-            "setLogging":  true
+            "setLogging":  false
         },
         coerce: {
             "setLogging": JSON.parse

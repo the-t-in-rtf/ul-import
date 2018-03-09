@@ -14,6 +14,8 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii = fluid.registerNamespace("gpii");
 
 require("./diff-import-output");
@@ -36,7 +38,7 @@ fluid.defaults("gpii.ul.imports.diffImportResults.launcher", {
         defaults: {
             "optionsFile": "{that}.options.optionsFile",
             "outputPath": "{that}.options.outputPath",
-            "setLogging":  true
+            "setLogging":  false
         },
         coerce: {
             "setLogging": JSON.parse

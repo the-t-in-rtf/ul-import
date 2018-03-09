@@ -41,12 +41,12 @@ gpii.ul.imports.updateReport.createSummary = function (that) {
                 var overallSummaryHtml = that.renderer.render(that.options.templateKeys.overallSummary, { options: that.options, sources: Object.keys(diffsAndUpdatesBySource).sort(), recordCountBySource: recordCountBySource, totalRecords: diffsAndUpdates.length, dateStamp: dateStamp});
                 var overallSummaryPath = path.resolve(resolvedOutputPath, "index.html");
                 fs.writeFileSync(overallSummaryPath, overallSummaryHtml, { encoding: "utf8" });
-                fluid.log("Saved overall summary.");
+                fluid.log(fluid.logLevel.IMPORTANT, "Saved overall summary.");
 
                 var overallAllUpdatesHtml = that.renderer.render(that.options.templateKeys.overallAllUpdates, { options: that.options, diffsAndUpdates: diffsAndUpdates, dateStamp: dateStamp});
                 var overallAllUpdatesPath = path.resolve(resolvedOutputPath, "all-updates.html");
                 fs.writeFileSync(overallAllUpdatesPath, overallAllUpdatesHtml, { encoding: "utf8" });
-                fluid.log("Saved overall summary.");
+                fluid.log(fluid.logLevel.IMPORTANT, "Saved combined 'all updates' report.");
 
                 gpii.ul.imports.updateReport.createSourceReports(that, diffsAndUpdatesBySource, dateStamp);
             }, that.queuePromise.reject);
@@ -112,13 +112,13 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
                     var sourceSummaryHtml = that.renderer.render(that.options.templateKeys.sourceSummary, { options: that.options, source: source, diffsAndUpdates: diffsAndUpdates, dateStamp: dateStamp });
                     var sourceSummaryPath = path.resolve(sourceOutputPath, "summary.html");
                     fs.writeFileSync(sourceSummaryPath, sourceSummaryHtml, "utf8");
-                    fluid.log("Saved source summary for source '", source, "'.");
+                    fluid.log(fluid.logLevel.IMPORTANT, "Saved source summary for source '", source, "'.");
 
                     // Create a rollup page that includes (hidden) full records.  Requires both the diff and the full updated record.
                     var sourceAllUpdatesHtml = that.renderer.render(that.options.templateKeys.sourceAllUpdates, { options: that.options, source: source, diffsAndUpdates: diffsAndUpdates, dateStamp: dateStamp });
                     var sourceAllUpdatesPath = path.resolve(sourceOutputPath, "all-updates.html");
                     fs.writeFileSync(sourceAllUpdatesPath, sourceAllUpdatesHtml, "utf8");
-                    fluid.log("Saved combined 'all updates' report for source '", source, "'.");
+                    fluid.log(fluid.logLevel.IMPORTANT, "Saved combined 'all updates' report for source '", source, "'.");
 
                     // Create a page for each record that links back to the source and overall summaries.  Requires both the diff and the full updated record.s
                     fluid.each(diffsAndUpdates, function (diffAndUpdate) {
@@ -128,7 +128,7 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
                         var individualDiffPath     = path.resolve(sourceOutputPath, individualdiffFilename);
                         fs.writeFileSync(individualDiffPath, individualDiffHtml, "utf8");
                     });
-                    fluid.log("Saved ", diffsAndUpdates.length, " individual records for source '", source, "'.");
+                    fluid.log(fluid.logLevel.IMPORTANT, "Saved ", diffsAndUpdates.length, " individual records for source '", source, "'.");
                     reportPromise.resolve();
                 }
             });
@@ -138,7 +138,7 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
     var reportSequence = fluid.promise.sequence(reportPromises);
     reportSequence.then(
         function () {
-            fluid.log("Finished generating update report for all sources, output saved to '", resolvedOutputPath, "'.");
+            fluid.log(fluid.logLevel.IMPORTANT, "Finished generating update report for all sources, output saved to '", resolvedOutputPath, "'.");
             that.queuePromise.resolve();
         },
         that.queuePromise.reject

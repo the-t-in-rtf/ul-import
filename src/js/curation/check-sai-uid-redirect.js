@@ -1,7 +1,6 @@
 /* eslint-env node */
 "use strict";
 var fluid   = require("infusion");
-fluid.setLogging(true);
 
 var gpii    = fluid.registerNamespace("gpii");
 var request = require("request");
@@ -20,7 +19,7 @@ fluid.registerNamespace("gpii.ul.imports.saiChecker");
 gpii.ul.imports.saiChecker.retrieveUnifiedRecords = function (that) {
     var loginPromise = gpii.ul.imports.login(that);
     loginPromise.then(function () {
-        fluid.log("Looking up all existing products...");
+        fluid.log(fluid.logLevel.INFO, "Looking up all existing products...");
         var requestOptions = {
             url:  that.options.urls.products + "?limit=100000",
             jar: true,
@@ -35,10 +34,10 @@ gpii.ul.imports.saiChecker.processUnifiedRecords = function (that, error, respon
         fluid.fail(error);
     }
     else {
-        fluid.log("Checking SAI redirects for all entries returned.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Checking SAI redirects for all entries.");
         var promises = [];
         var nonDeletedRecords = body.products.filter(function (record) { return record.status !== "deleted"; });
-        fluid.log("There are ", nonDeletedRecords.length, " records to process.");
+        fluid.log(fluid.logLevel.INFO, "There are ", nonDeletedRecords.length, " records to process.");
         fluid.each(nonDeletedRecords, function (product, index) {
             var saiEntry = fluid.find(product.sources, function (sourceRecord) {
                 if (sourceRecord.source === "sai" && sourceRecord.status !== "deleted") {
@@ -51,7 +50,7 @@ gpii.ul.imports.saiChecker.processUnifiedRecords = function (that, error, respon
                     url: that.options.urls.saiUidApi + product.uid
                 };
                 request.get(saiCheckOptions, function (error, response, body) {
-                    fluid.log("Processing record ", index, ".");
+                    fluid.log(fluid.logLevel.TRACE, "Processing record ", index, ".");
                     var $          = cheerio.load(body);
                     var headerText = $(".page-header").text();
                     var ulApiName     = fluid.get(saiEntry, "name");
@@ -64,7 +63,7 @@ gpii.ul.imports.saiChecker.processUnifiedRecords = function (that, error, respon
 
         var allCheckSequence = gpii.ul.imports.pipeline.createPipeline(promises, 50);
         allCheckSequence.then(function (results) {
-            fluid.log("Analysing overall results:");
+            fluid.log(fluid.logLevel.INFO, "Analysing overall results:");
 
             var recordsWhoseNamesMatch = [];
             var recordsWithDifferentNames = [];
@@ -85,12 +84,12 @@ gpii.ul.imports.saiChecker.processUnifiedRecords = function (that, error, respon
                 }
             });
 
-            fluid.log("Summary report, responses by status code:\n", JSON.stringify(responsesByStatusCode, null, 2));
-            fluid.log("Redirect names match for ", recordsWhoseNamesMatch.length, " of ", results.length, " records.");
+            fluid.log(fluid.logLevel.IMPORTANT, "Summary report, responses by status code:\n", JSON.stringify(responsesByStatusCode, null, 2));
+            fluid.log(fluid.logLevel.IMPORTANT, "Redirect names match for ", recordsWhoseNamesMatch.length, " of ", results.length, " records.");
 
             var mismatchedRecordOutputPath = path.resolve(os.tmpdir(), "mismatch-after-redirect-" + (new Date()).toISOString() + ".json");
             fs.writeFileSync(mismatchedRecordOutputPath, JSON.stringify(recordsWithDifferentNames, null, 2), "utf8");
-            fluid.log("Mismatched record uids saved to: ", mismatchedRecordOutputPath);
+            fluid.log(fluid.logLevel.IMPORTANT, "Mismatched record uids saved to: ", mismatchedRecordOutputPath);
         }, fluid.fail);
     }
 };

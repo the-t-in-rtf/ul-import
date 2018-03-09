@@ -20,7 +20,7 @@ require("./concurrent-promise-queue");
 fluid.registerNamespace("gpii.ul.imports.syncer");
 
 gpii.ul.imports.syncer.LoginAndStartSync = function (that) {
-    fluid.log("Logging in to UL API...");
+    fluid.log(fluid.logLevel.TRACE, "Logging in to UL API...");
     var options = {
         jar: true,
         json: true,
@@ -31,20 +31,20 @@ gpii.ul.imports.syncer.LoginAndStartSync = function (that) {
     };
     request.post(that.options.urls.login, options, function (error, response, body) {
         if (error) {
-            fluid.log("Login returned an error:" + error);
+            fluid.log(fluid.logLevel.WARN, "Login returned an error:" + error);
         }
         else if (response.statusCode !== 200) {
-            fluid.log("Login returned an error message:\n" + JSON.stringify(body, null, 2));
+            fluid.log(fluid.logLevel.WARN, "Login returned an error message:\n" + JSON.stringify(body, null, 2));
         }
         else {
-            fluid.log("Logged in...");
+            fluid.log(fluid.logLevel.TRACE, "Logged in...");
             gpii.ul.imports.syncer.getExistingSourceRecords(that);
         }
     });
 };
 
 gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
-    fluid.log("Retrieving existing source records...");
+    fluid.log(fluid.logLevel.INFO, "Retrieving existing source records...");
     var options = {
         jar: true,
         json: true,
@@ -56,15 +56,15 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
     };
     request.get(that.options.urls.products, options, function (error, response, body) {
         if (error) {
-            fluid.log("Error retrieving existing records:" + error);
+            fluid.log(fluid.logLevel.WARN, "Error retrieving existing records:" + error);
         }
         else if (response.statusCode !== 200) {
-            fluid.log("Error messsage returned when retrieving existing records:\n" + JSON.stringify(body, null, 2));
+            fluid.log(fluid.logLevel.WARN, "Error messsage returned when retrieving existing records:\n" + JSON.stringify(body, null, 2));
         }
         else {
             that.existingRecordCount = body.products.length;
 
-            fluid.log("Retrieved data regarding ", body.products.length + " existing records...");
+            fluid.log(fluid.logLevel.INFO, "Retrieved data regarding ", body.products.length + " existing records...");
             var updateTasks = [];
 
             // Take a pass through the "incoming" records and add any that do not already exist.
@@ -100,14 +100,14 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
             });
 
             if (updateTasks.length === 0) {
-                fluid.log("No records to sync (or all were skipped)...");
+                fluid.log(fluid.logLevel.IMPORTANT, "No records to sync (or all were skipped)...");
                 that.events.onSyncComplete.fire(that);
             }
             else {
                 // Process the stack of tasks
                 var queue = gpii.ul.imports.promiseQueue.createQueue(updateTasks, that.options.maxRequests);
                 queue.then(function () {
-                    fluid.log("Finished synchronisation...");
+                    fluid.log(fluid.logLevel.IMPORTANT, "Finished synchronisation...");
                 }, fluid.fail);
             }
         }
@@ -127,7 +127,7 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, o
 
         request.put(that.options.urls.product, requestOptions, function (error, response, body) {
             if (error) {
-                fluid.log("Record update returned an error:\n" + error);
+                fluid.log(fluid.logLevel.WARN, "Record update returned an error:\n" + error);
                 that.failedRecords.push(updatedRecord);
             }
             else if (response.statusCode === 200 || response.statusCode === 201) { // Updated
@@ -141,7 +141,7 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, o
             }
             // There was an error processing our request
             else {
-                fluid.log("Record update returned an error message:\n" + JSON.stringify(body, null, 2));
+                fluid.log(fluid.logLevel.WARN, "Record update returned an error message:\n" + JSON.stringify(body, null, 2));
                 that.failedRecords.push(updatedRecord);
             }
 
@@ -162,21 +162,21 @@ gpii.ul.imports.syncer.saveRecords = function (that) {
 
             fs.writeFileSync(outputPath, JSON.stringify(that[key], null, 2), { encoding: "utf8"});
 
-            fluid.log("Saved " + that[key].length + " " + key + " records to '" + outputPath + "'...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Saved " + that[key].length + " " + key + " records to '" + outputPath + "'...");
         }
     });
 };
 
 gpii.ul.imports.syncer.report = function (that) {
     if (that.options.displayReport) {
-        fluid.log("Evaluated " + that.model.data.length + " incoming records.");
-        fluid.log("Compared with " + that.existingRecordCount + " existing records for this source.");
-        fluid.log("Found " + that.newRecordCount + " new records.");
-        fluid.log("Skipped " + that.skippedRecordsCount + " records that had not been updated.");
-        fluid.log("Created " + that.createdRecordCount + " new records.");
-        fluid.log("Updated " + that.updatedRecords.length + " existing records...");
-        fluid.log("Encountered " + that.failedRecords.length + " failures while saving the data.");
-        fluid.log("Found ", that.staleRecordCount + " existing records that were not a part of the incoming feed.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Evaluated " + that.model.data.length + " incoming records.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Compared with " + that.existingRecordCount + " existing records for this source.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found " + that.newRecordCount + " new records.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Skipped " + that.skippedRecordsCount + " records that had not been updated.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Created " + that.createdRecordCount + " new records.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Updated " + that.updatedRecords.length + " existing records...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Encountered " + that.failedRecords.length + " failures while saving the data.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found ", that.staleRecordCount + " existing records that were not a part of the incoming feed.");
     }
 };
 

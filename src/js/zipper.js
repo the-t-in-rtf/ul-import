@@ -6,7 +6,6 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var gpii  = fluid.registerNamespace("gpii");
 
@@ -49,7 +48,7 @@ gpii.ul.imports.zipper = function (srcPath, destPath, deleteOriginal) {
                     if (err) {
                         fluid.fail("Error saving zip file:", err);
                     }
-                    fluid.log("Zip file '", destPath, " created.");
+                    fluid.log(fluid.logLevel.INFO, "Zip file '", destPath, " created.");
                     if (deleteOriginal) {
                         fs.unlink(srcPath, function (err) {
                             if (err) {

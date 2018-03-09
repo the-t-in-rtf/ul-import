@@ -1,6 +1,8 @@
 // Rudimentary code to determine an extension from a mime type.
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 fluid.registerNamespace("gpii.ul.imports.images.extensions");
 

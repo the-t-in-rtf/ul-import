@@ -5,7 +5,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -23,7 +22,7 @@ fluid.require("%ul-api/src/js/images/file/file-helpers.js");
 fluid.registerNamespace("gpii.ul.imports.curation.md5");
 
 gpii.ul.imports.curation.md5.retrieveIncompleteRecordReport = function (that) {
-    fluid.log("Retrieving ", that.options.updateAll ? "all records" : "records without a checksum", "...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Retrieving ", that.options.updateAll ? "all records" : "records without a checksum", "...");
     var url = that.options.urls.md5 + "?reduce=false";
     if (!that.options.updateAll) {
         url += "&key=null";
@@ -52,7 +51,7 @@ gpii.ul.imports.curation.md5.handleIncompleteRecordResults = function (that, err
                 var filePath  = gpii.ul.api.images.file.resolvePath(that.options.originalsDir, pathSegments);
                 md5File(filePath, function (error, hash) {
                     if (error) {
-                        fluid.log(error);
+                        fluid.log(fluid.logLevel.WARN, error);
                         promise.resolve(record);
                     }
                     else {
@@ -83,15 +82,15 @@ gpii.ul.imports.curation.md5.updateRecords = function (that, records) {
 
 gpii.ul.imports.curation.md5.handleUpdateResults = function (that, error, response, body) {
     if (error) {
-        fluid.log("The update returned an error...");
+        fluid.log(fluid.logLevel.WARN, "The update returned an error...");
         fluid.fail(error);
     }
     else if (response.statusCode !== 201) {
-        fluid.log("The update had a status that indicates the request failed...", response.statusCode);
+        fluid.log(fluid.logLevel.WARN, "The update had a status that indicates the request failed...", response.statusCode);
         fluid.fail(body);
     }
     else {
-        fluid.log("Updated checksums for ", that.recordsToUpdate.length, " records...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Updated checksums for ", that.recordsToUpdate.length, " records...");
     }
 };
 

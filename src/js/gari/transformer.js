@@ -1,6 +1,8 @@
 // A component to transform GARI's data into the format required by the Unified Listing.
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%universal");

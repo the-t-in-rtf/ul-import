@@ -27,7 +27,7 @@ gpii.ul.imports.importer.checkCache = function (that) {
     // Otherwise, download it.
     else {
         if (that.options.noCache) {
-            fluid.log("Disabled loading from cache, vendor content will always be downloaded...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Disabled loading from cache, vendor content will always be downloaded...");
         }
         var promise = that.downloader.get();
         promise.then(that.saveData, fluid.fail);
@@ -40,7 +40,7 @@ gpii.ul.imports.importer.saveDownload = function (that, data) {
 
 fluid.defaults("gpii.ul.imports.importer", {
     gradeNames: ["fluid.modelComponent"],
-    setLogging: false,
+    setLogging: fluid.logLevel.IMPORTANT,
     cacheDir:   tmpDir,
     cacheFilename: {
         expander: {

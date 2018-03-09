@@ -5,6 +5,8 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 var request = require("request");
@@ -83,7 +85,7 @@ fluid.defaults("gpii.ul.imports.images.core", {
             "": "products"
         }
     },
-    setLogging: true,
+    setLogging: fluid.logLevel.IMPORTANT,
     messages: {
         errorLoadingImageData: "There was an error loading the source image data:"
     },

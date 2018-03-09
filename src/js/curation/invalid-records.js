@@ -5,7 +5,6 @@
 */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -29,7 +28,7 @@ gpii.ul.imports.curation.invalidRecords.login = function (that) {
 };
 
 gpii.ul.imports.curation.invalidRecords.getAllRecords = function (that) {
-    fluid.log("Looking up all existing products...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Looking up all existing products...");
     var requestOptions = {
         url:  that.options.urls.products + "?unified=false&limit=1000000",
         json: true,
@@ -55,7 +54,7 @@ gpii.ul.imports.curation.invalidRecords.handleRecordLookup = function (that, err
         fluid.fail("Error response retrieving records:", body);
     }
     else {
-        fluid.log("Validating records...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Validating records...");
 
         fluid.each(body.products, function (product) {
             // validate the record in question
@@ -82,23 +81,23 @@ gpii.ul.imports.curation.invalidRecords.handleRecordLookup = function (that, err
             }
         });
 
-        fluid.log("Found ", that.invalidRecords.length, " invalid records...");
-        fluid.log(that.fixableRecords.length, " invalid records can be automatically fixed...");
-        fluid.log(that.unfixableRecords.length, " invalid records cannot be fixed...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found ", that.invalidRecords.length, " invalid records...");
+        fluid.log(fluid.logLevel.IMPORTANT, that.fixableRecords.length, " invalid records can be automatically fixed...");
+        fluid.log(fluid.logLevel.IMPORTANT, that.unfixableRecords.length, " invalid records cannot be fixed...");
 
         if (that.invalidRecords.length) {
             var invalidRecordsPath = gpii.ul.imports.curation.invalidRecords.saveOutput(that, "invalid-records", that.invalidRecords);
-            fluid.log("Saved invalid records to '", invalidRecordsPath, "'...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Saved invalid records to '", invalidRecordsPath, "'...");
         }
 
         if (that.unfixableRecords.length) {
             var unfixableRecordsPath = gpii.ul.imports.curation.invalidRecords.saveOutput(that, "unfixable-records", that.unfixableRecords);
-            fluid.log("Saved unfixable records to '", unfixableRecordsPath, "'...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Saved unfixable records to '", unfixableRecordsPath, "'...");
         }
 
         if (that.options.commit) {
             if (that.fixableRecords.length) {
-                fluid.log("Saving changes to ", that.fixableRecords.length, " records that can be fixed automatically...");
+                fluid.log(fluid.logLevel.IMPORTANT, "Saving changes to ", that.fixableRecords.length, " records that can be fixed automatically...");
 
                 // Save the automatic fixes to the "fixable" records.
                 var promises = [];
@@ -113,11 +112,11 @@ gpii.ul.imports.curation.invalidRecords.handleRecordLookup = function (that, err
                         };
                         request.put(fixRequestOptions, function (error, response, body) {
                             if (error) {
-                                fluid.log("Error saving record:", error);
+                                fluid.log(fluid.logLevel.WARN, "Error saving record:", error);
                                 that.errorRecords.push(fixableRecord);
                             }
                             else if (response.statusCode !== 200) {
-                                fluid.log("Error response saving record", body);
+                                fluid.log(fluid.logLevel.WARN, "Error response saving record", body);
                                 that.errorRecords.push(fixableRecord);
                             }
 
@@ -130,11 +129,11 @@ gpii.ul.imports.curation.invalidRecords.handleRecordLookup = function (that, err
                 queue.then(
                     function (results) {
                         if (that.errorRecords.length) {
-                            fluid.log(that.errorRecords.length, " errors updating records...");
+                            fluid.log(fluid.logLevel.WARN, that.errorRecords.length, " errors updating records...");
                             var errorRecordsPath = gpii.ul.imports.curation.invalidRecords.saveOutput(that, "error-records", that.errorRecords);
-                            fluid.log("Saved records that resulted in update errors to '", errorRecordsPath, "'...");
+                            fluid.log(fluid.logLevel.WARN, "Saved records that resulted in update errors to '", errorRecordsPath, "'...");
                         }
-                        fluid.log("Saved changes to ", results.length - that.errorRecords.length, " records...");
+                        fluid.log(fluid.logLevel.IMPORTANT, "Saved changes to ", results.length - that.errorRecords.length, " records...");
                     },
                     fluid.fail
                 );
@@ -143,7 +142,7 @@ gpii.ul.imports.curation.invalidRecords.handleRecordLookup = function (that, err
         }
         else {
             if (that.fixableRecords.length) {
-                fluid.log("Automatic fixes for invalid records are available.  Run with --commit to automatically update 'fixable' records...");
+                fluid.log(fluid.logLevel.IMPORTANT, "Automatic fixes for invalid records are available.  Run with --commit to automatically update 'fixable' records...");
             }
         }
     }

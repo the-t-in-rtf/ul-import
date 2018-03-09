@@ -5,7 +5,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -58,10 +57,10 @@ gpii.ul.imports.curation.imageRecordsMissingFiles.handleImageRecordLookupResults
 
 gpii.ul.imports.curation.imageRecordsMissingFiles.bulkDeleteImageRecords = function (that) {
     if (that.recordsMissingImages.length === 0 ) {
-        fluid.log("No records found with missing images...");
+        fluid.log(fluid.logLevel.IMPORTANT, "No records found with missing images...");
     }
     else if (!that.options.commit) {
-        fluid.log("Found ", that.recordsMissingImages.length, " images missing an associated image file.  Run with --deleteRecords=true to remove these records.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found ", that.recordsMissingImages.length, " images missing an associated image file.  Run with --deleteRecords=true to remove these records.");
     }
     else {
         var deletePayload = fluid.transform(that.recordsMissingImages, function (originalRecord) { var record = fluid.copy(originalRecord); record._deleted = true; return record; });
@@ -81,10 +80,10 @@ gpii.ul.imports.curation.imageRecordsMissingFiles.handleBulkUpdateResults = func
         fluid.fail(error);
     }
     else if (response.statusCode !== 201) {
-        fluid.log("Update returned a status code of ", response.statusCode, "\n", body);
+        fluid.log(fluid.logLevel.WARN, "Update returned a status code of ", response.statusCode, "\n", body);
     }
     else {
-        fluid.log(that.recordsMissingImages.length, " records missing image data removed...");
+        fluid.log(fluid.logLevel.IMPORTANT, that.recordsMissingImages.length, " records missing image data removed...");
     }
 };
 
@@ -126,7 +125,7 @@ fluid.defaults("gpii.ul.imports.curation.imageRecordsMissingFiles.launcher", {
             "setLogging": "The logging level to use.  Set to `true` by default."
         },
         "defaults": {
-            setLogging: true
+            setLogging: fluid.logLevel.IMPORTANT
         },
         "coerce": {
             "setLogging": JSON.parse

@@ -4,6 +4,8 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 var fs    = require("fs");
@@ -36,7 +38,7 @@ gpii.ul.imports.diffsFromImports.processQueue = function (that) {
 
     if (Object.keys(filesToProcess).length) {
         fluid.each(filesToProcess, function (batchDef, batchId) {
-            fluid.log("Processing batch '", batchId, "'.");
+            fluid.log(fluid.logLevel.TRACE, "Processing batch '", batchId, "'.");
             var outputFileName =  gpii.ul.imports.diffImportResults.generateOutputPath(that, that.options.incomingDiffsDir);
             gpii.ul.imports.diffImportResults.generateDiff(batchDef.preupdateOriginals, batchDef.updatedRecords, gpii.ul.imports.diffImportResults.defaultFieldsToCompare, outputFileName);
             var resolvedArchivedImportOutputDir  = fluid.module.resolvePath(that.options.archivedImportOutputDir);
@@ -49,7 +51,7 @@ gpii.ul.imports.diffsFromImports.processQueue = function (that) {
         });
     }
     else {
-        fluid.log("No incoming files to process.");
+        fluid.log(fluid.logLevel.IMPORTANT, "No incoming files to process.");
     }
 };
 

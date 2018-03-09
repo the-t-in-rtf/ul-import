@@ -14,6 +14,8 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii = fluid.registerNamespace("gpii");
 
 var fs   = require("fs");
@@ -40,7 +42,7 @@ gpii.ul.imports.diffImportResults.generateDiff = function (originalsPath, update
     fluid.each(updates, function (updatedRecord) {
         var originalRecord = fluid.get(originalsBySourceAndSid, updatedRecord.source + "." + updatedRecord.sid);
         if (originalRecord !== undefined) {
-            fluid.log("diffing ", originalRecord.source, ":", originalRecord.sid);
+            fluid.log(fluid.logLevel.TRACE, "diffing ", originalRecord.source, ":", originalRecord.sid);
             var filteredOriginalRecord = fluid.filterKeys(originalRecord, diffFieldsToCompare);
             var filteredUpdatedRecord = fluid.filterKeys(updatedRecord, diffFieldsToCompare);
             if (!gpii.diff.equals(filteredOriginalRecord, filteredUpdatedRecord)) {
@@ -59,10 +61,10 @@ gpii.ul.imports.diffImportResults.generateDiff = function (originalsPath, update
 
         fs.writeFileSync(resolvedOutputPath, JSON.stringify(diffsAndUpdates, null, 2), { encoding: "utf8"});
 
-        fluid.log("Saved " + diffsAndUpdates.length + " diffs and updated records to '" + resolvedOutputPath + "'...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Saved " + diffsAndUpdates.length + " diffs and updated records to '" + resolvedOutputPath + "'...");
     }
     else {
-        fluid.log("No updates to process.");
+        fluid.log(fluid.logLevel.IMPORTANT, "No updates to process.");
     }
 
 };

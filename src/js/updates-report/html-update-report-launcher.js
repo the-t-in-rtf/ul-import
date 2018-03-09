@@ -25,7 +25,7 @@ fluid.defaults("gpii.ul.imports.updateReport.launcher", {
         defaults: {
             "optionsFile": "{that}.options.optionsFile",
             "outputDir":   "{that}.options.outputDir",
-            "setLogging":  true
+            "setLogging":  false
         },
         coerce: {
             "setLogging": JSON.parse

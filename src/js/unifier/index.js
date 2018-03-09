@@ -5,11 +5,12 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii = fluid.registerNamespace("gpii");
 
 var request = require("request");
 
-fluid.setLogging(true);
 fluid.require("%kettle");
 fluid.require("%ul-imports");
 
@@ -51,7 +52,7 @@ gpii.ul.imports.unifier.singleAdoptionHandler.login = function (that) {
             that.promise.reject({ isError: true, message: body });
         }
         else {
-            fluid.log("Logged in...");
+            fluid.log(fluid.logLevel.TRACE, "Logged in...");
             that.handleLoginResponse();
         }
     });
@@ -74,7 +75,7 @@ gpii.ul.imports.unifier.singleAdoptionHandler.readChild = function (that) {
             that.promise.reject({ isError: true, message: body });
         }
         else {
-            fluid.log("Read existing child record...");
+            fluid.log(fluid.logLevel.TRACE, "Read existing child record...");
             that.handleChildReadResponse(body);
         }
     });
@@ -107,7 +108,7 @@ gpii.ul.imports.unifier.singleAdoptionHandler.handleChildReadResponse = function
             that.promise.reject({ isError: true, message: body });
         }
         else {
-            fluid.log("Retrieved child record...");
+            fluid.log(fluid.logLevel.TRACE, "Retrieved child record...");
             that.handleParentWriteResponse(body.product);
         }
     });
@@ -133,8 +134,8 @@ gpii.ul.imports.unifier.singleAdoptionHandler.handleParentWriteResponse = functi
         }
         else {
             var product = body.product;
-            fluid.log("Succesfully created unified record '", product.uid, "' based on child record ", product.source, ":", product.sid);
-            fluid.log("Created parent record...");
+            fluid.log(fluid.logLevel.TRACE, "Succesfully created unified record '", product.uid, "' based on child record ", product.source, ":", product.sid);
+            fluid.log(fluid.logLevel.TRACE, "Created parent record...");
             that.promise.resolve(body);
         }
     });
@@ -207,7 +208,7 @@ gpii.ul.imports.unifier.handleOrphanResponse = function (that, response) {
     var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
 
     queue.then(function (results) {
-        fluid.log("Created unified records for " + results.length + " orphaned records...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Created unified records for " + results.length + " orphaned records...");
     }, that.handleError);
 };
 

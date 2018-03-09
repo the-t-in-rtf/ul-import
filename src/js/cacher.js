@@ -33,7 +33,7 @@ gpii.ul.imports.cacher.cacheFileExists = function (that) {
 gpii.ul.imports.cacher.saveToCache = function (that, dataToSave) {
     gpii.ul.imports.cacher.failOnMissingOption(that);
 
-    fluid.log("Caching data to '" + that.options.cacheFile + "'...");
+    fluid.log(fluid.logLevel.INFO, "Caching data to '" + that.options.cacheFile + "'...");
 
     var fd = fs.openSync(that.options.cacheFile, "w");
     var stringData = typeof dataToSave === "object" ? JSON.stringify(dataToSave, null, 2) : dataToSave;
@@ -47,7 +47,7 @@ gpii.ul.imports.cacher.loadFromCache = function (that) {
     gpii.ul.imports.cacher.failOnMissingOption(that);
 
     if (gpii.ul.imports.cacher.cacheFileExists(that)) {
-        fluid.log("Loading cached data...");
+        fluid.log(fluid.logLevel.INFO, "Loading cached data...");
 
         var data = fs.readFileSync(that.options.cacheFile, { encoding: "utf8"});
 
@@ -61,14 +61,14 @@ gpii.ul.imports.cacher.loadFromCache = function (that) {
         }
     }
     else {
-        fluid.fail("Cannot load cached data, file does not exist...");
+        fluid.fail(fluid.logLevel.WARN, "Cannot load cached data, file does not exist...");
     }
 };
 
 gpii.ul.imports.cacher.clearCache = function (that) {
     gpii.ul.imports.cacher.failOnMissingOption(that);
 
-    fluid.log("Clearing cache...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Clearing cache...");
 
     if (gpii.ul.imports.cacher.cacheFileExists(that)) {
         fs.unlinkSync(that.options.cacheFile);

@@ -20,7 +20,7 @@ fluid.defaults("gpii.ul.imports.launcher", {
             "setLogging":     "The logging level to use.  Set to `false` (only errors and warnings) by default."
         },
         defaults: {
-            "setLogging":  true,
+            "setLogging":  false,
             "optionsFile": "{that}.options.optionsFile"
         },
         coerce: {

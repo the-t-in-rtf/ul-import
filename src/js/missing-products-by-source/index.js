@@ -7,6 +7,8 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.registerNamespace("gpii.ul.imports.missingProductsBySource");
@@ -31,7 +33,7 @@ gpii.ul.imports.missingProductsBySource.login = function (that) {
 };
 
 gpii.ul.imports.missingProductsBySource.retrieveUnifiedRecords = function (that) {
-    fluid.log("Looking up all existing products...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Looking up all existing products...");
     var requestOptions = {
         url:  that.options.urls.products + "?&limit=1000000",
         json: true,
@@ -146,7 +148,7 @@ gpii.ul.imports.missingProductsBySource.processUnifiedRecords = function (that, 
     });
     var sequence = fluid.promise.sequence(emailPromises);
     sequence.then(function (result) {
-        fluid.log("Sent ", result.length, " database vendor emails.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Sent ", result.length, " database vendor emails.");
 
         var summaryContent = that.renderer.render(that.options.templateKeys.overallSummary, missingRecordCountsAllSources);
 
@@ -154,7 +156,7 @@ gpii.ul.imports.missingProductsBySource.processUnifiedRecords = function (that, 
         var summaryPath = path.resolve(os.tmpdir(), summaryFilename);
 
         fs.writeFileSync(summaryPath, summaryContent, "utf8");
-        fluid.log("Save summary report to '", summaryPath, "'.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Saved summary report to '", summaryPath, "'.");
     }, fluid.fail);
 };
 

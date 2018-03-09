@@ -37,10 +37,10 @@ gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction = funct
             }
         };
 
-        fluid.log("Starting to retrieve isoCode '" + isoCode + "'...");
+        fluid.log(fluid.logLevel.TRACE, "Starting to retrieve isoCode '" + isoCode + "'...");
         request(options, function (error, response, body) {
             if (error) {
-                fluid.log(error);
+                fluid.log(fluid.logLevel.WARN, error);
             }
             else {
                 try {
@@ -48,14 +48,14 @@ gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction = funct
 
                     // If we receive an "ExceptionMessage" object, display its contents in the console.
                     if (!data.Ok && data.ExceptionMessages) {
-                        fluid.log("There were errors returned when retrieving records:\n" + JSON.stringify(data.ExceptionMessages, null, 2));
+                        fluid.log(fluid.logLevel.WARN, "There were errors returned when retrieving records:\n" + JSON.stringify(data.ExceptionMessages, null, 2));
                     }
 
-                    fluid.log("Retrieved ", data.Records.length , " records for ISO code '", myIsoCode, "'...");
+                    fluid.log(fluid.logLevel.TRACE, "Retrieved ", data.Records.length , " records for ISO code '", myIsoCode, "'...");
                     that.isoRecordLists.push(data.Records);
                 }
                 catch (e) {
-                    fluid.log("Error retrieving records from '" + response.request.uri.href + "':\n");
+                    fluid.log(fluid.logLevel.WARN, "Error retrieving records from '" + response.request.uri.href + "':\n");
                 }
             }
 
@@ -102,7 +102,7 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
                         }
                     };
 
-                    fluid.log("Retrieving detailed record '", record.Database, ":", record.ProductCode, "'...");
+                    fluid.log(fluid.logLevel.TRACE, "Retrieving detailed record '", record.Database, ":", record.ProductCode, "'...");
 
                     request(options, function (error, response, body) {
                         // We have to make sure we are being given JSON data because EASTIN returns HTML errors at the moment.
@@ -110,26 +110,26 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
                             var data = body && JSON.parse(body);
                             // If we receive an "ExceptionMessage" object, display its contents in the console.
                             if (data && !data.Ok) {
-                                fluid.log("Exception returned by EASTIN API:", data.exceptionMessage || data.exceptionMessages);
+                                fluid.log(fluid.logLevel.WARN, "Exception returned by EASTIN API:", data.exceptionMessage || data.exceptionMessages);
                             }
                             else if (error) {
-                                fluid.log("Error retrieving record:", error);
+                                fluid.log(fluid.logLevel.WARN, "Error retrieving record:", error);
                             }
                             else if (data.Record) {
-                                fluid.log("Detailed record for '", data.Record.Database, ":", data.Record.ProductCode, "' retrieved...");
+                                fluid.log(fluid.logLevel.TRACE, "Detailed record for '", data.Record.Database, ":", data.Record.ProductCode, "' retrieved...");
                                 that.originalRecords.push(data.Record);
                             }
                             else {
-                                fluid.log("Skipping empty record retrieved from '" + response.request.uri.href + "'...");
+                                fluid.log(fluid.logLevel.TRACE, "Skipping empty record retrieved from '" + response.request.uri.href + "'...");
                             }
                         }
                         catch (e) {
                             if (response && response.request) {
                                 // Ignore "junk" HTML records.
-                                fluid.log("Error retrieving record from '" + response.request.uri.href + "':\n", e);
+                                fluid.log(fluid.logLevel.WARN, "Error retrieving record from '" + response.request.uri.href + "':\n", e);
                             }
                             else {
-                                fluid.log("Error retrieving record:\n", e);
+                                fluid.log(fluid.logLevel.WARN, "Error retrieving record:\n", e);
                             }
                         }
                         promise.resolve();
@@ -148,7 +148,7 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
             that.events.onRecordsRetrieved.fire(that);
         },
         function (error) {
-            fluid.log("Error retrieving detailed records...", error);
+            fluid.log(fluid.logLevel.WARN, "Error retrieving detailed records...", error);
         }
     );
 };

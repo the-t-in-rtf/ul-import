@@ -11,6 +11,7 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
 var gpii  = fluid.registerNamespace("gpii");
 
 var request = require("request");
@@ -36,10 +37,10 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
             };
             request.get(lookupOptions, function (error, response, body) {
                 if (error) {
-                    fluid.log("Error looking up record...", error);
+                    fluid.log(fluid.logLevel.WARN, "Error looking up record...", error);
                 }
                 else if (response.statusCode !== 200) {
-                    fluid.log("Non-standard status code ", response.statusCode, " returned:\n", body);
+                    fluid.log(fluid.logLevel.WARN, "Non-standard status code ", response.statusCode, " returned:\n", body);
                 }
                 else {
                     var data = JSON.parse(body);
@@ -88,13 +89,13 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
     });
 
     if (recordsToUpdate.length === 0) {
-        fluid.log("All unified records are up to date with SAI metadata...");
+        fluid.log(fluid.logLevel.IMPORTANT, "All unified records are up to date with SAI metadata...");
     }
     else if (that.options.commit) {
         gpii.ul.imports.sai.metadata.updateRecords(that, recordsToUpdate);
     }
     else {
-        fluid.log("Found " + recordsToUpdate.length + " unified records whose metadata needs to be updated, run with --commit to update...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found " + recordsToUpdate.length + " unified records whose metadata needs to be updated, run with --commit to update...");
     }
 };
 
@@ -112,19 +113,19 @@ gpii.ul.imports.sai.metadata.updateRecords = function (that, recordsToUpdate) {
 
             request.put(putOptions, function (error, response, body) {
                 if (error) {
-                    fluid.log("Error updating record '" + record.uid + "':", error);
+                    fluid.log(fluid.logLevel.WARN, "Error updating record '" + record.uid + "':", error);
                     promise.resolve(false);
                 }
                 else if (response.statusCode !== 200) {
-                    fluid.log("Error response updating record '" + record.uid + "':", body.message);
+                    fluid.log(fluid.logLevel.WARN, "Error response updating record '" + record.uid + "':", body.message);
                     fluid.each(body.fieldErrors, function (fieldError) {
                         var fieldPath = fieldError.dataPath.substring(1);
                         if (fieldError.keyword === "required") {
-                            fluid.log(fieldPath, fieldError.keyword, " is required but was not provided...");
+                            fluid.log(fluid.logLevel.WARN, fieldPath, fieldError.keyword, " is required but was not provided...");
                         }
                         else {
                             var actualValue = fluid.get(record, fieldPath);
-                            fluid.log(fieldPath, " value '", actualValue, "': ", fieldError.message);
+                            fluid.log(fluid.logLevel.WARN, fieldPath, " value '", actualValue, "': ", fieldError.message);
                         }
                     });
                     promise.resolve(false);
@@ -150,10 +151,10 @@ gpii.ul.imports.sai.metadata.updateRecords = function (that, recordsToUpdate) {
             });
 
             if (updates) {
-                fluid.log("Updated " + updates + " unified records with newer metadata coming from the SAI...");
+                fluid.log(fluid.logLevel.IMPORTANT, "Updated " + updates + " unified records with newer metadata coming from the SAI...");
             }
             if (errors) {
-                fluid.log("There were " + errors + " errors while attempting to update records...");
+                fluid.log(fluid.logLevel.WARN, "There were " + errors + " errors while attempting to update records...");
             }
         },
         fluid.fail

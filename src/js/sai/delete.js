@@ -5,6 +5,7 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
 var gpii  = fluid.registerNamespace("gpii");
 
 var request = require("request");
@@ -88,10 +89,10 @@ gpii.ul.imports.sai.deletes.processSaiResults = function (that, results) {
 
     var unifiedRecordUidsToUpdate = Object.keys(unifiedRecordKeysToUpdate);
 
-    fluid.log("Found " + alreadyDeletedUnifiedRecords.length + " unified records that have already been flagged as deleted...");
-    fluid.log("Found " + unifiedRecordUidsToUpdate.length + " unified records that need to be flagged as deleted...");
-    fluid.log("Found " + alreadyDeletedSaiRecords.length + " SAI records that have already been flagged as deleted...");
-    fluid.log("Found " + saiNidsToUpdate.length + " SAI records that need to be flagged as deleted...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Found " + alreadyDeletedUnifiedRecords.length + " unified records that have already been flagged as deleted...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Found " + unifiedRecordUidsToUpdate.length + " unified records that need to be flagged as deleted...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Found " + alreadyDeletedSaiRecords.length + " SAI records that have already been flagged as deleted...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Found " + saiNidsToUpdate.length + " SAI records that need to be flagged as deleted...");
 
     if (unifiedRecordUidsToUpdate.length || saiNidsToUpdate.length) {
         if (that.options.commit) {
@@ -101,7 +102,7 @@ gpii.ul.imports.sai.deletes.processSaiResults = function (that, results) {
             gpii.ul.imports.sai.deletes.loginAndDeleteRecords(that, combinedRecordsToUpdate);
         }
         else {
-            fluid.log("Run with --commit to flag unified records as deleted...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Run with --commit to flag unified records as deleted...");
         }
     }
 
@@ -119,10 +120,10 @@ gpii.ul.imports.sai.deletes.loginAndDeleteRecords = function (that, recordsToUpd
 
             request.del(deleteOptions, function (error, response, body) {
                 if (error) {
-                    fluid.log("Error deleting ", recordToUpdate.source, " record '",  recordToUpdate.sid, "':", error);
+                    fluid.log(fluid.logLevel.WARN, "Error deleting ", recordToUpdate.source, " record '",  recordToUpdate.sid, "':", error);
                 }
                 else if (response.statusCode !== 200) {
-                    fluid.log("Error response deleting ", recordToUpdate.source, " record '", recordToUpdate.sid, "':", body.message);
+                    fluid.log(fluid.logLevel.WARN, "Error response deleting ", recordToUpdate.source, " record '", recordToUpdate.sid, "':", body.message);
                 }
 
                 promise.resolve(body);
@@ -138,7 +139,7 @@ gpii.ul.imports.sai.deletes.loginAndDeleteRecords = function (that, recordsToUpd
         function (results) {
             var savedRecords = results.filter(function (result) { return !result.isError;});
             var errors = results.filter(function (result) { return result.isError;});
-            fluid.log("Updated ", savedRecords.length, " records with ", errors.length, " errors...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Updated ", savedRecords.length, " records with ", errors.length, " errors...");
         },
         fluid.fail
     );

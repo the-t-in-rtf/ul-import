@@ -4,6 +4,8 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 var fs    = require("fs");
@@ -37,7 +39,7 @@ gpii.ul.imports.reportsFromDiffs.processQueue = function (that) {
         var allBatchPromises = [];
         fluid.each(filesToProcess, function (diffFilePath, batchId) {
             allBatchPromises.push(function () {
-                fluid.log("Processing batch '", batchId, "'...");
+                fluid.log(fluid.logLevel.TRACE, "Processing batch '", batchId, "'...");
 
                 var batchPromises = [];
                 // Emails
@@ -66,7 +68,7 @@ gpii.ul.imports.reportsFromDiffs.processQueue = function (that) {
 
                 var batchSequence = fluid.promise.sequence(batchPromises);
                 batchSequence.then(function () {
-                    fluid.log("Finished processing batch '", batchId, "'.");
+                    fluid.log(fluid.logLevel.TRACE, "Finished processing batch '", batchId, "'.");
                 });
                 return batchSequence;
             });
@@ -74,13 +76,13 @@ gpii.ul.imports.reportsFromDiffs.processQueue = function (that) {
         var allBatchesSequence = fluid.promise.sequence(allBatchPromises);
         allBatchesSequence.then(
             function () {
-                fluid.log("Finished processing incoming diff results.");
+                fluid.log(fluid.logLevel.IMPORTANT, "Finished processing incoming diff results.");
             },
             fluid.fail
         );
     }
     else {
-        fluid.log("No incoming files to process.");
+        fluid.log(fluid.logLevel.IMPORTANT, "No incoming files to process.");
     }
 };
 

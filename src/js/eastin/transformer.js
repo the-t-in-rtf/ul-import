@@ -24,7 +24,7 @@ gpii.ul.imports.eastin.transformer.lookupLanguage = function (rawValue, transfor
     }
 
     if (!transformSpec.databases[rawValue]) {
-        fluid.log("No configuration found for database '" + rawValue + "', defaulting to US english...");
+        fluid.log(fluid.logLevel.INFO, "No configuration found for database '" + rawValue + "', defaulting to US english...");
         return null;
     }
 

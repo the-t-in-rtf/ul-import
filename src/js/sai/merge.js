@@ -6,6 +6,7 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
 var gpii  = fluid.registerNamespace("gpii");
 
 var request = require("request");
@@ -75,10 +76,10 @@ gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
             });
             if (targetUid) {
                 if (targetUid === row.uid) {
-                    fluid.log("Can't merge record '", targetUid, "' with itself, excluding from source list...");
+                    fluid.log(fluid.logLevel.WARN, "Can't merge record '", targetUid, "' with itself, excluding from source list...");
                 }
                 else if (!row.uid || row.uid.length <= 0) {
-                    fluid.log("Can't merge source with empty uid, excluding from sources list...");
+                    fluid.log(fluid.logLevel.WARN, "Can't merge source with empty uid, excluding from sources list...");
                 }
                 else if (unifiedRecord && unifiedRecord.status === "deleted" && unifiedRecord.uid === targetUid) {
                     alreadyMerged.push(unifiedRecord);
@@ -89,23 +90,23 @@ gpii.ul.imports.sai.merge.processSaiResults = function (that, results) {
                 }
             }
             else {
-                fluid.log("Can't work with bogus duplicate_nid '" + row.duplicate_nid + "'...");
+                fluid.log(fluid.logLevel.IMPORTANT, "Can't work with bogus duplicate_nid '" + row.duplicate_nid + "'...");
             }
         }
     });
 
-    fluid.log(alreadyMerged.length, " records were already previously merged...");
+    fluid.log(fluid.logLevel.IMPORTANT, alreadyMerged.length, " records were already previously merged...");
     var recordsToUpdate = Object.keys(sourcesByTarget).length;
     if (!recordsToUpdate) {
-        fluid.log("No duplicate records need to be merged...");
+        fluid.log(fluid.logLevel.IMPORTANT, "No duplicate records need to be merged...");
     }
     else {
-        fluid.log(recordsToUpdate, " unified records need to be merged...");
+        fluid.log(fluid.logLevel.IMPORTANT, recordsToUpdate, " unified records need to be merged...");
         if (that.options.commit) {
             gpii.ul.imports.sai.merge.mergeRecords(that, sourcesByTarget);
         }
         else {
-            fluid.log("Run with --commit to merge...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Run with --commit to merge...");
         }
     }
 };
@@ -124,12 +125,12 @@ gpii.ul.imports.sai.merge.mergeRecords = function (that, sourcesByTarget) {
 
                 request.post(mergeOptions, function (error, response, body) {
                     if (error) {
-                        fluid.log("Error merging record '" + target + "':", error);
+                        fluid.log(fluid.logLevel.WARN, "Error merging record '" + target + "':", error);
                     }
                     else if (response.statusCode !== 200) {
-                        fluid.log("Error response merging record + '" + target + "' with sources '" + JSON .stringify(sources) + "':", body.message);
+                        fluid.log(fluid.logLevel.WARN, "Error response merging record + '" + target + "' with sources '" + JSON .stringify(sources) + "':", body.message);
                         fluid.each(body.fieldErrors, function (fieldError) {
-                            fluid.log("\t- ", fieldError.message);
+                            fluid.log(fluid.logLevel.WARN, "\t- ", fieldError.message);
                         });
                     }
 
@@ -140,7 +141,7 @@ gpii.ul.imports.sai.merge.mergeRecords = function (that, sourcesByTarget) {
             });
         }
         else {
-            fluid.log("Skipping empty source set, will not attempt to merge...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Skipping empty source set, will not attempt to merge...");
         }
     });
 
@@ -148,7 +149,7 @@ gpii.ul.imports.sai.merge.mergeRecords = function (that, sourcesByTarget) {
 
     queue.then(
         function (results) {
-            fluid.log("Merged " + results.length + " unified records based on updates from the SAI...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Merged " + results.length + " unified records based on updates from the SAI...");
         },
         fluid.fail
     );

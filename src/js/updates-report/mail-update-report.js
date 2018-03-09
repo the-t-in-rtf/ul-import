@@ -5,6 +5,8 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogging(false);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%gpii-handlebars");
@@ -34,7 +36,7 @@ gpii.ul.imports.mailUpdateReport.processQueue = function (that) {
     var sequence = fluid.promise.sequence(promises);
     sequence.then(
         function (results) {
-            fluid.log("Sent ", results.length, " update emails...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Sent ", results.length, " update emails...");
             that.queuePromise.resolve();
         },
         function (error) {

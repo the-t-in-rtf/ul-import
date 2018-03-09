@@ -14,7 +14,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -45,7 +44,7 @@ gpii.ul.imports.curation.urlChecker.checkSourceUrls = function (that, results) {
 
     // For each product with a source URL, check it with a raw request.  We have to do this because dataSources only deal
     // in results, and not in things like headers and status codes.
-    fluid.log("Examining ", results.rows.length, " total records...");
+    fluid.log(fluid.logLevel.INFO, "Examining ", results.rows.length, " total records...");
     fluid.each(results.rows, function (couchRecord) {
         var record = couchRecord.doc;
         if (record.source !== "unified" && record.sourceUrl) {
@@ -71,7 +70,7 @@ gpii.ul.imports.curation.urlChecker.checkSourceUrls = function (that, results) {
         }
     });
 
-    fluid.log("Checking URLs for ", promises.length, " records with a source URL...");
+    fluid.log(fluid.logLevel.INFO, "Checking URLs for ", promises.length, " records with a source URL...");
     // Run everything through our new "concurrent promise queue"
     var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
     queue.then(
@@ -98,38 +97,38 @@ gpii.ul.imports.curation.urlChecker.processSourceUrlResults = function (that, re
 
     if (activeButNotFound.length) {
         var activeButNotFoundReportPath = path.resolve(that.options.outputDir, that.options.filenames.activeButMissing);
-        fluid.log("Found ", activeButNotFound.length, " active records whose source URL cannot be retrieved.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found ", activeButNotFound.length, " active records whose source URL cannot be retrieved.");
         fs.writeFile(activeButNotFoundReportPath, JSON.stringify({ docs: activeButNotFound }, null, 2), function (error) {
             if (error) {
-                fluid.log("Error saving irretrievable active records: ", error);
+                fluid.log(fluid.logLevel.WARN, "Error saving irretrievable active records: ", error);
             }
             else {
-                fluid.log("Saved active records that could not be retrieved as a bulk update at ", activeButNotFoundReportPath);
+                fluid.log(fluid.logLevel.IMPORTANT, "Saved active records that could not be retrieved as a bulk update at ", activeButNotFoundReportPath);
             }
         });
     }
     else {
-        fluid.log("No active records were found whose source record could not be retrieved.");
+        fluid.log(fluid.logLevel.IMPORTANT, "No active records were found whose source record could not be retrieved.");
     }
 
     if (deletedButFound.length) {
         var deletedButFoundReportPath = path.resolve(that.options.outputDir, that.options.filenames.deletedButFound);
-        fluid.log("Found ", deletedButFound.length, " deleted records whose source URL is still active.");
+        fluid.log(fluid.logLevel.INFO, "Found ", deletedButFound.length, " deleted records whose source URL is still active.");
         fs.writeFile(deletedButFoundReportPath, JSON.stringify({ docs: deletedButFound }, null, 2), function (error) {
             if (error) {
-                fluid.log("Error saving deleted records with active source URLs: ", error);
+                fluid.log(fluid.logLevel.WARN, "Error saving deleted records with active source URLs: ", error);
             }
             else {
-                fluid.log("Saved deleted records with active source URLs as a bulk json update at ", deletedButFoundReportPath);
+                fluid.log(fluid.logLevel.IMPORTANT, "Saved deleted records with active source URLs as a bulk json update at ", deletedButFoundReportPath);
             }
         });
     }
     else {
-        fluid.log("No deleted records with active Source URLs were found.");
+        fluid.log(fluid.logLevel.IMPORTANT, "No deleted records with active Source URLs were found.");
     }
 
     if (activeButNotFound.length || deletedButFound.length) {
-        fluid.log("To bulk update records, POST one of the fix files to: http://username:password@hostname:port/db/_bulk_docs");
+        fluid.log(fluid.logLevel.IMPORTANT, "To bulk update records, POST one of the fix files to: http://username:password@hostname:port/db/_bulk_docs");
     }
 };
 

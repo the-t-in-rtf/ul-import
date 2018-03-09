@@ -5,7 +5,6 @@
 */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -42,10 +41,10 @@ gpii.ul.imports.curation.duplicateImages.handleMd5ReportResults = function (that
         });
 
         if (duplicateImageIds.length === 0) {
-            fluid.log("No duplicates found...");
+            fluid.log(fluid.logLevel.IMPORTANT, "No duplicates found...");
         }
         else {
-            fluid.log("Found ", duplicateImageIds.length, " groups of duplicates, preparing report...");
+            fluid.log(fluid.logLevel.IMPORTANT, "Found ", duplicateImageIds.length, " groups of duplicates, preparing report...");
             var promises = [];
             for (var a = 0; a < duplicateImageIds.length; a += 100) {
                 var batchKeys = duplicateImageIds.slice(a, a + 100);
@@ -98,7 +97,7 @@ gpii.ul.imports.curation.duplicateImages.saveReport = function (that, results) {
     });
     var outputPath = path.resolve(os.tmpDir(), "duplicate-images-" + that.id + ".json");
     fs.writeFileSync(outputPath, JSON.stringify(recordsByImageId, null, 2));
-    fluid.log("Saved duplicate image report to '", outputPath, "'...");
+    fluid.log(fluid.logLevel.IMPORTANT, "Saved duplicate image report to '", outputPath, "'...");
 };
 
 
