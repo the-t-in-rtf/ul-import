@@ -1,4 +1,4 @@
-"UID","Name","Description","Only in UL?","UL Entry URL"
+"UID","Name","Only in UL?","UL Entry URL","Description"
 {{#each missingRecords}}
-"{{uid}}",{{{csvEscape name}}},{{{csvEscape description}}},"{{onlyInUL}}","https://ul.gpii.net/uid/{{uid}}"
+"{{uid}}",{{{csvEscape name}}},"{{onlyInUL}}","https://ul.gpii.net/uid/{{uid}}",{{{csvEscape description}}}
 {{/each}}

@@ -120,9 +120,11 @@ gpii.ul.imports.missingProductsBySource.processUnifiedRecords = function (that, 
 
         var mailOptions = fluid.copy(that.options.baseMailOptions);
 
+        var recordsOnlyInUl = recordCountBySource["Unified Listing"];
         mailOptions.subject = fluid.stringTemplate(that.options.stringTemplates.mailSubject, { source: sourceKey });
-        mailOptions.text = that.renderer.render(that.options.templateKeys.sourceEmailText, { options: that.options, source: sourceName, recordCountBySource: recordCountBySource, missingRecords: taggedRecords});
-        mailOptions.html = that.renderer.render(that.options.templateKeys.sourceEmailHtml, { options: that.options, source: sourceName, recordCountBySource: recordCountBySource, missingRecords: taggedRecords});
+        var emailContext = { options: that.options, source: sourceName, recordsOnlyInUl: recordsOnlyInUl, missingRecords: taggedRecords.length};
+        mailOptions.text = that.renderer.render(that.options.templateKeys.sourceEmailText, emailContext);
+        mailOptions.html    = that.renderer.render(that.options.templateKeys.sourceEmailHtml, emailContext);
 
 
         var sourceCSV   = that.renderer.render(that.options.templateKeys.sourceCSV, { options: that.options, source: sourceName, missingRecords: taggedRecords});
