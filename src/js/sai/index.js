@@ -84,7 +84,7 @@ fluid.defaults("gpii.ul.imports.sai", {
                     "description": {
                         transform: {
                             type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
-                            values: [ "body", "title" ]
+                            values: [ "summary", "title" ]
                         }
                     },
                     "source": { literalValue: "sai" },
