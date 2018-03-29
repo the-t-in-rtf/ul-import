@@ -1,7 +1,7 @@
 /*
 
     A script to compare active unified records and report on sources that do not contain them.  Used to inform database
-    vendords of products they might not be aware of.
+    vendors of products they might not be aware of.
 
 */
 /* eslint-env node */
