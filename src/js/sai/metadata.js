@@ -17,6 +17,7 @@ var gpii  = fluid.registerNamespace("gpii");
 var request = require("request");
 
 fluid.require("%ul-imports");
+fluid.require("%gpii-diff");
 
 require("../launcher");
 require("../concurrent-promise-queue");
@@ -55,34 +56,13 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
 gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, results) {
     var recordsToUpdate = [];
     fluid.each(results.products, function (unifiedRecord) {
-        var saiRecord = fluid.find(unifiedRecord.sources, function (sourceRecord) { return sourceRecord.source === "sai" ? sourceRecord : false; });
+        var saiRecord             = fluid.find(unifiedRecord.sources, function (sourceRecord) { return sourceRecord.source === "sai" ? sourceRecord : false; });
         if (saiRecord) {
-            if (saiRecord.name !== unifiedRecord.name || saiRecord.description !== unifiedRecord.description || saiRecord.status !== unifiedRecord.status) {
-                var updatedRecord = gpii.ul.imports.transforms.stripNonValues(fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true));
-                updatedRecord.name = saiRecord.name;
-                updatedRecord.description = saiRecord.description;
-                updatedRecord.status = saiRecord.status;
+            var filteredSaiRecord     = fluid.filterKeys(saiRecord, that.options.fieldsToDiff);
+            var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
+            if (!gpii.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
+                var updatedRecord = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredSaiRecord);
                 updatedRecord.updated = (new Date()).toISOString();
-
-                // // TODO:  These clean up errors in legacy data and can eventually be removed.
-                // if (updatedRecord.manufacturer) {
-                //     if (updatedRecord.manufacturer.url) {
-                //         updatedRecord.manufacturer.url = gpii.ul.imports.transforms.prependProtocol(updatedRecord.manufacturer.url);
-                //     }
-                // }
-                // else {
-                //     updatedRecord.manufacturer = {};
-                // }
-                //
-                // if (!updatedRecord.manufacturer.name) {
-                //     updatedRecord.manufacturer.name = "Unknown";
-                // }
-                //
-                // if (updatedRecord.manufacturer.email) {
-                //     updatedRecord.manufacturer.email = gpii.ul.imports.transforms.sanitizeEmail(updatedRecord.manufacturer.email);
-                // }
-                // // End "legacy" cleanup.
-
                 recordsToUpdate.push(updatedRecord);
             }
         }
@@ -163,7 +143,8 @@ gpii.ul.imports.sai.metadata.updateRecords = function (that, recordsToUpdate) {
 
 fluid.defaults("gpii.ul.imports.sai.metadata", {
     gradeNames: ["fluid.component"],
-    keysToStrip: ["sources", "updated"],
+    keysToStrip: ["sources"],
+    fieldsToDiff: ["name", "description"],
     maxRequests: 100,
     invokers: {
         "processRecordLookupResults": {
