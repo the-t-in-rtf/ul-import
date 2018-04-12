@@ -70,12 +70,12 @@ fluid.defaults("gpii.ul.imports.sai", {
         transformer: {
             options: {
                 rules: {
-                    "status": {
-                        transform: {
-                            type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
-                            values: [ "ul_status", { literalValue: "new" } ]
-                        }
-                    },
+                    //"status": {
+                    //    transform: {
+                    //        type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
+                    //        values: [ "ul_status", { literalValue: "new" } ]
+                    //    }
+                    //},
                     "uid": {
                         transform: {
                             type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
