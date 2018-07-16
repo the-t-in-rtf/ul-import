@@ -58,9 +58,24 @@ require("./transforms");
     The rules below transform this into our JSON format.
 
  */
+
+gpii.ul.imports.sai.saveDownload = function (that, body) {
+    var filtered = body.filter(function (entry) {
+        return entry.ul_status !== "new" || entry.uid;
+    });
+    gpii.ul.imports.importer.saveDownload(that, filtered);
+};
+
 fluid.defaults("gpii.ul.imports.sai", {
     gradeNames: ["gpii.ul.imports.importer"],
     cacheFilename: "sai.json",
+    invokers: {
+        "saveData": {
+            funcName: "gpii.ul.imports.sai.saveDownload",
+            args:     ["{that}", "{arguments}.0"]
+
+        }
+    },
     components: {
         downloader: {
             options: {

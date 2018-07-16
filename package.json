@@ -39,7 +39,9 @@
     "homepage": "https://github.com/the-t-in-rtf/ul-import#readme",
     "dependencies": {
         "cheerio": "1.0.0-rc.2",
+        "fast-csv": "2.4.1",
         "foundation-sites": "6.4.4-rc1",
+        "fuse.js": "3.2.0",
         "gpii-diff": "1.0.0-dev.20171128T134233Z.8584f1c",
         "gpii-express": "1.0.9",
         "gpii-express-user": "1.0.0-dev.20170420T094715Z.667e69a",
@@ -47,6 +49,7 @@
         "gpii-pouchdb-lucene": "0.1.0-dev.20170523T095210Z.7508cd5",
         "gpii-sort": "1.0.0-dev.20170420T114825Z.804ac19",
         "infusion": "3.0.0-dev.20171121T212609Z.9b4fde781",
+        "json5": "1.0.1",
         "juice": "4.2.2",
         "markdown-it": "8.4.0",
         "md5-file": "3.2.2",
