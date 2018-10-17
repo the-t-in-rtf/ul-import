@@ -12,6 +12,7 @@ var mkdirp = require("mkdirp");
 var fs     = require("fs");
 var path   = require("path");
 
+require("../bundle-deps");
 require("./lib/jsonLoader");
 require("./lib/renderer");
 require("./lib/sanitize-filename");
@@ -31,7 +32,7 @@ gpii.ul.imports.updateReport.createSummary = function (that) {
         }
         else {
             // Copy our required dependencies into the new directory.
-            var dependencyPromise = gpii.ul.imports.updateReport.copyDependencies(that);
+            var dependencyPromise = gpii.ul.imports.copyDependencies(that.options.outputDir, that.options.depsToBundle);
             dependencyPromise.then(function () {
                 // Generate an index.html summary page with links to source pages
                 var recordCountBySource = {};
@@ -52,46 +53,6 @@ gpii.ul.imports.updateReport.createSummary = function (that) {
             }, that.queuePromise.reject);
         }
     });
-};
-
-gpii.ul.imports.updateReport.copyDependencies = function (that) {
-    var resolvedOutputPath = fluid.module.resolvePath(that.options.outputDir);
-    fluid.each(that.options.depsToBundle, function (files, depKey) {
-        var depSubDir = path.resolve(resolvedOutputPath, depKey);
-        mkdirp(depSubDir, function (err) {
-            if (err) {
-                that.queuePromise.reject(err);
-            }
-            else if (!that.queuePromise.disposition) {
-                var promises = [];
-                fluid.each(files, function (unresolvedSourcePath) {
-                    promises.push(function () {
-                        var promise = fluid.promise();
-                        var sourcePath = fluid.module.resolvePath(unresolvedSourcePath);
-                        var filename = path.basename(sourcePath);
-                        var destinationPath = path.resolve(depSubDir, filename);
-                        try {
-                            var readStream = fs.createReadStream(sourcePath);
-                            var writeStream = fs.createWriteStream(destinationPath);
-                            readStream.pipe(writeStream);
-                            promise.resolve();
-                        }
-                        catch (err) {
-                            promise.reject(err);
-                        }
-
-                        return promise;
-                    });
-                    var sequence = fluid.promise.sequence(promises);
-                    return sequence;
-                });
-            }
-        });
-    });
-
-    var emptyPromise = fluid.promise();
-    emptyPromise.resolve();
-    return emptyPromise;
 };
 
 gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdatesBySource, dateStamp) {
