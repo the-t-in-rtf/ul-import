@@ -1,0 +1,17 @@
+{
+    "type": "ul.imports.gari.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.ableData"
+        ],
+        "jobKey": "gari",
+        "sources": [
+            "AbleData"
+        ],
+        "username": "importer",
+        "password": "password",
+        "urls": {
+            "ableData": "https://abledata.acl.gov/export/abledata-product-list-xml?f%5B0%5D=field_product_status%3A70320&f%5B1%5D=field_indexing_term_s_%3A63601"
+        }
+    }
+}
