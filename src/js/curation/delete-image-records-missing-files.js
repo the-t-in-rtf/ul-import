@@ -60,7 +60,7 @@ gpii.ul.imports.curation.imageRecordsMissingFiles.bulkDeleteImageRecords = funct
         fluid.log(fluid.logLevel.IMPORTANT, "No records found with missing images...");
     }
     else if (!that.options.commit) {
-        fluid.log(fluid.logLevel.IMPORTANT, "Found ", that.recordsMissingImages.length, " images missing an associated image file.  Run with --deleteRecords=true to remove these records.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found ", that.recordsMissingImages.length, " images missing an associated image file.  Run with --commit to remove these records.");
     }
     else {
         var deletePayload = fluid.transform(that.recordsMissingImages, function (originalRecord) { var record = fluid.copy(originalRecord); record._deleted = true; return record; });
@@ -121,14 +121,7 @@ fluid.defaults("gpii.ul.imports.curation.imageRecordsMissingFiles.launcher", {
     optionsFile: "%ul-imports/configs/curation-imageRecordsMissingFiles-prod.json",
     "yargsOptions": {
         "describe": {
-            "commit": "If true, actually delete the image records missing file data. Otherwise, report on them and exit.",
-            "setLogging": "The logging level to use.  Set to `true` by default."
-        },
-        "defaults": {
-            setLogging: fluid.logLevel.IMPORTANT
-        },
-        "coerce": {
-            "setLogging": JSON.parse
+            "commit": "If true, actually delete the image records missing file data. Otherwise, report on them and exit."
         }
     }
 });

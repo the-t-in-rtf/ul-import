@@ -1,7 +1,7 @@
 {
   "options": {
     "gradeNames": ["gpii.ul.imports.curation.orphanedImageFiles"],
-    "originalsDir": "/opt/ul-files/originalsDir"
+    "originalsDir": "/srv/ul-images/originalsDir"
   },
   "mergeConfigs": ["%ul-imports/configs/curation-base.json"]
 }

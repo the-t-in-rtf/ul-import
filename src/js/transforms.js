@@ -3,6 +3,8 @@
 var fluid = require("infusion");
 fluid.setLogging(false);
 
+var cheerio = require("cheerio");
+
 var gpii = fluid.registerNamespace("gpii");
 
 fluid.registerNamespace("gpii.ul.imports.transforms");
@@ -168,6 +170,21 @@ gpii.ul.imports.transforms.stripNonValues = function (value) {
 fluid.defaults("gpii.ul.imports.transforms.stripNonValues", {
     gradeNames: ["fluid.standardTransformFunction"]
 });
+
+gpii.ul.imports.transforms.stripTags = function (value) {
+    if (value && value.match(/[<>]/)) {
+        var dom = cheerio.load(value);
+        return dom.text();
+    }
+    else {
+        return value;
+    }
+};
+
+fluid.defaults("gpii.ul.imports.transforms.stripTags", {
+    gradeNames: ["fluid.standardTransformFunction"]
+});
+
 
 gpii.ul.imports.transforms.prependProtocol = function (value) {
     return (value && value.length > 0 && value.indexOf("http") === 0) ? value : "http://" + value;

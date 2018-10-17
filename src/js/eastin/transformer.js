@@ -105,8 +105,13 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
                     type: "gpii.ul.imports.transforms.prependProtocol",
                     input: {
                         transform: {
-                            type:      "gpii.ul.imports.transforms.stripNonValues",
-                            inputPath: "ManufacturerWebSiteUrl"
+                            type: "gpii.ul.imports.transforms.stripTags",
+                            input: {
+                                transform: {
+                                    type:      "gpii.ul.imports.transforms.stripNonValues",
+                                    inputPath: "ManufacturerWebSiteUrl"
+                                }
+                            }
                         }
                     }
                 }

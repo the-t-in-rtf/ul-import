@@ -92,6 +92,7 @@ gpii.ul.imports.curation.strayImages.handleBulkUpdateResults = function (that, e
         fluid.fail(error);
     }
     else {
+        fluid.log(fluid.logLevel.IMPORTANT, "Fixed stray image records...");
         fluid.log(fluid.logLevel.TRACE, body);
     }
 };

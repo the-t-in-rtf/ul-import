@@ -101,18 +101,7 @@ fluid.defaults("gpii.ul.imports.curation.orphanedImageFiles", {
 
 fluid.defaults("gpii.ul.imports.curation.orphanedImageFiles.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-imports/configs/curation-orphanedImageFiles-prod.json",
-    "yargsOptions": {
-        "describe": {
-            "setLogging": "The logging level to use.  Set to `true` by default."
-        },
-        "defaults": {
-            setLogging: fluid.logLevel.IMPORTANT
-        },
-        "coerce": {
-            "setLogging": JSON.parse
-        }
-    }
+    optionsFile: "%ul-imports/configs/curation-orphanedImageFiles-prod.json"
 });
 
 gpii.ul.imports.curation.orphanedImageFiles.launcher();

@@ -108,6 +108,7 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
                 var queue = gpii.ul.imports.promiseQueue.createQueue(updateTasks, that.options.maxRequests);
                 queue.then(function () {
                     fluid.log(fluid.logLevel.IMPORTANT, "Finished synchronisation...");
+                    that.events.onSyncComplete.fire(that);
                 }, fluid.fail);
             }
         }
@@ -142,6 +143,7 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, o
             // There was an error processing our request
             else {
                 fluid.log(fluid.logLevel.WARN, "Record update returned an error message:\n" + JSON.stringify(body, null, 2));
+                fluid.log(fluid.logLevel.INFO, "Full record follows:\n" + JSON.stringify(updatedRecord, null, 2));
                 that.failedRecords.push(updatedRecord);
             }
 
