@@ -7,14 +7,19 @@
             "api": 4896,
             "couch": 5984
         },
+        "hosts": {
+            "api": "ul-website",
+            "couch": "couchdb"
+        },
         "couchAuthCreds": "admin:admin@",
         "urls": {
             "api": {
                 "expander": {
                     "funcName": "fluid.stringTemplate",
                     "args": [
-                        "http://localhost:%port/api",
+                        "http://%host:%port/api",
                         {
+                            "host": "{that}.options.hosts.api",
                             "port": "{that}.options.ports.api"
                         }
                     ]
@@ -90,9 +95,10 @@
                 "expander": {
                     "funcName": "fluid.stringTemplate",
                     "args": [
-                        "http://%authCredslocalhost:%port",
+                        "http://%authCreds%host:%port",
                         {
                             "authCreds": "{that}.options.couchAuthCreds",
+                            "host": "{that}.options.hosts.couch",
                             "port": "{that}.options.ports.couch"
                         }
                     ]

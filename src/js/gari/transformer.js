@@ -5,9 +5,9 @@ fluid.setLogging(false);
 
 var gpii  = fluid.registerNamespace("gpii");
 
-fluid.require("%universal");
+require("gpii-universal");
+//fluid.require("%universal");
 fluid.require("%settingsHandlers");
-// require("../../../../node_modules/universal/gpii/node_modules/settingsHandlers/index");
 require("../transforms");
 require("../helpers");
 

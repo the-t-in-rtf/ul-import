@@ -9,7 +9,8 @@ var gpii = fluid.registerNamespace("gpii");
 
 fluid.registerNamespace("gpii.ul.imports.transforms");
 
-fluid.require("%universal/gpii/node_modules/settingsHandlers/index");
+require("gpii-universal");
+fluid.require("%settingsHandlers");
 
 // These functions have no configuration available, so we are fine with the implied `fluid.standardTransformFunction` grade
 
