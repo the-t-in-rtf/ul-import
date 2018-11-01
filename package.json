@@ -57,6 +57,7 @@
         "nodemailer": "4.3.1",
         "nodemailer-smtp-transport": "2.7.4",
         "pako": "1.0.6",
+        "request": "2.81.0",
         "ul-api": "1.0.0-dev.20181024T125123Z.afea43d"
     },
     "devDependencies": {
@@ -70,7 +71,6 @@
         "istanbul": "0.4.5",
         "kettle": "1.7.0",
         "node-jqunit": "1.1.7",
-        "request": "2.81.0",
         "rimraf": "2.6.1"
     }
 }
