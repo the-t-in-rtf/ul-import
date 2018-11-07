@@ -26,7 +26,7 @@
         "updates-report": "npm run updates-report:diffs && npm run updates-report:reports",
         "updates-report:diffs": "node src/js/updates-report/process-incoming-import-results.js",
         "updates-report:reports": "node src/js/updates-report/process-incoming-diff-results.js",
-        "noop": "echo This container should be launched manually using a command like: `docker-compose run ul-imports <command>`."
+        "noop": "echo This container should be launched manually using a command like: \\'docker-compose run ul-imports full-sync\\'."
     },
     "repository": {
         "type": "git",
