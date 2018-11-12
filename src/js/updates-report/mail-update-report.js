@@ -93,7 +93,6 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     gradeNames: ["fluid.component"],
     textTemplateKey: "single-update-email-text",
     htmlTemplateKey: "single-update-email-html",
-    smtpPort:   25,
     queuePromise: fluid.promise(),
     members: {
         queuePromise: "{that}.options.queuePromise"
@@ -102,7 +101,8 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     transportOptions: {
         ignoreTLS: true,
         secure:    false,
-        port:      "{that}.options.smtpPort"
+        host:      "{that}.options.hosts.smtp",
+        port:      "{that}.options.ports.smtp"
     },
     subjectTemplate: "Update report for Unified Listing vendor record '%source:%sid'.",
     baseMailOptions: {

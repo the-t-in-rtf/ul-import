@@ -4,12 +4,14 @@
         "gradeNames": "fluid.component",
         "outputDir": "/srv/ul-import-output/incoming",
         "ports": {
-            "api": 4896,
-            "couch": 5984
+            "api":   14896,
+            "couch": 15984,
+            "smtp":  25
         },
         "hosts": {
-            "api": "ul-website",
-            "couch": "couchdb"
+            "api":   "ul-website",
+            "couch": "couchdb",
+            "smtp":  "localhost"
         },
         "couchAuthCreds": "admin:admin@",
         "urls": {
