@@ -77,6 +77,10 @@ fluid.defaults("gpii.ul.imports.diffImportResults", {
     outputPath:  "@expand:gpii.ul.imports.diffImportResults.generateOutputPath({that}, {that}.options.outputDir)",
     diffFieldsToCompare: gpii.ul.imports.diffImportResults.defaultFieldsToCompare,
     listeners: {
+        "onCreate.logOptions": {
+            funcName: "fluid.log",
+            args: ["diff import options:", "@expand:JSON.stringify({that}.options, null, 2)"]
+        },
         "onCreate.generateDiff": {
             funcName: "gpii.ul.imports.diffImportResults.generateDiff",
             args:     ["{that}.options.originalsPath", "{that}.options.updatesPath", "{that}.options.diffFieldsToCompare", "{that}.options.outputPath"] // originalsPath, updatesPath, diffFieldsToCompare, outputPath

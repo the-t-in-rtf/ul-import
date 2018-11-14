@@ -14,7 +14,8 @@
 */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(false);
+fluid.logObjectRenderChars = 20480;
+fluid.setLogging(true);
 
 var gpii = fluid.registerNamespace("gpii");
 
