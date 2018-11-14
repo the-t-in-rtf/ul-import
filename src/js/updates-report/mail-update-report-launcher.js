@@ -16,7 +16,9 @@ fluid.require("%gpii-launcher");
 fluid.defaults("gpii.ul.imports.mailUpdateReport.launcher", {
     gradeNames: ["gpii.launcher"],
     optionsFile: "%ul-imports/configs/updates-email.json",
+    filterKeys: false,
     "yargsOptions": {
+        env: true,
         "describe": {
             "diffsAndUpdatesPath": "The path (absolute or package-relative) to the 'diffs and updates' JSON file generated for a given import.",
             "outputDir":           "The path (absolute or package-relative) to the directory where the output from this run will be saved.",

@@ -26,7 +26,9 @@ fluid.require("%gpii-launcher");
 fluid.defaults("gpii.ul.imports.diffImportResults.launcher", {
     gradeNames:  ["gpii.launcher"],
     optionsFile: "%ul-imports/configs/updates-diff.json",
+    filterKeys: false,
     "yargsOptions": {
+        env: true,
         "describe": {
             "updatesPath":   "The path (absolute or package-relative) to the updated versions of records that were updated in a given import.",
             "originalsPath": "The path (absolute or package-relative) to the original versions of records that were updated in a given import.",
