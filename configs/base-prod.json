@@ -4,8 +4,8 @@
         "gradeNames": "fluid.component",
         "outputDir": "/srv/ul-import-output/incoming",
         "ports": {
-            "api":   14896,
-            "couch": 15984,
+            "api":   4896,
+            "couch": 5984,
             "smtp":  25
         },
         "hosts": {
