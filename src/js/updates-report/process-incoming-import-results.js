@@ -39,15 +39,26 @@ gpii.ul.imports.diffsFromImports.processQueue = function (that) {
     if (Object.keys(filesToProcess).length) {
         fluid.each(filesToProcess, function (batchDef, batchId) {
             fluid.log(fluid.logLevel.TRACE, "Processing batch '", batchId, "'.");
-            var outputFileName =  gpii.ul.imports.diffImportResults.generateOutputPath(that, that.options.incomingDiffsDir);
-            gpii.ul.imports.diffImportResults.generateDiff(batchDef.preupdateOriginals, batchDef.updatedRecords, gpii.ul.imports.diffImportResults.defaultFieldsToCompare, outputFileName);
             var resolvedArchivedImportOutputDir  = fluid.module.resolvePath(that.options.archivedImportOutputDir);
-            // Archive and compress the incoming files
-            fluid.each([batchDef.preupdateOriginals, batchDef.updatedRecords], function (pathToArchive) {
-                var originalFilename = path.basename(pathToArchive);
-                var destPath = path.resolve(resolvedArchivedImportOutputDir, originalFilename + ".gz");
-                gpii.ul.imports.zipper(pathToArchive, destPath, true);
-            });
+
+            if (batchDef.preupdateOriginals && batchDef.updatedRecords) {
+                var outputFileName =  gpii.ul.imports.diffImportResults.generateOutputPath(that, that.options.incomingDiffsDir);
+                gpii.ul.imports.diffImportResults.generateDiff(batchDef.preupdateOriginals, batchDef.updatedRecords, gpii.ul.imports.diffImportResults.defaultFieldsToCompare, outputFileName);
+                // Archive and compress the incoming files
+                fluid.each([batchDef.preupdateOriginals, batchDef.updatedRecords], function (pathToArchive) {
+                    var originalFilename = path.basename(pathToArchive);
+                    var destPath = path.resolve(resolvedArchivedImportOutputDir, originalFilename + ".gz");
+                    gpii.ul.imports.zipper(pathToArchive, destPath, true);
+                });
+            }
+
+            if (batchDef.failedRecords) {
+                fluid.each([batchDef.failedRecords], function (pathToArchive) {
+                    var originalFilename = path.basename(pathToArchive);
+                    var destPath = path.resolve(resolvedArchivedImportOutputDir, originalFilename + ".gz");
+                    gpii.ul.imports.zipper(pathToArchive, destPath, true);
+                });
+            }
         });
     }
     else {
