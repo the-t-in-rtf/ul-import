@@ -5,6 +5,16 @@
         "archivedImportOutputDir": "/srv/ul-import-output/archived",
         "incomingDiffsDir": "/srv/ul-diffs/incoming",
         "archivedDiffsDir": "/srv/ul-diffs/archived",
-        "reportDir": "/srv/ul-updates-reports"
+        "reportDir": "/srv/ul-updates-reports",
+        "ports": {
+            "api":   4896,
+            "couch": 5984,
+            "smtp":  26
+        },
+        "hosts": {
+            "api":   "ul-website",
+            "couch": "couchdb",
+            "smtp":  "no-reasonable-hostname"
+        }
     }
 }
