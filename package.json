@@ -67,6 +67,7 @@
         "nodemailer-smtp-transport": "2.7.4",
         "pako": "1.0.6",
         "request": "2.81.0",
+        "rimraf": "2.6.1",
         "ul-api": "1.0.0-dev.20181126T142401Z.124fbf0"
     },
     "devDependencies": {
@@ -79,7 +80,6 @@
         "grunt-jsonlint": "1.1.0",
         "istanbul": "0.4.5",
         "kettle": "1.7.0",
-        "node-jqunit": "1.1.7",
-        "rimraf": "2.6.1"
+        "node-jqunit": "1.1.7"
     }
 }
