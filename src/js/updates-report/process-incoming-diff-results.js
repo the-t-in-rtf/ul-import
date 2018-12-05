@@ -123,7 +123,9 @@ fluid.defaults("gpii.ul.imports.reportsFromDiffs", {
 fluid.defaults("gpii.ul.imports.reportsFromDiffs.launcher", {
     gradeNames: ["gpii.launcher"],
     optionsFile: "%ul-imports/configs/updates-process-incoming-diff-results.json",
+    filterKeys: false,
     "yargsOptions": {
+        env: true,
         options: {
             incomingDiffsDir: {
                 describe:     "The directory to search for unprocesed 'diff' output.",

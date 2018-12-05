@@ -79,7 +79,9 @@ fluid.defaults("gpii.ul.imports.diffsFromImports", {
 fluid.defaults("gpii.ul.imports.diffsFromImports.launcher", {
     gradeNames: ["gpii.launcher"],
     optionsFile: "%ul-imports/configs/updates-process-incoming-import-results.json",
+    filterKeys: false,
     "yargsOptions": {
+        env: true,
         options: {
             archivedImportOutputDir: {
                 describe: "The path to archive processed import results to.",
