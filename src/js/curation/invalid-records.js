@@ -1,6 +1,6 @@
 /*
 
-    Generate a report on "duplicate" images, i.e. instances in which there are multiple records with the same md5 checksum.
+    Detect (and optionally fix) invalid records, i.e. records that do not conform to our JSON Schema.
 
 */
 "use strict";

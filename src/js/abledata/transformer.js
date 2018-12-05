@@ -6,7 +6,6 @@ fluid.setLogging(false);
 var gpii  = fluid.registerNamespace("gpii");
 
 require("gpii-universal");
-// fluid.require("%universal");
 fluid.require("%settingsHandlers");
 require("../transforms");
 require("../helpers");
@@ -103,12 +102,22 @@ fluid.defaults("gpii.ul.imports.ableData.transformer", {
     xmlParserRules: {
         rules: {
             // Drill down to only the objects we care about to simplify the transform paths
-            products: "search_api_index_product_export_indexs.search_api_index_product_export_index"
+            products: "search_api_index_product_export_index.search_api_index_product_export_index"
         }
     },
     mapRules: {
-        /*
-         */
+        status: {
+            transform: {
+                type: "fluid.transforms.valueMapper",
+                defaultInputPath: "Product-Status",
+                match: {
+                    "Discontinued": "discontinued"
+                },
+                noMatch: {
+                    outputValue: "new"
+                }
+            }
+        },
         source: {
             literalValue: "{that}.options.defaults.source"
         },
@@ -121,7 +130,15 @@ fluid.defaults("gpii.ul.imports.ableData.transformer", {
         name: "Title",
         description: "Description",
         manufacturer: {
-            name:    "Maker"
+            name:    {
+                transform: {
+                    type: "fluid.transforms.firstValue",
+                    values: [
+                        "Maker",
+                        { transform: { type: "fluid.transforms.literalValue", input: "Manufacturer Unknown"}}
+                    ]
+                }
+            }
         },
         updated: {
             transform: {

@@ -19,10 +19,19 @@
         "eastin-image-import": "node src/js/images/eastin-image-sync.js",
         "sai-image-import": "node src/js/images/sai-image-sync.js",
         "gari-image-import": "node src/js/images/gari-image-sync.js",
+        "curation-check-source-urls": "node src/js/curation/check-source-urls.js",
+        "curation-invalid-records": "node src/js/curation/invalid-records.js",
+        "image-curation": "npm run image-curation-missing-files && npm run image-curation-md5-checksums && npm run image-curation-orphaned-files",
+        "image-curation-missing-files": "node src/js/curation/delete-image-records-missing-files.js",
+        "image-curation-md5-checksums": "node src/js/curation/add-missing-md5-checksums.js",
+        "image-curation-orphaned-files": "node src/js/curation/delete-orphaned-image-files.js",
         "sai-curation": "npm run sai-curation-merge && npm run sai-curation-metadata && npm run sai-curation-delete",
         "sai-curation-delete": "node src/js/sai/delete.js",
         "sai-curation-merge": "node src/js/sai/merge.js",
         "sai-curation-metadata": "node src/js/sai/metadata.js",
+        "sai-curation-merge-loops": "node src/js/curation/fix-merge-loops.js",
+        "sai-curation-missing-records": "node src/js/curation/flag-missing-sai-records-as-deleted.js",
+        "sai-curation-duplicate-children": "node src/js/curation/fix-duplicate-children.js",
         "updates-report": "npm run updates-report:diffs && npm run updates-report:reports",
         "updates-report:diffs": "node src/js/updates-report/process-incoming-import-results.js",
         "updates-report:reports": "node src/js/updates-report/process-incoming-diff-results.js",
@@ -58,7 +67,7 @@
         "nodemailer-smtp-transport": "2.7.4",
         "pako": "1.0.6",
         "request": "2.81.0",
-        "ul-api": "1.0.0-dev.20181024T125123Z.afea43d"
+        "ul-api": "1.0.0-dev.20181126T142401Z.124fbf0"
     },
     "devDependencies": {
         "eslint": "4.6.1",
