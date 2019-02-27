@@ -53,7 +53,7 @@ gpii.ul.imports.curation.transformAndBulkUpdate.bulkDeleteImageRecords = functio
     else if (!that.options.commit) {
         fluid.log(fluid.logLevel.IMPORTANT, "Found and transformed " + updatedRecords.length + " records.  Run with --commit=true to save the updated records.");
         var filename = "updates-" + that.id + ".json";
-        var fullPath = path.join(os.tmpDir(), filename);
+        var fullPath = path.join(os.tmpdir(), filename);
         fs.writeFile(fullPath, JSON.stringify(updatedRecords, null, 2), function (error) {
             if (error) {
                 fluid.fail(fluid.logLevel.WARN, "Error saving temporary results:", error);

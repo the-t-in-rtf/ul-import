@@ -5,7 +5,7 @@ var gpii  = fluid.registerNamespace("gpii");
 
 var os     = require("os");
 var path   = require("path");
-var tmpDir = path.resolve(os.tmpDir());
+var tmpDir = path.resolve(os.tmpdir());
 
 fluid.require("%ul-imports");
 fluid.require("%kettle");

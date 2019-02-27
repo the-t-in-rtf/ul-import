@@ -95,7 +95,7 @@ gpii.ul.imports.curation.duplicateImages.saveReport = function (that, results) {
             recordsByImageId[row.key].push(row.value);
         });
     });
-    var outputPath = path.resolve(os.tmpDir(), "duplicate-images-" + that.id + ".json");
+    var outputPath = path.resolve(os.tmpdir(), "duplicate-images-" + that.id + ".json");
     fs.writeFileSync(outputPath, JSON.stringify(recordsByImageId, null, 2));
     fluid.log(fluid.logLevel.IMPORTANT, "Saved duplicate image report to '", outputPath, "'...");
 };

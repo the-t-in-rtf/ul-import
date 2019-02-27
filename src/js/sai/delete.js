@@ -2,6 +2,8 @@
 
     Look through the list of SAI records flagged for deletion and update the corresponding "unified" record.
 
+    NOTE: This script is likely no longer useful, you should rely on the "metadata" script to relay deletions.
+
  */
 "use strict";
 var fluid = require("infusion");

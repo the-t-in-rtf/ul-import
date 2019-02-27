@@ -40,7 +40,7 @@ gpii.ul.imports.curation.invalidRecords.getAllRecords = function (that) {
 
 gpii.ul.imports.curation.invalidRecords.saveOutput = function (that, prefix, dataToSave) {
     var filename = prefix + "-" + that.id + ".json";
-    var filePath = path.resolve(os.tmpDir(), filename);
+    var filePath = path.resolve(os.tmpdir(), filename);
     fs.writeFileSync(filePath, JSON.stringify(dataToSave, null, 2));
 
     return filePath;

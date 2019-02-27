@@ -85,12 +85,13 @@ fluid.defaults("gpii.ul.imports.sai", {
         transformer: {
             options: {
                 rules: {
-                    //"status": {
-                    //    transform: {
-                    //        type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
-                    //        values: [ "ul_status", { literalValue: "new" } ]
-                    //    }
-                    //},
+                    // SAI status must eventually trump what's in the UL API.
+                    "status": {
+                        transform: {
+                            type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
+                            values: [ "ul_status", { literalValue: "new" } ]
+                        }
+                    },
                     "uid": {
                         transform: {
                             type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
@@ -114,6 +115,12 @@ fluid.defaults("gpii.ul.imports.sai", {
                     },
                     "sourceData": ""
                 }
+            }
+        },
+        syncer: {
+            options: {
+                fieldsToPreserve:    [],
+                diffFieldsToCompare: ["status", "manufacturer", "description", "name", "uid", "sid", "source", "sourceUrl", "language"]
             }
         }
     }

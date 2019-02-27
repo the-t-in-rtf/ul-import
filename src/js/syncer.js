@@ -69,8 +69,8 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
 
             // Take a pass through the "incoming" records and add any that do not already exist.
             fluid.each(that.model.data, function (incomingRecord) {
-                var existingRecord = fluid.find(body.products, function (product) {
-                    if (incomingRecord.source === product.source && incomingRecord.sid === product.sid) { return product; }
+                var existingRecord = fluid.find(body.products, function (cachedRecord) {
+                    if (cachedRecord.source === incomingRecord.source && cachedRecord.sid === incomingRecord.sid) { return cachedRecord; }
                 });
 
                 var combinedRecord = fluid.copy(incomingRecord);
@@ -185,6 +185,11 @@ gpii.ul.imports.syncer.report = function (that) {
 fluid.defaults("gpii.ul.imports.syncer", {
     gradeNames:    ["fluid.modelComponent"],
     maxRequests:   50,
+    mergePolicy: {
+        fieldsToPreserve:    "nomerge",
+        fieldsNotToCompare:  "nomerge",
+        diffFieldsToCompare: "nomerge"
+    },
     fieldsToPreserve: ["status", "uid"],
     fieldsNotToCompare: ["updated"],
     diffFieldsToCompare: ["manufacturer", "description", "name", "uid", "sid", "source", "sourceUrl", "language"],

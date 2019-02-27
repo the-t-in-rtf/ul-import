@@ -144,7 +144,7 @@ gpii.ul.imports.sai.metadata.updateRecords = function (that, recordsToUpdate) {
 fluid.defaults("gpii.ul.imports.sai.metadata", {
     gradeNames: ["fluid.component"],
     keysToStrip: ["sources"],
-    fieldsToDiff: ["name", "description"],
+    fieldsToDiff: ["name", "description", "status"],
     maxRequests: 100,
     invokers: {
         "processRecordLookupResults": {

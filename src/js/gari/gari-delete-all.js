@@ -79,13 +79,13 @@ gpii.ul.imports.gari.deleteAll.processProductsResults = function (that, error, r
         fluid.log(fluid.logLevel.IMPORTANT, "Skipped ", skippedRecords.length, " records that did not need to be updated...");
 
         var skipFileName = "skipped-" + that.id + ".json";
-        var skipPath = path.resolve(os.tmpDir(), skipFileName);
+        var skipPath = path.resolve(os.tmpdir(), skipFileName);
         fs.writeFileSync(skipPath, JSON.stringify(skippedRecords, null, 2));
         fluid.log(fluid.logLevel.IMPORTANT, "Saved skipped records to '", skipPath, "'...");
 
         fluid.log(fluid.logLevel.IMPORTANT, unifiedRecordsToUpdate.length, " records ready to be updated...");
         var updatesFilename = "updated-" + that.id + ".json";
-        var updatesPath = path.resolve(os.tmpDir(), updatesFilename);
+        var updatesPath = path.resolve(os.tmpdir(), updatesFilename);
         fs.writeFileSync(updatesPath, JSON.stringify(unifiedRecordsToUpdate, null, 2));
 
         fluid.log(fluid.logLevel.IMPORTANT, "Saved proposed updated records to '", updatesPath, "'...");

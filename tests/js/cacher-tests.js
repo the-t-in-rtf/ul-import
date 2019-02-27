@@ -7,7 +7,7 @@ var gpii  = fluid.registerNamespace("gpii");
 var path = require("path");
 var os = require("os");
 var timestamp = (new Date()).getTime();
-var cacheFile = path.resolve(os.tmpDir(), "cacher-tests-" + timestamp);
+var cacheFile = path.resolve(os.tmpdir(), "cacher-tests-" + timestamp);
 
 require("../../src/js/cacher");
 
