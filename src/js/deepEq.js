@@ -12,11 +12,11 @@ fluid.registerNamespace("gpii.ul.imports");
  *
  * A function that uses `fluid.filterKeys` to compare only part of two objects.
  *
- * @param a The first object to compare.
- * @param b The second object to compare.
- * @param keys The keys to include (by default) in the comparison.
- * @param exclude If this is set to true, we will exclude the above keys instead.
- * @return {*}
+ * @param {Object} a - The first object to compare.
+ * @param {Object} b - The second object to compare.
+ * @param {Array<String>} keys - The keys to include (by default) in the comparison.
+ * @param {Boolean} exclude If this is set to true, we will exclude the above keys instead.
+ * @return {Boolean} - `true` if the filtered portion of each record is deeply equal, `false` otherwise.
  *
  */
 gpii.ul.imports.filteredDeepEq = function (a, b, keys, exclude) {

@@ -33,8 +33,10 @@ fluid.registerNamespace("gpii.ul.imports.promiseQueue");
  * Note that if you choose to add promises to this array, their execution will not be governed by the `promisesAtOnce`
  * limit.
  *
- * @param promiseArray {Array} - An array of promise instances, promise-returning functions, synchronous functions returning a value, and simple values.
- * @param promisesAtOnce {Integer} - The number of promises that are allowed to execute at a single time.
+ * @param {Array} promiseArray - An array of promise instances, promise-returning functions, synchronous functions returning a value, and simple values.
+ * @param {Integer} promisesAtOnce - The number of promises that are allowed to execute at a single time.
+ * @return {Promise} - A `fluid.promise` that will resolve when all promises in the "queue" are processed or reject if
+ * any promise in the "queue" is rejected.
  *
  */
 gpii.ul.imports.promiseQueue.createQueue = function (promiseArray, promisesAtOnce) {

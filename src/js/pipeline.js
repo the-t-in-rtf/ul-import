@@ -18,8 +18,11 @@ fluid.registerNamespace("gpii.ul.imports.pipeline");
  * A function to create a "pipeline" of promises, a "sequence of sequences" in which at most `promisesPerSequence`
  * promises are executed at a time.
  *
- * @param promiseArray
- * @param promisesPerSequence
+ * @param {Array<Promise>} promiseArray - The array of promises to convert to a "pipeline".
+ * @param {Integer} promisesPerSequence - The number of promises to execute at once.
+ * @return {Promise} - An overall promise that will resolve when all promises in the "pipeline" are resolved, or
+ * rejected if any promise in the pipeline is rejected.
+ *
  */
 gpii.ul.imports.pipeline.createPipeline = function (promiseArray, promisesPerSequence) {
     var outerPromise = fluid.promise();
