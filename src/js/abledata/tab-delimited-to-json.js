@@ -6,18 +6,32 @@ var csv = require("fast-csv");
 
 require("../bundle-deps");
 
+/*
+
+    1. Open the "Abledata duplicates" sheet Achilleas prepared.
+    2. Save it to ~/Downloads/AbleData/abledata-duplicates.csv
+    3. Run this script
+    4. Review the output in /tmp/abledata-duplicates.json
+    5. If acceptable, copy to ./data/known-duplicates/abledata.json
+    6. Run src/js/curation/fix-known-duplicates.js (see docs in that file).
+
+ */
+// TODO: Improve and automate this process if there are frequent changes.
+
+// TODO: Output is empty at the moment, investigate.
+
 var filename = "/Users/duhrer/Downloads/AbleData/abledata-duplicates.csv";
 var stream = fs.createReadStream(filename);
 
 var row = 0;
 var jsonData = [];
-var csvStream = csv({ delimiter: ";"})
+var csvStream = csv({ delimiter: ","})
     .on("data", function (data) {
-        if (row > 0 && data[0] && data[0].length && data[6] && data[6].length) {
+        if (row > 0 && data[1] && data[1].length && data[7] && data[7].length) {
             var singleRecord = {
                 source: "AbleData",
-                sid: data[0],
-                uid: data[6]
+                sid: data[1],
+                uid: data[7]
             };
             jsonData.push(singleRecord);
         }

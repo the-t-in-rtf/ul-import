@@ -26,7 +26,7 @@ gpii.ul.imports.ableData.transformer.parseXml = function (that) {
  *
  * &lt;span class="date-display-single" property="dc:date" datatype="xsd:dateTime" content="2012-11-06T19:00:00-05:00"&gt;11/06/2012&lt;/span&gt;
  *
- * @attr {String} value - The escaped markup to extract the data from.
+ * @param {String} value - The escaped markup to extract the data from.
  * @return {String} - The date as a string
  *
  */
@@ -50,7 +50,7 @@ fluid.defaults("gpii.ul.imports.ableData.transformer.extractLastUpdated", {
  *
  * &lt;a href="/product/playing-card-holder-model-bk9431"&gt;https://abledata.acl.gov/node/72998&lt;/a&gt;
  *
- * @attr {String} value - The escaped markup to extract the data from.
+ * @param {String} value - The escaped markup to extract the data from.
  * @return {String} - The URL as a string
  *
  */
@@ -74,7 +74,7 @@ fluid.defaults("gpii.ul.imports.ableData.transformer.extractProductLink", {
  *
  * &lt;a href="/product/playing-card-holder-model-bk9431"&gt;https://abledata.acl.gov/node/72998&lt;/a&gt;
  *
- * @attr {String} value - The escaped markup to extract the data from.
+ * @param {String} value - The escaped markup to extract the data from.
  * @return {String} - The SID as a string
  *
  */
@@ -92,6 +92,96 @@ fluid.defaults("gpii.ul.imports.ableData.transformer.extractProductSid", {
     gradeNames: "fluid.standardTransformFunction"
 });
 
+gpii.ul.imports.ableData.transformer.extractTitle = function (value) {
+    var matches = value.match(/^<a href=[^>]+>(.+)<[^>]+>$/i);
+    if (matches) {
+        return matches[1];
+    }
+    else {
+        return value;
+    }
+};
+
+fluid.defaults("gpii.ul.imports.ableData.transformer.extractTitle", {
+    gradeNames: "fluid.standardTransformFunction"
+});
+
+
+/*
+    If we decide we need to pull out the structure from category data, we'd need to parse category HTML like:
+
+    <div class='term-tree-list'>
+        <ul class="term">
+            <li class='selected'>Computers (63601)
+                <ul class="term">
+                    <li class='selected'>Hardware (63602)
+                        <ul class="term">
+                            <li class='selected'>Input (63618)
+                                <ul class="term">
+                                    <li class='selected'>General Input Interfaces (63625)
+                                        <ul class="term">
+                                            <li class='selected'>Joystick (67343)</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class='selected'>Controls (63803)
+                <ul class="term">
+                    <li class='selected'>Control Switches (63804)
+                        <ul class="term">
+                            <li class='selected'>Electro-mechanical Switches (63811)
+                                <ul class="term">
+                                    <li class='selected'>Joysticks (63851)
+                                        <ul class="term">
+                                            <li class='selected'>Joystick (63852)</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class='selected'>Disability Terms (68606)
+                <ul class="term">
+                    <li class='selected'>Severe Physical Disabilities (67640)</li>
+                    <li class='selected'>Upper Extremity Disabilities (67645)</li>
+                </ul>
+            </li>
+            <li class='selected'>Universal (67365)
+                <ul class="term">
+                    <li class='selected'>Price 1001 To 5000 Dollars (68171)</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    The above would result in text like:
+
+    Computers (63601)
+        -> Hardware (63602)
+            -> Input (63618)
+                -> General Input Interfaces (63625)
+                    -> Joystick (67343)
+
+    Controls (63803)
+        -> Control Switches (63804)
+            -> Electro-mechanical Switches (63811)
+                -> Joysticks (63851)
+                    -> Joystick (63852)
+
+    Disability Terms (68606)
+        -> Severe Physical Disabilities (67640)
+        -> Upper Extremity Disabilities (67645)
+
+    Universal (67365)
+        -> Price 1001 To 5000 Dollars (68171)
+
+ */
 fluid.defaults("gpii.ul.imports.ableData.transformer", {
     gradeNames: ["fluid.modelComponent"],
     model: {
@@ -102,7 +192,7 @@ fluid.defaults("gpii.ul.imports.ableData.transformer", {
     xmlParserRules: {
         rules: {
             // Drill down to only the objects we care about to simplify the transform paths
-            products: "search_api_index_product_export_index.search_api_index_product_export_index"
+            products: "nodes.node"
         }
     },
     mapRules: {
@@ -127,8 +217,13 @@ fluid.defaults("gpii.ul.imports.ableData.transformer", {
                 inputPath: "Link-to-Product-Page"
             }
         },
-        name: "Title",
-        description: "Description",
+        name: {
+            transform: {
+                type: "gpii.ul.imports.ableData.transformer.extractTitle",
+                inputPath: "Title"
+            }
+        },
+        description: "Description.$cd",
         manufacturer: {
             name:    {
                 transform: {
@@ -152,7 +247,29 @@ fluid.defaults("gpii.ul.imports.ableData.transformer", {
                 inputPath: "Link-to-Product-Page"
             }
         },
-        sourceData: ""
+        // Lightly massage their raw record to include sane titles, parsed category data, etc.
+        sourceData: {
+            "": "",
+            Title: {
+                transform: {
+                    type: "gpii.ul.imports.ableData.transformer.extractTitle",
+                    inputPath: "Title"
+                }
+            },
+            Description: "Description.$cd",
+            "Product-information-last-updated": {
+                transform: {
+                    type: "gpii.ul.imports.ableData.transformer.extractLastUpdated",
+                    inputPath: "Product-information-last-updated"
+                }
+            },
+            "Link-to-Product-Page": {
+                transform: {
+                    type: "gpii.ul.imports.ableData.transformer.extractProductLink",
+                    inputPath: "Link-to-Product-Page"
+                }
+            }
+        }
     },
     defaults: {
         description: "No description available.", // There is no description data, but the field is required, so we set it to a predefined string.

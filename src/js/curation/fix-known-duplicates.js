@@ -1,6 +1,11 @@
 /*
 
-    A script to use JSON records to update known duplicates based on the source, SID, and UID.
+    A script to use JSON records to update known duplicates based on the source, SID, and UID.  To use this script:
+
+    1. Update the data following the process described in the header of src/abledata/tab-delimited-to-json.js
+    2. Run this script.
+
+    This script should be run after the abledata imports but before the "unifier".
 
  */
 "use strict";
@@ -13,6 +18,9 @@ var request = require("request");
 
 require("../../../");
 require("../concurrent-promise-queue");
+
+require("../launcher");
+require("../login");
 
 fluid.registerNamespace("gpii.ul.imports.curation.knownDuplicates");
 
@@ -28,13 +36,20 @@ gpii.ul.imports.curation.knownDuplicates.processDuplicates = function (that) {
             var updatePromiseQueue = gpii.ul.imports.promiseQueue.createQueue(updatePromises, that.options.requestsAtOnce);
             updatePromiseQueue.then(
                 function (results) {
-                    fluid.log("Updated " + results.length + " duplicate records.");
+                    var updatedResults = results.filter(function (entry) { return entry; });
+                    fluid.log("Updated " + updatedResults.length + "/" + results.length + " duplicate records listed in 'known duplicates' files.");
                     processDuplicatesPromise.resolve();
                 },
-                processDuplicatesPromise.reject
+                function (error) {
+                    fluid.log("Error processing queue: ", error);
+                    processDuplicatesPromise.reject(error);
+                }
             );
         },
-        processDuplicatesPromise.reject
+        function (error) {
+            fluid.log("Error logging in:" + error);
+            processDuplicatesPromise.reject(error);
+        }
     );
 
     return processDuplicatesPromise;
@@ -75,25 +90,34 @@ gpii.ul.imports.curation.knownDuplicates.updateSingleEntry = function (that, dup
             jar:  true
         };
         request.get(productReadOptions, function (error, response, body) {
-            if (error || response.statusCode !== 200) {
+            if (response.statusCode === 404) {
+                //fluid.log("Known duplicate '" + dupeDef.sid + "' from source '" + dupeDef.source + "' not found in the UL API.");
+                outerUpdatePromise.resolve(false);
+            }
+            else if (error || response.statusCode !== 200) {
                 outerUpdatePromise.reject(response);
             }
             else {
                 try {
-                    var existingRecord = JSON.parse(body);
+                    var existingRecord = body;
                     var updatedRecord = fluid.extend({}, existingRecord, { uid: dupeDef.uid});
-                    var productWriteOptions = fluid.extend({}, productReadOptions, { body: JSON.stringify(updatedRecord, null, 2)});
-                    request(productWriteOptions, function (error, response, body) {
+                    var productWriteOptions = fluid.extend({}, productReadOptions, { body: updatedRecord });
+                    request(productWriteOptions, function (error, response) {
                         if (error || response.statusCode !== 200) {
                             outerUpdatePromise.reject(response);
                         }
                         else {
-                            outerUpdatePromise.resolve(body);
+                            outerUpdatePromise.resolve(true);
                         }
                     });
                 }
                 catch (error) {
-                    outerUpdatePromise.reject(error);
+                    if (!outerUpdatePromise.disposition) {
+                        outerUpdatePromise.reject(error);
+                    }
+                    else {
+                        fluid.fail(error);
+                    }
                 }
             }
         });
@@ -104,7 +128,7 @@ gpii.ul.imports.curation.knownDuplicates.updateSingleEntry = function (that, dup
 
 fluid.defaults("gpii.ul.imports.curation.knownDuplicates", {
     gradeNames: ["fluid.component"],
-    dataDir: "%ul-import/data/known-duplicates",
+    dataDir: "%ul-imports/data/known-duplicates",
     requestsAtOnce: 10,
     productUrlTemplate: "%baseUrl/%source/%sid",
     invokers: {
