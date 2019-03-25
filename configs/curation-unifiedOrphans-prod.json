@@ -1,0 +1,3 @@
+{
+    "mergeConfigs": ["%ul-imports/configs/curation-unifiedOrphans-base.json", "%ul-imports/configs/base-prod.json"]
+}
