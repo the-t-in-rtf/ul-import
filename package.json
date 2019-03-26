@@ -8,7 +8,7 @@
     },
     "scripts": {
         "test": "node node_modules/istanbul/lib/cli.js cover tests/all-tests.js",
-        "full-sync": "npm run all-imports && npm run curation-known-duplicates && npm run unifier && npm run all-image-imports && npm run sai-curation",
+        "full-sync": "npm run all-imports && npm run curation-known-duplicates && npm run unifier && npm run all-image-imports && npm run sai-curation && npm run curation-unified-orphans",
         "all-imports": "npm run eastin-import && npm run sai-import && npm run abledata-import",
         "abledata-import": "node src/js/abledata/index.js -- --noCache",
         "eastin-import": "node src/js/eastin/launcher.js -- --noCache",
