@@ -1,7 +1,7 @@
 /*
 
-    A script to report any SAI records not found in the API and (if the "commit" flag is set) to automatically flag
-    these SAI records as deleted.
+    A script to locate any SAI records not found in their API and (if the "commit" flag is set) to automatically purge
+    these.
 
 */
 /* eslint-env node */
