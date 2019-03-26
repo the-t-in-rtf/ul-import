@@ -140,7 +140,7 @@ gpii.ul.imports.gari.deleteAll.performUpdate = function (that, unifiedRecordsToU
 fluid.defaults("gpii.ul.imports.gari.deleteAll", {
     gradeNames: ["fluid.component"],
     commit: false,
-    maxRequests: 100,
+    maxRequests: 10,
     keysToStrip: ["sources"],
     listeners: {
         "onCreate.login": {

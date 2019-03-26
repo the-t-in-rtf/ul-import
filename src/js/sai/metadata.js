@@ -145,7 +145,7 @@ fluid.defaults("gpii.ul.imports.sai.metadata", {
     gradeNames: ["fluid.component"],
     keysToStrip: ["sources"],
     fieldsToDiff: ["name", "description", "status"],
-    maxRequests: 100,
+    maxRequests: 10,
     invokers: {
         "processRecordLookupResults": {
             funcName: "gpii.ul.imports.sai.metadata.processRecordLookupResults",

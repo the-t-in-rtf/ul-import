@@ -157,7 +157,7 @@ gpii.ul.imports.sai.merge.mergeRecords = function (that, sourcesByTarget) {
 
 fluid.defaults("gpii.ul.imports.sai.merge", {
     gradeNames: ["fluid.component"],
-    maxRequests: 100,
+    maxRequests: 10,
     components: {
         deletesReader: {
             type: "kettle.dataSource.URL",

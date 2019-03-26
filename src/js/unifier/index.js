@@ -230,7 +230,7 @@ gpii.ul.imports.unifier.handleError = function (that, errorResponse) {
 
 fluid.defaults("gpii.ul.imports.unifier", {
     gradeNames: ["fluid.component"],
-    maxRequests: 10,
+    maxRequests: 2,
     components: {
         orphanReader: {
             type: "gpii.ul.imports.dataSource",

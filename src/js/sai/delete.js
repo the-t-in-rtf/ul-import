@@ -149,7 +149,7 @@ gpii.ul.imports.sai.deletes.loginAndDeleteRecords = function (that, recordsToUpd
 
 fluid.defaults("gpii.ul.imports.sai.deletes", {
     gradeNames: ["fluid.component"],
-    maxRequests: 100,
+    maxRequests: 10,
     components: {
         productReader: {
             type: "kettle.dataSource.URL",

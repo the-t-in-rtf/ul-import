@@ -134,7 +134,7 @@ gpii.ul.imports.curation.urlChecker.processSourceUrlResults = function (that, re
 
 fluid.defaults("gpii.ul.imports.curation.urlChecker", {
     gradeNames: ["fluid.component"],
-    maxRequests: 100,
+    maxRequests: 10,
     outputDir: os.tmpdir(),
     filenames: {
         activeButMissing: "fix-active-but-missing.json",

@@ -279,7 +279,7 @@ gpii.ul.imports.images.syncer.handleSuccess = function (that, results) {
 
 fluid.defaults("gpii.ul.imports.images.syncer", {
     gradeNames: ["fluid.modelComponent"],
-    maxRequests: 25,
+    maxRequests: 10,
     messages: {
         errorSavingRecords: "There was an error syncing one or more records.",
         savedRecords: "Successfully processed %length records."

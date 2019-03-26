@@ -160,7 +160,7 @@ fluid.defaults("gpii.ul.imports.eastin.downloader", {
         originalRecords:    []
     },
     detailedRecordTimeout: 120000, // Timeout in milliseconds
-    maxRequests: 150,
+    maxRequests: 10,
     model: {
         records: []
     },
