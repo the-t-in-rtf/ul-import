@@ -223,7 +223,12 @@ fluid.defaults("gpii.ul.imports.ableData.transformer", {
                 inputPath: "Title"
             }
         },
-        description: "Description.$cd",
+        description: {
+            transform: {
+                type: "gpii.ul.imports.transforms.extractDescription",
+                inputPath: "Description.$cd"
+            }
+        },
         manufacturer: {
             name:    {
                 transform: {
@@ -256,7 +261,12 @@ fluid.defaults("gpii.ul.imports.ableData.transformer", {
                     inputPath: "Title"
                 }
             },
-            Description: "Description.$cd",
+            Description: {
+                transform: {
+                    type: "gpii.ul.imports.transforms.extractDescription",
+                    inputPath: "Description.$cd"
+                }
+            },
             "Product-information-last-updated": {
                 transform: {
                     type: "gpii.ul.imports.ableData.transformer.extractLastUpdated",

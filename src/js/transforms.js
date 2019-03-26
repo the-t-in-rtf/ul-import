@@ -235,3 +235,20 @@ gpii.ul.imports.transforms.encodeURIComponent = function (value) {
 fluid.defaults("gpii.ul.imports.transforms.encodeURIComponent", {
     gradeNames: ["fluid.standardTransformFunction"]
 });
+
+
+/*
+
+    Remove redundant "product description" leader and tone down all the rest of the headings.  Used with both
+    the SAI and AbleData.
+
+ */
+gpii.ul.imports.transforms.extractDescription = function (value) {
+    var withoutLeader = value.replace(/<h2>Product Description:<\/h2>/, "");
+    var withSmallerHeaders = withoutLeader.replace(/h2>/g, "h4>");
+    return withSmallerHeaders;
+};
+
+fluid.defaults("gpii.ul.imports.transforms.extractDescription", {
+    gradeNames: "fluid.standardTransformFunction"
+});

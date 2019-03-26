@@ -9,6 +9,7 @@ fluid.require("%ul-imports");
 require("../importer");
 require("../launcher");
 require("./transforms");
+require("../transforms");
 
 /*
 
@@ -101,8 +102,13 @@ fluid.defaults("gpii.ul.imports.sai", {
                     "name": "title",
                     "description": {
                         transform: {
-                            type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
-                            values: [ "body", "title" ]
+                            type:   "gpii.ul.imports.transforms.extractDescription",
+                            input: {
+                                transform: {
+                                    type: "gpii.ul.imports.sai.transformer.firstSaneValue",
+                                    values: ["body", "title"]
+                                }
+                            }
                         }
                     },
                     "source": { literalValue: "sai" },
