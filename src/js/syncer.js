@@ -86,11 +86,10 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
                         updateTasks.push(recordUpdatePromise);
                     }
                     else {
-                        that.skippedRecordsCount++;
+                        that.skippedRecordCount++;
                     }
                 }
                 else {
-                    that.newRecordCount++;
                     if (!combinedRecord.status) {
                         combinedRecord.status = "new";
                     }
@@ -134,10 +133,12 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, o
             else if (response.statusCode === 200 || response.statusCode === 201) { // Updated
                 if (originalRecord && !gpii.ul.imports.filteredDeepEq(originalRecord, updatedRecord, that.options.diffFieldsToCompare)) {
                     that.preupdateOriginals.push(originalRecord);
+                    that.updatedRecordCount++;
                     that.updatedRecords.push(updatedRecord);
                 }
                 else {
                     that.createdRecordCount++;
+                    that.updatedRecords.push(updatedRecord);
                 }
             }
             // There was an error processing our request
@@ -156,7 +157,7 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, o
 
 gpii.ul.imports.syncer.saveRecords = function (that) {
     fluid.each(["failedRecords", "preupdateOriginals", "updatedRecords"], function (key) {
-        if (that[key] && that[key].length) {
+        if (that[key]) {
             var timestamp  = (new Date()).toISOString();
 
             var filename   = timestamp + "-" + that.options.jobKey + "-" + key + "-" + that.id + ".json";
@@ -173,10 +174,9 @@ gpii.ul.imports.syncer.report = function (that) {
     if (that.options.displayReport) {
         fluid.log(fluid.logLevel.IMPORTANT, "Evaluated " + that.model.data.length + " incoming records.");
         fluid.log(fluid.logLevel.IMPORTANT, "Compared with " + that.existingRecordCount + " existing records for this source.");
-        fluid.log(fluid.logLevel.IMPORTANT, "Found " + that.newRecordCount + " new records.");
-        fluid.log(fluid.logLevel.IMPORTANT, "Skipped " + that.skippedRecordsCount + " records that had not been updated.");
+        fluid.log(fluid.logLevel.IMPORTANT, "Skipped " + that.skippedRecordCount + " records that had not been updated.");
         fluid.log(fluid.logLevel.IMPORTANT, "Created " + that.createdRecordCount + " new records.");
-        fluid.log(fluid.logLevel.IMPORTANT, "Updated " + that.updatedRecords.length + " existing records...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Updated " + that.updatedRecordCount + " existing records...");
         fluid.log(fluid.logLevel.IMPORTANT, "Encountered " + that.failedRecords.length + " failures while saving the data.");
         fluid.log(fluid.logLevel.IMPORTANT, "Found ", that.staleRecordCount + " existing records that were not a part of the incoming feed.");
     }
@@ -184,7 +184,7 @@ gpii.ul.imports.syncer.report = function (that) {
 
 fluid.defaults("gpii.ul.imports.syncer", {
     gradeNames:    ["fluid.modelComponent"],
-    maxRequests:   50,
+    maxRequests:   10,
     mergePolicy: {
         fieldsToPreserve:    "nomerge",
         fieldsNotToCompare:  "nomerge",
@@ -210,13 +210,13 @@ fluid.defaults("gpii.ul.imports.syncer", {
     },
     members: {
         createdRecordCount:  0,
-        newRecordCount:      0,
         existingRecordCount: 0,
-        failedRecords:       [],
-        skippedRecordsCount: 0,
+        updatedRecordCount:  0,
+        skippedRecordCount:  0,
         staleRecordCount:    0,
-        updatedRecords:      [],
-        preupdateOriginals:  []
+        failedRecords:       [],
+        preupdateOriginals:  [],
+        updatedRecords:      []
     },
     model: {
         data: []

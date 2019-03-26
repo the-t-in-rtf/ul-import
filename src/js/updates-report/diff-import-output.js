@@ -40,16 +40,22 @@ gpii.ul.imports.diffImportResults.generateDiff = function (originalsPath, update
 
     var updates   = require(fluid.module.resolvePath(updatesPath));
     fluid.each(updates, function (updatedRecord) {
+        var compareOptions = { compareStringsAsMarkdown: true, markdownItOptions: { html: true }, lcsOptions: { tracebackStrategy: "full", timeout: 30000 }};
+
         var originalRecord = fluid.get(originalsBySourceAndSid, updatedRecord.source + "." + updatedRecord.sid);
-        if (originalRecord !== undefined) {
-            fluid.log(fluid.logLevel.TRACE, "diffing ", originalRecord.source, ":", originalRecord.sid);
+        var filteredUpdatedRecord = fluid.filterKeys(updatedRecord, diffFieldsToCompare);
+        if (originalRecord === undefined) {
+            var allNewDiff = gpii.diff.compare({}, filteredUpdatedRecord, compareOptions);
+            diffsAndUpdates.push({ diff: allNewDiff, update: updatedRecord });
+        }
+        else {
+            //fluid.log(fluid.logLevel.TRACE, "diffing ", originalRecord.source, ":", originalRecord.sid);
             var filteredOriginalRecord = fluid.filterKeys(originalRecord, diffFieldsToCompare);
-            var filteredUpdatedRecord = fluid.filterKeys(updatedRecord, diffFieldsToCompare);
             if (!gpii.diff.equals(filteredOriginalRecord, filteredUpdatedRecord)) {
                 var diff = gpii.diff.compare(
                     filteredOriginalRecord,
                     filteredUpdatedRecord,
-                    { compareStringsAsMarkdown: true, markdownItOptions: { html: true }, lcsOptions: { tracebackStrategy: "full", timeout: 30000 }}
+                    compareOptions
                 );
                 diffsAndUpdates.push({ diff: diff, update: updatedRecord});
             }
