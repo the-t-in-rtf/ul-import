@@ -65,6 +65,7 @@
         "infusion": "3.0.0-dev.20190212T124747Z.23b4bc89d",
         "json5": "2.1.0",
         "juice": "5.2.0",
+        "kettle": "1.10.1",
         "markdown-it": "8.4.2",
         "md5-file": "4.0.0",
         "mkdirp": "0.5.1",
@@ -84,7 +85,6 @@
         "grunt": "1.0.3",
         "grunt-jsonlint": "1.1.0",
         "istanbul": "0.4.5",
-        "kettle": "1.10.1",
         "node-jqunit": "1.1.8"
     }
 }
