@@ -10,10 +10,10 @@ fluid.require("%settingsHandlers");
 require("../transforms");
 require("../helpers");
 
-fluid.registerNamespace("gpii.ul.imports.ableData.transformer");
+fluid.registerNamespace("gpii.ul.imports.ableData.transforms");
 
 // Parse the XML data we already have
-gpii.ul.imports.ableData.transformer.parseXml = function (that) {
+gpii.ul.imports.ableData.transforms.parseXml = function (that) {
     var parsedXml = gpii.settingsHandlers.XMLHandler.parser.parse(that.model.xml, that.options.xmlParserRules);
     var flattenedJson = gpii.ul.imports.transforms.flatten(parsedXml);
     var remappedJson = fluid.transform(flattenedJson.products, that.transformData);
@@ -30,7 +30,7 @@ gpii.ul.imports.ableData.transformer.parseXml = function (that) {
  * @return {String} - The date as a string
  *
  */
-gpii.ul.imports.ableData.transformer.extractLastUpdated = function (value) {
+gpii.ul.imports.ableData.transforms.extractLastUpdated = function (value) {
     var matches = value.match(/.+content *= *"([^"]+)".+/i);
     if (matches) {
         return matches[1];
@@ -40,7 +40,7 @@ gpii.ul.imports.ableData.transformer.extractLastUpdated = function (value) {
     }
 };
 
-fluid.defaults("gpii.ul.imports.ableData.transformer.extractLastUpdated", {
+fluid.defaults("gpii.ul.imports.ableData.transforms.extractLastUpdated", {
     gradeNames: "fluid.standardTransformFunction"
 });
 
@@ -54,7 +54,7 @@ fluid.defaults("gpii.ul.imports.ableData.transformer.extractLastUpdated", {
  * @return {String} - The URL as a string
  *
  */
-gpii.ul.imports.ableData.transformer.extractProductLink = function (value) {
+gpii.ul.imports.ableData.transforms.extractProductLink = function (value) {
     var matches = value.match(/.+>([^&]+)<.+/i);
     if (matches) {
         return matches[1];
@@ -64,7 +64,7 @@ gpii.ul.imports.ableData.transformer.extractProductLink = function (value) {
     }
 };
 
-fluid.defaults("gpii.ul.imports.ableData.transformer.extractProductLink", {
+fluid.defaults("gpii.ul.imports.ableData.transforms.extractProductLink", {
     gradeNames: "fluid.standardTransformFunction"
 });
 
@@ -78,7 +78,7 @@ fluid.defaults("gpii.ul.imports.ableData.transformer.extractProductLink", {
  * @return {String} - The SID as a string
  *
  */
-gpii.ul.imports.ableData.transformer.extractProductSid = function (value) {
+gpii.ul.imports.ableData.transforms.extractProductSid = function (value) {
     var matches = value.match(/.+\/node\/(.+)<.+/i);
     if (matches) {
         return matches[1];
@@ -88,11 +88,11 @@ gpii.ul.imports.ableData.transformer.extractProductSid = function (value) {
     }
 };
 
-fluid.defaults("gpii.ul.imports.ableData.transformer.extractProductSid", {
+fluid.defaults("gpii.ul.imports.ableData.transforms.extractProductSid", {
     gradeNames: "fluid.standardTransformFunction"
 });
 
-gpii.ul.imports.ableData.transformer.extractTitle = function (value) {
+gpii.ul.imports.ableData.transforms.extractTitle = function (value) {
     var matches = value.match(/^<a href=[^>]+>(.+)<[^>]+>$/i);
     if (matches) {
         return matches[1];
@@ -102,7 +102,7 @@ gpii.ul.imports.ableData.transformer.extractTitle = function (value) {
     }
 };
 
-fluid.defaults("gpii.ul.imports.ableData.transformer.extractTitle", {
+fluid.defaults("gpii.ul.imports.ableData.transforms.extractTitle", {
     gradeNames: "fluid.standardTransformFunction"
 });
 
@@ -182,124 +182,3 @@ fluid.defaults("gpii.ul.imports.ableData.transformer.extractTitle", {
         -> Price 1001 To 5000 Dollars (68171)
 
  */
-fluid.defaults("gpii.ul.imports.ableData.transformer", {
-    gradeNames: ["fluid.modelComponent"],
-    model: {
-        xml:          {},
-        rawJson:      {},
-        remappedJson: {}
-    },
-    xmlParserRules: {
-        rules: {
-            // Drill down to only the objects we care about to simplify the transform paths
-            products: "nodes.node"
-        }
-    },
-    mapRules: {
-        status: {
-            transform: {
-                type: "fluid.transforms.valueMapper",
-                defaultInputPath: "Product-Status",
-                match: {
-                    "Discontinued": "discontinued"
-                },
-                noMatch: {
-                    outputValue: "new"
-                }
-            }
-        },
-        source: {
-            literalValue: "{that}.options.defaults.source"
-        },
-        sid: {
-            transform: {
-                type: "gpii.ul.imports.ableData.transformer.extractProductSid",
-                inputPath: "Link-to-Product-Page"
-            }
-        },
-        name: {
-            transform: {
-                type: "gpii.ul.imports.ableData.transformer.extractTitle",
-                inputPath: "Title"
-            }
-        },
-        description: {
-            transform: {
-                type: "gpii.ul.imports.transforms.extractDescription",
-                inputPath: "Description.$cd"
-            }
-        },
-        manufacturer: {
-            name:    {
-                transform: {
-                    type: "fluid.transforms.firstValue",
-                    values: [
-                        "Maker",
-                        { transform: { type: "fluid.transforms.literalValue", input: "Manufacturer Unknown"}}
-                    ]
-                }
-            }
-        },
-        updated: {
-            transform: {
-                type: "gpii.ul.imports.ableData.transformer.extractLastUpdated",
-                inputPath: "Product-information-last-updated"
-            }
-        },
-        sourceUrl: {
-            transform: {
-                type: "gpii.ul.imports.ableData.transformer.extractProductLink",
-                inputPath: "Link-to-Product-Page"
-            }
-        },
-        // Lightly massage their raw record to include sane titles, parsed category data, etc.
-        sourceData: {
-            "": "",
-            Title: {
-                transform: {
-                    type: "gpii.ul.imports.ableData.transformer.extractTitle",
-                    inputPath: "Title"
-                }
-            },
-            Description: {
-                transform: {
-                    type: "gpii.ul.imports.transforms.extractDescription",
-                    inputPath: "Description.$cd"
-                }
-            },
-            "Product-information-last-updated": {
-                transform: {
-                    type: "gpii.ul.imports.ableData.transformer.extractLastUpdated",
-                    inputPath: "Product-information-last-updated"
-                }
-            },
-            "Link-to-Product-Page": {
-                transform: {
-                    type: "gpii.ul.imports.ableData.transformer.extractProductLink",
-                    inputPath: "Link-to-Product-Page"
-                }
-            }
-        }
-    },
-    defaults: {
-        description: "No description available.", // There is no description data, but the field is required, so we set it to a predefined string.
-        language:    "en_us", // Their data only contains English language content
-        source:      "AbleData"
-    },
-    invokers: {
-        parseXml: {
-            funcName: "gpii.ul.imports.ableData.transformer.parseXml",
-            args: ["{that}"]
-        },
-        transformData: {
-            funcName: "fluid.model.transformWithRules",
-            args: ["{arguments}.0", "{that}.options.mapRules"]
-        }
-    },
-    modelListeners: {
-        xml: {
-            func: "{that}.parseXml",
-            excludeSource: "init"
-        }
-    }
-});

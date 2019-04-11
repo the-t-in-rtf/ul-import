@@ -11,7 +11,7 @@
         "username": "importer",
         "password": "password",
         "urls": {
-            "ableData": "https://abledata.acl.gov/export/abledata-product-list-2019-xml?field_indexing_term_s__tid=Computers&field_product_status_tid=70320"
+            "ableData": "https://abledata.acl.gov/export/tree-product-list-xml?field_product_status_tid=70320&field_indexing_term_s__tid%5B0%5D=69367&field_indexing_term_s__tid%5B1%5D=68951&field_indexing_term_s__tid_1%5B0%5D=68156"
         }
     }
 }

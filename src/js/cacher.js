@@ -37,7 +37,7 @@ gpii.ul.imports.cacher.saveToCache = function (that, dataToSave) {
 
     var fd = fs.openSync(that.options.cacheFile, "w");
     var stringData = typeof dataToSave === "object" ? JSON.stringify(dataToSave, null, 2) : dataToSave;
-    var buffer = new Buffer(stringData);
+    var buffer = new Buffer.from(stringData);
     fs.writeSync(fd, buffer, 0, buffer.length);
     fs.closeSync(fd);
 };
