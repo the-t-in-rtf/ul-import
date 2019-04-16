@@ -81,6 +81,13 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
                             combinedRecord[field] = existingRecord[field];
                         }
                     });
+
+                    // uid is a special case.  The SAI can update it to move records around.  But only clobber what's
+                    // there if it's actually set, otherwise preserve what's in the existing record..
+                    if (!combinedRecord.uid && existingRecord.uid) {
+                        combinedRecord.uid = existingRecord.uid;
+                    }
+
                     if (!gpii.ul.imports.filteredDeepEq(existingRecord, combinedRecord, that.options.fieldsNotToCompare, true)) {
                         var recordUpdatePromise = that.getRecordUpdatePromise(combinedRecord, existingRecord);
                         updateTasks.push(recordUpdatePromise);
