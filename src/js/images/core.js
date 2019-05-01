@@ -54,7 +54,7 @@ gpii.ul.imports.images.core.startDownload = function (that) {
         "%baseUrl/products?sources=%sources&unified=false&limit=10000",
         {
             baseUrl: that.options.urls.api,
-            sources: sources
+            sources: sources // TODO: Why do we have this twice?
         }
     );
 
@@ -152,7 +152,8 @@ fluid.defaults("gpii.ul.imports.images.core.launcher", {
             sources:    JSON.parse
         },
         defaults: {
-            "optionsFile": "{that}.options.optionsFile"
+            "optionsFile": "{that}.options.optionsFile",
+            setLogging: true
         },
         help: true
     },

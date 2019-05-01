@@ -1,0 +1,7 @@
+{
+  "type": "ul.imports.images.ableData.baseConfig",
+  "options": {
+    "gradeNames": ["gpii.ul.imports.images.ableData"],
+    "sources": ["AbleData"]
+  }
+}

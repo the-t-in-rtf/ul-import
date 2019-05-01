@@ -15,16 +15,23 @@ var md5File   = require("md5-file");
 
 fluid.registerNamespace("gpii.ul.imports.images.syncer.singleRecordSyncer");
 
+// TODO: Rewrite as a chained promise event or pipelined event`.
+
 gpii.ul.imports.images.syncer.singleRecordSyncer.initAndStartSync = function (that) {
+    setTimeout(function () {
+        if (!that.promise.disposition) {
+            that.promise.reject("Image sync timed out.");
+        }
+    }, that.options.timeout);
+
     that.jar = request.jar();
-    that.promise = fluid.promise();
 
     if (that.record.mime_type) {
         gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
     }
     else {
         // Get the HEAD information for the original image as a precursor to doing anything else.
-        request.head({ url: that.record.uri, timeout: 1500 }, function (error, response, body) {
+        request.head(that.record.uri, { timeout: 5000 }, function (error, response, body) {
             if (error) {
                 fluid.log(fluid.logLevel.WARN, "Error downloading image file:", error);
                 fluid.log(fluid.logLevel.WARN, "Skipping record...");
@@ -230,6 +237,10 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
 
 fluid.defaults("gpii.ul.imports.images.syncer.singleRecordSyncer", {
     gradeNames: ["fluid.component"],
+    timeout: 60000,
+    members: {
+        promise: "@expand:fluid.promise()"
+    },
     messages: {
         notFound: "Image not found."
     },

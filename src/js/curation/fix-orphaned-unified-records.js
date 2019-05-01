@@ -28,7 +28,8 @@ gpii.ul.imports.curation.unifiedOrphans.retrieveAndSave = function (that, custom
 gpii.ul.imports.curation.unifiedOrphans.detectOrphans = function (that) {
     var activeUidsAsObject = {};
     fluid.each(that.activeUids.rows, function (singleChildEntry) {
-        if (singleChildEntry.value.source !== "unified" || (singleChildEntry.value.source === "unified" && singleChildEntry.value.sid !== singleChildEntry.value.uid)) {
+        // Only flag a UID as active if it has a non-deleted entry.
+        if (singleChildEntry.value.status !== "deleted" && (singleChildEntry.value.source !== "unified" || (singleChildEntry.value.source === "unified" && singleChildEntry.value.sid !== singleChildEntry.value.uid))) {
             activeUidsAsObject[singleChildEntry.key] = true;
         }
     });
@@ -60,7 +61,7 @@ gpii.ul.imports.curation.unifiedOrphans.detectOrphans = function (that) {
 gpii.ul.imports.curation.unifiedOrphans.deleteUnifiedOrphans = function (that) {
     var recordsToBulkUpdate = fluid.transform(that.unifiedOrphans, function (singleRawRecord) {
         var updatedRecord = fluid.copy(singleRawRecord);
-        updatedRecord._deleted = true;
+        updatedRecord.status = "deleted";
         return updatedRecord;
     });
 
