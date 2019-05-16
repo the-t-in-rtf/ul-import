@@ -207,7 +207,6 @@ fluid.defaults("gpii.ul.imports.ableData.launcher", {
             "password": "The password to use when writing records to the UL.",
             "source": "The UL source to sync records with.",
             "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
-            // TODO: Eventually we will also need to bring in the structured category data as well. Look at EASTIN.
             "urls.ableData": "The URL to use when retrieving records from AbleData."
         },
         "coerce": {
