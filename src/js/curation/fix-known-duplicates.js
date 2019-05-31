@@ -2,10 +2,22 @@
 
     A script to use JSON records to update known duplicates based on the source, SID, and UID.  To use this script:
 
-    1. Update the data following the process described in the header of src/abledata/tab-delimited-to-json.js
+    1. Update the data (see below)
     2. Run this script.
 
-    This script should be run after the abledata imports but before the "unifier".
+    This script should be run after the AbleData imports but before the "unifier".
+
+    To prepare the data for AbleData, you may be able to use the script src/abledata/tab-delimited-to-json.js. That
+    script is likely out of date, and is specific to a particular version of the AbleData spreadsheet.  To manually
+    generate a feed:
+
+    1. Open the data in Excel
+    2. Add a duplicate column that is based on a formula like: =IF(LEN(A2);1;0) * IF(LEN(G2);1;0)
+    3. Sort by the duplicate column in descending order, then by the source ID in ascending order.
+    4. Hide all columns but the UID and source record ID.
+    5. Copy the duplicates to a text file.
+    6. Generate the JSON by replacing the text using a regular expression like s/^(.+)\t(.+)$/\{ "source": "AbleData", "sid": "$1", "uid": "$2" \},/
+    7. Save the JSON to a file in data/known-duplicates
 
  */
 "use strict";
