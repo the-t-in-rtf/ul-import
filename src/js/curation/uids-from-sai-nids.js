@@ -20,14 +20,25 @@ fluid.each(saiData.products, function (saiEntry) {
     uidsByNid[saiEntry.sid] = saiEntry.uid;
 });
 
+var existingDupesData = require("../../../data/known-duplicates/abledata.json");
+var existingDupes = {};
+fluid.each(existingDupesData, function (existingDupe) {
+    existingDupes[existingDupe.sid] = true;
+});
+
 var output = "";
 var abledataSaiBreakdown = fs.readFileSync("/tmp/abledata-by-sai.txt", { encoding: "utf8"});
 var lines = abledataSaiBreakdown.split(/\n/);
+var newDupes = 0;
 fluid.each(lines, function (line) {
     var segments = line.split(/\t/);
     var sid = segments[0];
-    var uid = uidsByNid[segments[1]];
-    output += sid + "\t" + uid + "\n";
+    if (!existingDupes[sid]) {
+        newDupes++;
+        var uid = uidsByNid[segments[1]];
+        output += sid + "\t" + uid + "\n";
+    }
 });
 
 console.log(output);
+console.log(newDupes + " new duplicates.");
