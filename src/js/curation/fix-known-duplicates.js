@@ -19,6 +19,10 @@
     6. Generate the JSON by replacing the text using a regular expression like s/^(.+)\t(.+)$/\{ "source": "AbleData", "sid": "$1", "uid": "$2" \},/
     7. Save the JSON to a file in data/known-duplicates
 
+https://api.ul.gpii.net/api/product/AbleData/73253 => https://api.ul.gpii.net/api/product/unified/1551892373506-552100642
+https://api.ul.gpii.net/api/product/AbleData/73267 => https://api.ul.gpii.net/api/product/unified/1551892373487-219081177
+https://api.ul.gpii.net/api/product/AbleData/73959 => https://api.ul.gpii.net/api/product/unified/1500040630019-230016956
+
  */
 "use strict";
 var fluid = require("infusion");
@@ -49,7 +53,7 @@ gpii.ul.imports.curation.knownDuplicates.processDuplicates = function (that) {
             updatePromiseQueue.then(
                 function (results) {
                     var updatedResults = results.filter(function (entry) { return entry; });
-                    fluid.log("Updated " + updatedResults.length + "/" + results.length + " duplicate records listed in 'known duplicates' files.");
+                    fluid.log("Updated " + updatedResults.length + " records based on " + results.length + " duplicate records listed as 'known duplicates'.");
                     processDuplicatesPromise.resolve();
                 },
                 function (error) {
@@ -112,16 +116,27 @@ gpii.ul.imports.curation.knownDuplicates.updateSingleEntry = function (that, dup
             else {
                 try {
                     var existingRecord = body;
-                    var updatedRecord = fluid.extend({}, existingRecord, { uid: dupeDef.uid});
-                    var productWriteOptions = fluid.extend({}, productReadOptions, { body: updatedRecord });
-                    request(productWriteOptions, function (error, response) {
-                        if (error || response.statusCode !== 200) {
-                            outerUpdatePromise.reject(response);
-                        }
-                        else {
-                            outerUpdatePromise.resolve(true);
-                        }
-                    });
+                    if (existingRecord.uid !== dupeDef.uid) {
+                        var updatedRecord = fluid.extend({}, existingRecord, { uid: dupeDef.uid});
+                        var productWriteOptions = {
+                            url:  that.options.urls.product,
+                            json: true,
+                            jar:  true,
+                            body: updatedRecord
+                        };
+                        request.put(productWriteOptions, function (error, response) {
+                            if (error || response.statusCode !== 200) {
+                                outerUpdatePromise.reject(response);
+                            }
+                            else {
+                                outerUpdatePromise.resolve(true);
+                            }
+                        });
+                    }
+                    else {
+                        // Nothing to do here. Resolve with false so that we can keep proper count of updated records.
+                        outerUpdatePromise.resolve(false);
+                    }
                 }
                 catch (error) {
                     if (!outerUpdatePromise.disposition) {
