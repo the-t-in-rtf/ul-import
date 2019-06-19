@@ -27,8 +27,9 @@ fluid.each(existingDupesData, function (existingDupe) {
 });
 
 var output = "";
-var abledataSaiBreakdown = fs.readFileSync("/tmp/abledata-by-sai.txt", { encoding: "utf8"});
+var abledataSaiBreakdown = fs.readFileSync("/tmp/abledata-sai-dupes20190619.txt", { encoding: "utf8"});
 var lines = abledataSaiBreakdown.split(/\n/);
+lines.sort();
 var newDupes = 0;
 fluid.each(lines, function (line) {
     var segments = line.split(/\t/);
@@ -36,7 +37,8 @@ fluid.each(lines, function (line) {
     if (!existingDupes[sid]) {
         newDupes++;
         var uid = uidsByNid[segments[1]];
-        output += sid + "\t" + uid + "\n";
+        //output += sid + "\t" + uid + "\n";
+        output += "{\"source\": \"AbleData\", \"sid\": \"" + sid + "\", \"uid\": \"" + uid + "\" },\n";
     }
 });
 
