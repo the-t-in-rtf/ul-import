@@ -80,8 +80,7 @@ fluid.defaults("gpii.ul.imports.tests.transforms", {
         stripped: {
             bar: {
                 qux: "not null"
-            },
-            quux: ""
+            }
         }
     },
     rules: {
@@ -224,4 +223,3 @@ jqUnit.test("The transformed values should match the expected values...", functi
 
     jqUnit.assertDeepEq("The stripped JSON should be as expected...", transformed.options.expected.stripped, transformed.options.transformed.stripped);
 });
-

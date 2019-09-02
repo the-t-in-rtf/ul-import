@@ -20,8 +20,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(false);
-
 var gpii  = fluid.registerNamespace("gpii");
 
 require("../transformer");

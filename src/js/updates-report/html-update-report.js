@@ -152,4 +152,3 @@ fluid.defaults("gpii.ul.imports.updateReport", {
         }
     }
 });
-

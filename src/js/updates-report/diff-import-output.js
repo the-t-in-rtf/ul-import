@@ -14,8 +14,6 @@
 */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(false);
-
 var gpii = fluid.registerNamespace("gpii");
 
 var fs   = require("fs");
@@ -93,4 +91,3 @@ fluid.defaults("gpii.ul.imports.diffImportResults", {
         }
     }
 });
-

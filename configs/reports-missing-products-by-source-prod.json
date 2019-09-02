@@ -1,8 +1,12 @@
 {
     "options": {
-        "gradeNames": ["gpii.ul.imports.missingProductsBySource"],
+        "gradeNames": [
+            "gpii.ul.imports.missingProductsBySource"
+        ],
         "username": "importer",
         "password": "password"
     },
-    "mergeConfigs": ["%ul-imports/configs/base-prod.json"]
+    "mergeConfigs": [
+        "%ul-imports/configs/base-prod.json"
+    ]
 }

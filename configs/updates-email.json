@@ -2,5 +2,7 @@
     "options": {
         "gradeNames": "gpii.ul.imports.mailUpdateReport"
     },
-    "mergeConfigs": ["%ul-imports/configs/updates-base.json"]
+    "mergeConfigs": [
+        "%ul-imports/configs/updates-base.json"
+    ]
 }

@@ -5,8 +5,6 @@
 */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(false);
-
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%gpii-handlebars");
@@ -121,4 +119,3 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
         }
     }
 });
-

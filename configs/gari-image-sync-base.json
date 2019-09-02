@@ -1,7 +1,11 @@
 {
-  "type": "ul.imports.images.gari.baseConfig",
-  "options": {
-    "gradeNames": ["gpii.ul.imports.images.gari"],
-    "sources": ["GARI"]
-  }
+    "type": "ul.imports.images.gari.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.images.gari"
+        ],
+        "sources": [
+            "GARI"
+        ]
+    }
 }

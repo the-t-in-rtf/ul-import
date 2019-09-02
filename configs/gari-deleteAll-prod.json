@@ -1,3 +1,6 @@
 {
-  "mergeConfigs": ["%ul-imports/configs/base-prod.json", "%ul-imports/configs/gari-deleteAll-base.json"]
+    "mergeConfigs": [
+        "%ul-imports/configs/base-prod.json",
+        "%ul-imports/configs/gari-deleteAll-base.json"
+    ]
 }

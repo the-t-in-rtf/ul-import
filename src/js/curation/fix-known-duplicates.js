@@ -186,4 +186,3 @@ fluid.defaults("gpii.ul.imports.curation.knownDuplicates.launcher", {
 });
 
 gpii.ul.imports.curation.knownDuplicates.launcher();
-

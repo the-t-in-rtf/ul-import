@@ -1,5 +1,7 @@
 {
-  "options": {
-    "gradeNames": ["gpii.ul.imports.sai.metadata"]
-  }
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.sai.metadata"
+        ]
+    }
 }

@@ -9,21 +9,7 @@ var kettle  = require("kettle");
 kettle.loadTestingSupport();
 
 require("../../src/js/syncer");
-require("./test-harness");
-
-fluid.defaults("gpii.tests.ul.imports.syncer.request", {
-    gradeNames: ["kettle.test.request.httpCookie"],
-    port:       "{testEnvironment}.options.ports.api",
-    headers: {
-        accept: "application/json"
-    },
-    path: {
-        expander: {
-            funcName: "fluid.stringTemplate",
-            args:     ["%apiUrl%endpoint", { apiUrl: "{testEnvironment}.options.urls.api", endpoint: "{that}.options.endpoint" }]
-        }
-    }
-});
+require("./lib/fixtures");
 
 fluid.registerNamespace("gpii.tests.ul.imports.syncer.caseHolder");
 
@@ -40,24 +26,19 @@ gpii.tests.ul.imports.syncer.caseHolder.checkProductsResponse = function (result
 };
 
 fluid.defaults("gpii.tests.ul.imports.syncer.caseHolder", {
-    gradeNames: ["fluid.test.testCaseHolder"],
+    gradeNames: ["gpii.test.ul.api.caseHolder"],
     testData:  [
         { "name": "existing with updates", "description": "existing record with updates", "status": "active", "source": "~existing", "sid": "existing", "manufacturer": { "name": "Acme Inc."} },
         { "name": "new", "description": "new record", "source": "~existing", "sid": "new", "status": "new", "manufacturer": { "name": "Acme Inc."} }
     ],
-    modules: [{
+    rawModules: [{
         name: "Testing synchronization mechanism...",
         tests: [{
             name: "Examine the results after a synchronisation...",
             type: "test",
             sequence: [
-                // TODO: Replace with standard sequence elements
                 {
-                    func: "{testEnvironment}.events.constructFixtures.fire"
-                },
-                {
-                    event: "{testEnvironment}.events.onFixturesConstructed",
-                    listener: "{testEnvironment}.syncer.applier.change",
+                    func: "{testEnvironment}.syncer.applier.change",
                     args: ["data", "{that}.options.testData"]
                 },
                 {
@@ -101,9 +82,6 @@ fluid.defaults("gpii.tests.ul.imports.syncer.caseHolder", {
                 {
                     func: "jqUnit.assertEquals",
                     args: ["The products request should have been successful...", 200, "{productsRequest}.nativeResponse.statusCode"]
-                },
-                {
-                    func: "{testEnvironment}.events.stopFixtures.fire"
                 }
             ]
         }]
@@ -113,48 +91,32 @@ fluid.defaults("gpii.tests.ul.imports.syncer.caseHolder", {
             type: "kettle.test.cookieJar"
         },
         loginRequest: {
-            type: "gpii.tests.ul.imports.syncer.request",
-            options: {
-                endpoint: "/api/user/login",
-                method:   "POST"
-            }
+            type: "gpii.test.ul.api.request.login"
         },
         newRecordRequest: {
-            type: "gpii.tests.ul.imports.syncer.request",
+            type: "gpii.test.ul.api.request",
             options: {
-                endpoint: "/api/product/~existing/new"
+                endpoint: "api/product/~existing/new"
             }
         },
         existingRecordRequest: {
-            type: "gpii.tests.ul.imports.syncer.request",
+            type: "gpii.test.ul.api.request",
             options: {
-                endpoint: "/api/product/~existing/existing"
+                endpoint: "api/product/~existing/existing"
             }
         },
         productsRequest: {
-            type: "gpii.tests.ul.imports.syncer.request",
+            type: "gpii.test.ul.api.request",
             options: {
-                endpoint: "/api/products?sources=%22~existing%22&unified=false"
+                endpoint: "api/products?sources=%22~existing%22&unified=false"
             }
         }
     }
 });
 
 fluid.defaults("gpii.tests.ul.imports.sync.environment", {
-    gradeNames: ["fluid.test.testEnvironment", "gpii.tests.ul.imports.harness"],
-    ports: {
-        api:    "3598",
-        couch:  "9998"
-    },
+    gradeNames: ["gpii.tests.ul.imports.environment"],
     components: {
-        syncer: {
-            type: "gpii.ul.imports.syncer",
-            options: {
-                urls: "{harness}.options.urls",
-                username: "existing",
-                password: "password"
-            }
-        },
         caseHolder: {
             type: "gpii.tests.ul.imports.syncer.caseHolder"
         }

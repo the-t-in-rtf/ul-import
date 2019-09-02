@@ -4,8 +4,6 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(false);
-
 var gpii  = fluid.registerNamespace("gpii");
 
 var fs    = require("fs");

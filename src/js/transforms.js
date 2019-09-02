@@ -1,8 +1,6 @@
 // A set of additional transforms to assist in migrating data.
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(false);
-
 var cheerio = require("cheerio");
 
 var gpii = fluid.registerNamespace("gpii");

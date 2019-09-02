@@ -102,7 +102,7 @@ gpii.ul.imports.saiMissingRecords.processSaiUlRecords = function (that, error, r
                     });
                 });
 
-                var updateSequence = gpii.ul.imports.pipeline.createPipeline(promises, 50);
+                var updateSequence = gpii.ul.imports.promiseQueue.createQueue(promises, 50);
                 updateSequence.then(
                     function (results) {
                         fluid.log("Updated ", results.length, " records.");

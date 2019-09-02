@@ -1,9 +1,19 @@
 {
-  "type": "ul.imports.images.eastin.baseConfig",
-  "options": {
-    "gradeNames": ["gpii.ul.imports.images.eastin"],
-    "sources": [
-      "Handicat", "Vlibank", "Siva", "EASTIN Admin", "Hjælpemiddelbasen", "Rehadat", "Hulpmiddelenwijzer", "Oaeg", "Dlf data"
-    ]
-  }
+    "type": "ul.imports.images.eastin.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.images.eastin"
+        ],
+        "sources": [
+            "Handicat",
+            "Vlibank",
+            "Siva",
+            "EASTIN Admin",
+            "Hjælpemiddelbasen",
+            "Rehadat",
+            "Hulpmiddelenwijzer",
+            "Oaeg",
+            "Dlf data"
+        ]
+    }
 }

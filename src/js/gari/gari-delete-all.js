@@ -5,8 +5,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(false);
-
 var gpii = fluid.registerNamespace("gpii");
 
 // Needed because we have to log in and have a session cookie for use in later requests.

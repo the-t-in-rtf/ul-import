@@ -5,8 +5,6 @@ var request = require("request");
 var fluid = require("infusion");
 var gpii  = fluid.registerNamespace("gpii");
 
-fluid.setLogging(true);
-
 fluid.registerNamespace("gpii.ul.imports.curation.allDocsToBulkDocs");
 
 gpii.ul.imports.curation.allDocsToBulkDocs.updateAllDbs = function (that) {

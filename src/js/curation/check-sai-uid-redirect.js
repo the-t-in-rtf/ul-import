@@ -61,7 +61,7 @@ gpii.ul.imports.saiChecker.processUnifiedRecords = function (that, error, respon
             });
         });
 
-        var allCheckSequence = gpii.ul.imports.pipeline.createPipeline(promises, 50);
+        var allCheckSequence = gpii.ul.imports.promiseQueue.createQueue(promises, 50);
         allCheckSequence.then(function (results) {
             fluid.log(fluid.logLevel.INFO, "Analysing overall results:");
 

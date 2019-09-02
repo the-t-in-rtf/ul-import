@@ -54,4 +54,3 @@ jqUnit.test("The 'helped' values should match the expected values...", function 
     jqUnit.assertEquals("Individual arguments should be combined with spaces as expected...", helpers.options.expected.space, helpers.options.helped.space);
     jqUnit.assertEquals("An array should be combined with spaces as expected...", helpers.options.expected.spaceArray, helpers.options.helped.spaceArray);
 });
-
