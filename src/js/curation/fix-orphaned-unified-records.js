@@ -47,7 +47,7 @@ gpii.ul.imports.curation.unifiedOrphans.detectOrphans = function (that) {
         }
     });
 
-    console.log("Found " + that.unifiedOrphans.length + " unified orphan records and " + redirects.length + " redirects.");
+    fluid.log("Found " + that.unifiedOrphans.length + " unified orphan records and " + redirects.length + " redirects.");
     if (that.unifiedOrphans.length) {
         if (that.options.commit) {
             gpii.ul.imports.curation.unifiedOrphans.deleteUnifiedOrphans(that);

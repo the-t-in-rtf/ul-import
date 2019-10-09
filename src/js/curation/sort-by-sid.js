@@ -16,4 +16,4 @@ fluid.each(existingRecords, function (record, index) {
     output += "\n";
 });
 output += "]\n";
-console.log(output);
+fluid.log(output);

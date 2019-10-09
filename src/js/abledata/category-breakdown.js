@@ -21,7 +21,7 @@ gpii.ul.imports.AbleData.categoriser.downloadAllCategories = function (that) {
             else {
                 var parsedXml = gpii.settingsHandlers.XMLHandler.parser.parse(body, that.options.xmlParserRules);
                 var flattenedJson = gpii.ul.imports.transforms.flatten(parsedXml);
-                console.log(categoryKey + ":" + fluid.get(flattenedJson, "products.length") || 0);
+                fluid.log(categoryKey + ":" + fluid.get(flattenedJson, "products.length") || 0);
             }
         });
     });

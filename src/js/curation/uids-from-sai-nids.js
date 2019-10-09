@@ -42,5 +42,5 @@ fluid.each(lines, function (line) {
     }
 });
 
-console.log(output);
-console.log(newDupes + " new duplicates.");
+fluid.log(output);
+fluid.log(newDupes + " new duplicates.");

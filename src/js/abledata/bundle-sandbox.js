@@ -28,6 +28,6 @@ var bundlePromise = gpii.ul.imports.copyDependencies("/tmp/abledata-sandbox", {
 });
 
 bundlePromise.then(
-    function () { console.log("Saved static abledata site to /tmp/abledata-sandbox."); },
+    function () { fluid.log("Saved static abledata site to /tmp/abledata-sandbox."); },
     fluid.fail
 );

@@ -28,10 +28,10 @@ mailOptions.html = inlinedHtml;
 
 transport.sendMail(mailOptions, function (err, info) {
     if (err) {
-        console.error(err);
+        fluid.fail(err);
     }
     else {
-        console.log("Mail sent successfully...");
-        console.log(JSON.stringify(info, null, 2));
+        fluid.log("Mail sent successfully...");
+        fluid.log(JSON.stringify(info, null, 2));
     }
 });

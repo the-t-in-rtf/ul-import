@@ -25,8 +25,8 @@ tagCloudAsArray.sort(function (a, b) {
     else { return 0; }
 });
 
-console.log("There are ", tagCloudAsArray.length, " categories in use.");
+fluid.log("There are ", tagCloudAsArray.length, " categories in use.");
 
 fluid.each(tagCloudAsArray, function (entry) {
-    console.log(entry.key, ",", entry.count);
+    fluid.log(entry.key, ",", entry.count);
 });

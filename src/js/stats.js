@@ -56,7 +56,7 @@ fluid.defaults("gpii.ul.imports.stats", {
     },
     invokers: {
         displayStats: {
-            funcName: "console.log",
+            funcName: "fluid.log",
             args: [
                 "Displaying stats for this run:\n",
                 {
