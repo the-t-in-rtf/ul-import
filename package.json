@@ -7,7 +7,7 @@
         "test": "tests"
     },
     "scripts": {
-        "test": "node node_modules/istanbul/lib/cli.js cover tests/all-tests.js",
+        "test": "node node_modules/nyc/bin/nyc.js node tests/all-tests.js",
         "full-sync": "npm run all-imports && npm run curation-known-duplicates && npm run unifier && npm run all-image-imports && npm run sai-curation && npm run curation-unified-orphans",
         "all-imports": "npm run eastin-import && npm run sai-import && npm run abledata-import",
         "abledata-import": "node src/js/abledata/index.js -- --noCache",
@@ -63,7 +63,7 @@
         "gpii-launcher": "1.0.0-dev.20171221T122035Z.edade23",
         "gpii-sort": "1.0.0-dev.20170420T114825Z.804ac19",
         "gpii-universal": "0.3.0-dev.20181016T230646Z.e3d03b4c",
-        "infusion": "3.0.0-dev.20190808T142952Z.f8576acb6",
+        "infusion": "3.0.0-dev.20191009T141140Z.32c9263b4.FLUID-6148",
         "json5": "2.1.1",
         "juice": "5.2.0",
         "kettle": "1.11.0",
@@ -81,11 +81,11 @@
         "eslint-config-fluid": "1.4.0",
         "fluid-grunt-eslint": "18.1.2",
         "gpii-couchdb-test-harness": "1.0.0-dev.20190827T101451Z.024d2c3.GPII-3531",
-        "gpii-express-user": "1.0.1",
+        "gpii-express-user": "1.0.2-dev.20191011T081350Z.de1da4c.GPII-3921",
         "gpii-grunt-lint-all": "1.0.5",
         "grunt": "1.0.4",
-        "istanbul": "0.4.5",
         "node-jqunit": "1.1.8",
-        "ul-api": "1.0.0-dev.20191009T114656Z.bf585a7.UL-65"
+        "nyc": "14.1.1",
+        "ul-api": "1.0.0-dev.20191011T085109Z.0ea5dd9.UL-65"
     }
 }
