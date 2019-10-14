@@ -81,11 +81,11 @@
         "eslint-config-fluid": "1.4.0",
         "fluid-grunt-eslint": "18.1.2",
         "gpii-couchdb-test-harness": "1.0.0-dev.20190827T101451Z.024d2c3.GPII-3531",
-        "gpii-express-user": "1.0.2-dev.20191011T081350Z.de1da4c.GPII-3921",
+        "gpii-express-user": "1.0.2-dev.20191014T133849Z.154a17f.GPII-3921",
         "gpii-grunt-lint-all": "1.0.5",
         "grunt": "1.0.4",
         "node-jqunit": "1.1.8",
         "nyc": "14.1.1",
-        "ul-api": "1.0.0-dev.20191011T163340Z.226532a.UL-65"
+        "ul-api": "1.0.0-dev.20191014T134607Z.a97da2a.UL-65"
     }
 }
