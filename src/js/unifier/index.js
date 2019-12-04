@@ -27,33 +27,14 @@ require("../concurrent-promise-queue");
  */
 fluid.registerNamespace("gpii.ul.imports.unifier.singleAdoptionHandler");
 
+require("../login");
+
 // TODO: Consider converting to an invoker once https://issues.fluidproject.org/browse/KETTLE-54 is resolved.
 gpii.ul.imports.unifier.singleAdoptionHandler.login = function (that) {
-    that.promise = fluid.promise();
-    that.jar = request.jar();
-
-    // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
-    var options = {
-        url: that.options.urls.login,
-        jar: that.jar,
-        json: true,
-        body: {
-            username: that.options.username,
-            password: that.options.password
-        }
-    };
-    request.post(options, function (error, response, body) {
-        if (error) {
-            that.promise.reject(error);
-        }
-        else if (response.statusCode !== 200) {
-            that.promise.reject({ isError: true, message: body });
-        }
-        else {
-            fluid.log(fluid.logLevel.TRACE, "Logged in...");
-            that.handleLoginResponse();
-        }
-    });
+    gpii.ul.imports.login(that).then(
+        that.handleLoginResponse,
+        fluid.fail
+    );
 };
 
 
@@ -82,7 +63,7 @@ gpii.ul.imports.unifier.singleAdoptionHandler.readChild = function (that) {
 gpii.ul.imports.unifier.singleAdoptionHandler.handleChildReadResponse = function (that, childRecord) {
     that.childRecord = childRecord;
 
-    var unifiedRecord = fluid.censorKeys(childRecord, ["source", "sid", "sourceData", "updated"]);
+    var unifiedRecord = fluid.censorKeys(childRecord, ["source", "sid", "sourceData", "updated", "sourceUrl"]);
     unifiedRecord.source = "unified";
 
     // TODO:  We need to figure out a better way of setting initial uids and managing them over time.
@@ -174,7 +155,7 @@ fluid.registerNamespace("gpii.ul.imports.unifier");
 
 // TODO: Consider converting to an invoker once https://issues.fluidproject.org/browse/KETTLE-54 is resolved.
 gpii.ul.imports.unifier.findOrphanedRecords = function (that) {
-    var promise = that.orphanReader.get({ sid: that.options.sid, source: that.options.source });
+    var promise = that.orphanReader.get({});
     promise.then(that.handleOrphanResponse, that.handleError);
 };
 
