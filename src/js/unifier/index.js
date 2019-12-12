@@ -14,7 +14,6 @@ fluid.require("%ul-imports");
 
 require("../launcher");
 require("../dataSource");
-require("../concurrent-promise-queue");
 
 /*
 
@@ -29,38 +28,46 @@ fluid.registerNamespace("gpii.ul.imports.unifier.singleAdoptionHandler");
 
 require("../login");
 
-// TODO: Consider converting to an invoker once https://issues.fluidproject.org/browse/KETTLE-54 is resolved.
+// TODO: rewrite this whole sequence as a single promise-chained event, i.e.
+// login
+// read child
+// handle child read
+// handle parent write
 gpii.ul.imports.unifier.singleAdoptionHandler.login = function (that) {
-    gpii.ul.imports.login(that).then(
-        that.handleLoginResponse,
-        fluid.fail
-    );
+    return gpii.ul.imports.login(that);
 };
 
 
 gpii.ul.imports.unifier.singleAdoptionHandler.readChild = function (that) {
+    var readPromise = fluid.promise();
+
     // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
     var childReaderUrl = fluid.stringTemplate("%baseUrl/%source/%sid", { baseUrl: that.options.urls.product, source: that.options.source, sid: encodeURIComponent(that.options.sid) });
     var options = {
         url:  childReaderUrl,
-        jar:  that.jar,
+        jar:  true,
         json: true
     };
     request.get(options, function (error, response, body) {
         if (error) {
-            that.promise.reject(error);
+            readPromise.promise.reject({ isError: true, url: childReaderUrl, error: error, message: body});
         }
         else if (response.statusCode !== 200) {
-            that.promise.reject({ isError: true, message: body });
+            readPromise.promise.reject({ isError: true, url: childReaderUrl, error: body, message: body });
         }
         else {
             fluid.log(fluid.logLevel.TRACE, "Read existing child record...");
-            that.handleChildReadResponse(body);
+            readPromise.resolve(body);
         }
     });
+
+    return readPromise;
 };
 
 gpii.ul.imports.unifier.singleAdoptionHandler.handleChildReadResponse = function (that, childRecord) {
+    var parentWritePromise = fluid.promise();
+
+    // Stuff this away so that we can update its uid once we create a new unified record.
     that.childRecord = childRecord;
 
     var unifiedRecord = fluid.censorKeys(childRecord, ["source", "sid", "sourceData", "updated", "sourceUrl"]);
@@ -75,49 +82,59 @@ gpii.ul.imports.unifier.singleAdoptionHandler.handleChildReadResponse = function
     // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
     var options = {
         url:  that.options.urls.product,
-        jar:  that.jar,
+        jar:  true,
         json: true,
         body: unifiedRecord
     };
     request.post(options, function (error, response, body) {
         if (error) {
-            that.promise.reject(error);
+            parentWritePromise.reject({ isError: true, url:  that.options.urls.product, error: error, message: body});
         }
         else if (response.statusCode !== 200 && response.statusCode !== 201) {
-            that.promise.reject({ isError: true, message: body });
+            parentWritePromise.reject({ isError: true, message: body, error: body, url:  that.options.urls.product });
         }
         else {
             fluid.log(fluid.logLevel.TRACE, "Retrieved child record...");
-            that.handleParentWriteResponse(body.product);
+            parentWritePromise.resolve(body.product);
         }
     });
+
+    return parentWritePromise;
 };
 
 gpii.ul.imports.unifier.singleAdoptionHandler.handleParentWriteResponse = function (that, parentRecord) {
+    var childUpdatePromise = fluid.promise();
+
     that.childRecord.uid = parentRecord.uid;
 
     // TODO: Convert to using a dataSource here once https://issues.fluidproject.org/browse/KETTLE-52 is resolved.
     var options = {
         url:  that.options.urls.product,
-        jar:  that.jar,
+        jar:  true,
         json: true,
         body: that.childRecord
     };
     request.post(options, function (error, response, body) {
         if (error) {
-            that.promise.reject(error);
+            childUpdatePromise.reject({ isError:true, url:  that.options.urls.product, error: error, message: body});
         }
         else if (response.statusCode !== 200) {
-            that.promise.reject({ isError: true, message: body, parentRecord: parentRecord });
-            // The parent record is included so that we can manually clean up when a parent is created but the "adoption" is never completed.
+            childUpdatePromise.reject({ isError: true, url:  that.options.urls.product, message: body, error: body });
         }
         else {
             var product = body.product;
             fluid.log(fluid.logLevel.TRACE, "Succesfully created unified record '", product.uid, "' based on child record ", product.source, ":", product.sid);
             fluid.log(fluid.logLevel.TRACE, "Created parent record...");
-            that.promise.resolve(body);
+            childUpdatePromise.resolve(body);
         }
     });
+
+    return childUpdatePromise;
+};
+
+gpii.ul.imports.unifier.singleAdoptionHandler.startAdoption = function (that) {
+    var adoptionPromise = fluid.promise.fireTransformEvent(that.events.onAdoption, {});
+    return adoptionPromise;
 };
 
 fluid.defaults("gpii.ul.imports.unifier.singleAdoptionHandler", {
@@ -125,27 +142,34 @@ fluid.defaults("gpii.ul.imports.unifier.singleAdoptionHandler", {
     members: {
         childRecord: {}
     },
-    listeners: {
-        "onCreate.login": {
-            funcName: "gpii.ul.imports.unifier.singleAdoptionHandler.login",
-            args:     ["{that}"]
-        }
+    events: {
+        onAdoption: null
     },
     invokers: {
-        "handleLoginResponse": {
+        "startAdoption": {
+            "funcName": "gpii.ul.imports.unifier.singleAdoptionHandler.startAdoption",
+            args: ["{that}"]
+        }
+    },
+    listeners: {
+        "onAdoption.login": {
+            priority: "first",
+            funcName: "gpii.ul.imports.unifier.singleAdoptionHandler.login",
+            args:     ["{that}"]
+        },
+        "onAdoption.handleLoginResponse": {
+            priority: "after:login",
             funcName: "gpii.ul.imports.unifier.singleAdoptionHandler.readChild",
             args:     ["{that}", "{arguments}.0"]
         },
-        "handleChildReadResponse": {
+        "onAdoption.handleChildReadResponse": {
+            priority: "after:handleLoginResponse",
             funcName: "gpii.ul.imports.unifier.singleAdoptionHandler.handleChildReadResponse",
             args:     ["{that}", "{arguments}.0"]
         },
-        "handleParentWriteResponse": {
+        "onAdoption.handleParentWriteResponse": {
+            priority: "after:handleChildReadResponse",
             funcName: "gpii.ul.imports.unifier.singleAdoptionHandler.handleParentWriteResponse",
-            args:     ["{that}", "{arguments}.0"]
-        },
-        "handleError": {
-            funcName: "gpii.ul.imports.unifier.handleError",
             args:     ["{that}", "{arguments}.0"]
         }
     }
@@ -171,7 +195,7 @@ gpii.ul.imports.unifier.generateAdoptionFunction = function (that, record) {
                 cookieJar: that.cookieJar
             }
         });
-        return adoptionHandler.promise;
+        return adoptionHandler.startAdoption();
     };
 };
 
@@ -184,26 +208,20 @@ gpii.ul.imports.unifier.handleOrphanResponse = function (that, response) {
         }
     });
 
-    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
 
-    queue.then(function (results) {
-        fluid.log(fluid.logLevel.IMPORTANT, "Created unified records for " + results.length + " orphaned records...");
-    }, that.handleError);
+    if (promises.length) {
+        var sequence = fluid.promise.sequence(promises);
+        sequence.then(function (results) {
+            fluid.log(fluid.logLevel.IMPORTANT, "Created unified records for " + results.length + " orphaned records...");
+        }, that.handleError);
+    }
+    else {
+        fluid.log("No unified records to create.");
+    }
 };
 
 gpii.ul.imports.unifier.handleError = function (that, errorResponse) {
-    if (errorResponse.parentRecord) {
-        fluid.fail(
-            "There was an error associating a 'child' record with a newly created parent.  The following record should be manually deleted:\n",
-            JSON.stringify(errorResponse.parentRecord, null, 2),
-            "\nThe original error message is:\n",
-            errorResponse.message
-        );
-    }
-    else {
-        fluid.fail("Error cloning orphaned record:", JSON.stringify(errorResponse, null, 2));
-    }
-
+    fluid.fail("Error unifying records:", JSON.stringify(errorResponse, null, 2));
 };
 
 
