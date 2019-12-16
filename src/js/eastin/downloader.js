@@ -19,8 +19,6 @@ fluid.registerNamespace("gpii.ul.imports.eastin.downloader");
 
 var request = require("request");
 
-require("../concurrent-promise-queue");
-
 /* TODO: Only look up records newer than the cache using the new lastUpdateMin parameter
  and the maximum LastUpdateDate value stored in the cache */
 // http://webservices.eastin.eu/cloud4all/searches/products/listsimilarity?isoCodes=22.24.24&lastUpdateMin=2014-01-01T12:00
@@ -67,12 +65,12 @@ gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction = funct
 };
 
 gpii.ul.imports.eastin.downloader.retrieveRecordListsByIsoCode = function (that) {
-    var deferrals = [];
+    var promises = [];
     fluid.each(that.options.isoCodes, function (code) {
-        deferrals.push(gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction(that, code));
+        promises.push(gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction(that, code));
     });
 
-    var queue = gpii.ul.imports.promiseQueue.createQueue(deferrals, that.options.maxRequests);
+    var queue = gpii.ul.imports.eastin.createThrottledQueue(promises, that.options.pauseBetweenRequests);
     queue.then(function () {
         that.events.onIsoSearchComplete.fire(that);
     }, fluid.fail);
@@ -81,7 +79,7 @@ gpii.ul.imports.eastin.downloader.retrieveRecordListsByIsoCode = function (that)
 };
 
 gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
-    var deferrals = [];
+    var promises = [];
     var uniqueIds = [];
 
     fluid.each(that.isoRecordLists, function (records) {
@@ -90,7 +88,7 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
             if (uniqueIds.indexOf(id) === -1) {
                 uniqueIds.push(id);
 
-                deferrals.push(function () {
+                promises.push(function () {
                     var promise = fluid.promise();
 
                     var options = {
@@ -141,7 +139,7 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
         });
     });
 
-    var queue = gpii.ul.imports.promiseQueue.createQueue(deferrals, that.options.maxRequests);
+    var queue = gpii.ul.imports.eastin.createThrottledQueue(promises, that.options.pauseBetweenRequests);
     queue.then(
         function () {
             that.applier.change("records", that.originalRecords);
@@ -153,6 +151,23 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
     );
 };
 
+gpii.ul.imports.eastin.createThrottledQueue = function (originalPromises, pauseBetweenInMs) {
+    var promisesWithPauses = [];
+
+    fluid.each(originalPromises, function (singlePromise, index) {
+        if (index % 2) {
+            promisesWithPauses.push(function () {
+                var pausePromise = fluid.promise();
+                setTimeout(pausePromise.resolve, pauseBetweenInMs);
+            });
+        }
+        promisesWithPauses.push(singlePromise);
+    });
+
+    var sequence = fluid.promise.sequence(promisesWithPauses);
+    return sequence;
+};
+
 fluid.defaults("gpii.ul.imports.eastin.downloader", {
     gradeNames: ["fluid.modelComponent"],
     members: {
@@ -160,7 +175,7 @@ fluid.defaults("gpii.ul.imports.eastin.downloader", {
         originalRecords:    []
     },
     detailedRecordTimeout: 120000, // Timeout in milliseconds
-    maxRequests: 10,
+    pauseBetweenRequests: 750,
     model: {
         records: []
     },

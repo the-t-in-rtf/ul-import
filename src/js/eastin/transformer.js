@@ -53,7 +53,12 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
         source:      "Database",
         sid:         "ProductCode",
         name:        "CommercialName",
-        sourceUrl:   "OriginalUrl",
+        sourceUrl:   {
+            transform: {
+                type: "gpii.ul.imports.transforms.prependProtocol",
+                inputPath: "OriginalUrl"
+            }
+        },
         description: {
             transform: {
                 type: "fluid.transforms.firstValue",
