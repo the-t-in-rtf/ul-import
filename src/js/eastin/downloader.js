@@ -46,11 +46,20 @@ gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction = funct
 
                     // If we receive an "ExceptionMessage" object, display its contents in the console.
                     if (!data.Ok && data.ExceptionMessages) {
-                        fluid.log(fluid.logLevel.WARN, "There were errors returned when retrieving records:\n" + JSON.stringify(data.ExceptionMessages, null, 2));
+                        fluid.each(data.ExceptionMessages, function (singleErrorMessage) {
+                            // Their API returns exceptions about DLF Data that we ignore.
+                            if (singleErrorMessage.indexOf("DLF Data") === -1) {
+                                fluid.log(fluid.logLevel.WARN, "Error retrieving records:\n" + singleErrorMessage);
+                            }
+                        });
                     }
 
                     fluid.log(fluid.logLevel.TRACE, "Retrieved ", data.Records.length , " records for ISO code '", myIsoCode, "'...");
-                    that.isoRecordLists.push(data.Records);
+                    // Required because EASTIN still tells us about the missing DLF Data records in its "ISO" feed.
+                    var filteredRecords = data.Records.filter(function (singleRecord) {
+                        return that.options.excludedSources.indexOf(singleRecord.Database) === -1;
+                    });
+                    that.isoRecordLists.push(filteredRecords);
                 }
                 catch (e) {
                     fluid.log(fluid.logLevel.WARN, "Error retrieving records from '" + response.request.uri.href + "':\n");
@@ -170,12 +179,13 @@ gpii.ul.imports.eastin.createThrottledQueue = function (originalPromises, pauseB
 
 fluid.defaults("gpii.ul.imports.eastin.downloader", {
     gradeNames: ["fluid.modelComponent"],
+    excludedSources: ["Dlf Data"],
     members: {
         isoRecordLists:     [],
         originalRecords:    []
     },
     detailedRecordTimeout: 120000, // Timeout in milliseconds
-    pauseBetweenRequests: 750,
+    pauseBetweenRequests: 2500,
     model: {
         records: []
     },
