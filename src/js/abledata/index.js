@@ -26,6 +26,8 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 require("../importer");
@@ -34,6 +36,8 @@ require("../downloader");
 require("../syncer");
 require("./transforms");
 require("./transformer");
+
+fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.ableData", {
     gradeNames: ["gpii.ul.imports.importer"],
@@ -76,11 +80,7 @@ fluid.defaults("gpii.ul.imports.ableData.launcher", {
             "username": "The username to use when writing records to the UL.",
             "password": "The password to use when writing records to the UL.",
             "source": "The UL source to sync records with.",
-            "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
             "urls.ableData": "The URL to use when retrieving records from AbleData."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
         }
     }
 });

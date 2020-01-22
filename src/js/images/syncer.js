@@ -47,7 +47,7 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.initAndStartSync = function (th
 gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse = function (that, headerResponse) {
     var contentType = headerResponse.headers["content-type"];
     if (headerResponse.statusCode !== 200) {
-        fluid.log(fluid.logLevel.WARN, "Skipping image file that cannot be downloaded...");
+        fluid.log(fluid.logLevel.INFO, "Skipping image file that cannot be downloaded...");
         that.promise.resolve();
     }
     else if (!gpii.ul.imports.images.extensions.extensionByMimeType[contentType]) {

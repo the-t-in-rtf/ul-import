@@ -7,6 +7,8 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.registerNamespace("gpii.ul.imports.missingProductsBySource");
@@ -24,6 +26,8 @@ var request       = require("request");
 var smtpTransport = require("nodemailer-smtp-transport");
 
 fluid.require("%ul-api");
+
+fluid.popLogging();
 
 gpii.ul.imports.missingProductsBySource.login = function (that) {
     var loginPromise = gpii.ul.imports.login(that);
@@ -223,11 +227,7 @@ fluid.defaults("gpii.ul.imports.curation.missingProductsBySource.launcher", {
     "yargsOptions": {
         "describe": {
             "username":   "The username to use when reading records from the UL.",
-            "password":   "The password to use when reading records from the UL.",
-            "setLogging": "The logging level to use.  Set to `true` by default."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
+            "password":   "The password to use when reading records from the UL."
         }
     }
 });

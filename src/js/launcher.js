@@ -1,8 +1,14 @@
 "use strict";
 var fluid = require("infusion");
 
+// Default to FAIL until the underlying launcher grade has a chance to change the log level.
+// Avoids some (but not all) "registering module" and "infusion at path" messages.
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 fluid.require("%gpii-launcher");
 fluid.require("%ul-imports");
+
+fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.launcher", {
     gradeNames: ["gpii.launcher"],
@@ -20,15 +26,10 @@ fluid.defaults("gpii.ul.imports.launcher", {
             "hosts.couch":    "The hostname where CouchDB/PouchDB is available",
             "hosts.smtp":     "The hostname where the mail server is available",
             "couchAuthCreds": "The auth credentials to pass as part of CouchDB URLs",
-            "noCache":        "Pass this argument to force a download regardless of whether there is a cached copy available.",
-            "setLogging":     "The logging level to use.  Set to `false` (only errors and warnings) by default."
+            "noCache":        "Pass this argument to force a download regardless of whether there is a cached copy available."
         },
         defaults: {
-            "setLogging":  false,
             "optionsFile": "{that}.options.optionsFile"
-        },
-        coerce: {
-            "setLogging": JSON.parse
         },
         help: true
     }

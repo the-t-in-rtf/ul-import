@@ -1,8 +1,12 @@
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%gpii-diff");
+
+fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.sai.transformer.firstSaneValue", {
     gradeNames: "fluid.standardOutputTransformFunction"

@@ -1,6 +1,8 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 var request = require("request");
 
@@ -8,6 +10,8 @@ require("gpii-universal");
 fluid.require("%settingsHandlers");
 
 require("../transforms");
+
+fluid.popLogging();
 
 fluid.registerNamespace("gpii.ul.imports.AbleData.categoriser");
 

@@ -5,6 +5,8 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii = fluid.registerNamespace("gpii");
 
 var request = require("request");
@@ -14,6 +16,7 @@ fluid.require("%ul-imports");
 
 require("../launcher");
 require("../dataSource");
+
 
 /*
 
@@ -27,6 +30,8 @@ require("../dataSource");
 fluid.registerNamespace("gpii.ul.imports.unifier.singleAdoptionHandler");
 
 require("../login");
+
+fluid.popLogging();
 
 // TODO: rewrite this whole sequence as a single promise-chained event, i.e.
 // login

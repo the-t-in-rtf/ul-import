@@ -14,9 +14,13 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%gpii-handlebars");
+
+fluid.popLogging();
 
 fluid.registerNamespace("gpii.ul.imports.helpers.csvEscape");
 

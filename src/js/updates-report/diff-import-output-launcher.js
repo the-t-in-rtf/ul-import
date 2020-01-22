@@ -14,12 +14,16 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii = fluid.registerNamespace("gpii");
 
 require("./diff-import-output");
 
 fluid.require("%ul-imports");
 fluid.require("%gpii-launcher");
+
+fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.diffImportResults.launcher", {
     gradeNames:  ["gpii.launcher"],
@@ -31,17 +35,12 @@ fluid.defaults("gpii.ul.imports.diffImportResults.launcher", {
             "updatesPath":   "The path (absolute or package-relative) to the updated versions of records that were updated in a given import.",
             "originalsPath": "The path (absolute or package-relative) to the original versions of records that were updated in a given import.",
             "outputDir":     "The directory in which we should save our output.  A unique filename will be generated for this run.",
-            "outputPath":    "The full path (absolute or package-relative) to use when saving the output from this run.",
-            "setLogging":    "Whether to display verbose log messages.  Set to `true` by default."
+            "outputPath":    "The full path (absolute or package-relative) to use when saving the output from this run."
         },
         required: ["updatesPath", "originalsPath", "outputPath"],
         defaults: {
             "optionsFile": "{that}.options.optionsFile",
-            "outputPath": "{that}.options.outputPath",
-            "setLogging":  false
-        },
-        coerce: {
-            "setLogging": JSON.parse
+            "outputPath": "{that}.options.outputPath"
         },
         help: true
     }

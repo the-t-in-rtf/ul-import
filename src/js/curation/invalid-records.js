@@ -290,11 +290,7 @@ fluid.defaults("gpii.ul.imports.curation.invalidRecords.launcher", {
         "describe": {
             "username":   "The username to use when writing records to the UL.",
             "password":   "The password to use when writing records to the UL.",
-            "commit":     "Save 'repaired' records using the UL API.",
-            "setLogging": "The logging level to use.  Set to `true` by default."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
+            "commit":     "Save 'repaired' records using the UL API."
         }
     }
 });

@@ -14,6 +14,8 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii = fluid.registerNamespace("gpii");
 
 var fs   = require("fs");
@@ -21,6 +23,9 @@ var os   = require("os");
 var path = require("path");
 
 fluid.require("%gpii-diff");
+
+fluid.popLogging();
+
 gpii.diff.loadMarkdownSupport();
 
 fluid.registerNamespace("gpii.ul.imports.diffImportResults");

@@ -104,11 +104,7 @@ fluid.defaults("gpii.ul.imports.eastin.sourceDataMiner.launcher", {
     "yargsOptions": {
         "describe": {
             "username":                "The username to use when writing records to the UL.",
-            "password":                "The password to use when writing records to the UL.",
-            "setLogging":              "The logging level to use.  Set to `false` (only errors and warnings) by default."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
+            "password":                "The password to use when writing records to the UL."
         }
     }
 });

@@ -165,11 +165,7 @@ fluid.defaults("gpii.ul.imports.gari.deleteAll.launcher", {
         "describe": {
             "username": "The username to use when logging in to the UL.",
             "password": "The password to use when logging in to the UL.",
-            "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
             "commit":     "Whether or not to actually make updates.  Set to `false` by default."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
         }
     }
 });

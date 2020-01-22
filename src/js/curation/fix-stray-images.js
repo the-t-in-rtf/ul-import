@@ -126,15 +126,7 @@ fluid.defaults("gpii.ul.imports.curation.strayImages", {
 
 fluid.defaults("gpii.ul.imports.curation.strayImages.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-imports/configs/curation-strayImages-prod.json",
-    "yargsOptions": {
-        "describe": {
-            "setLogging": "The logging level to use.  Set to `true` by default."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
-        }
-    }
+    optionsFile: "%ul-imports/configs/curation-strayImages-prod.json"
 });
 
 gpii.ul.imports.curation.strayImages.launcher();

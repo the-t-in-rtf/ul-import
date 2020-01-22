@@ -1,10 +1,12 @@
 // Convenience grades to handle common patterns in working with kettle.dataSource.URL
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
 
 fluid.require("%kettle");
 fluid.require("%gpii-express/src/js/lib/querystring-coding.js");
 
+fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.dataSource", {
     gradeNames: ["kettle.dataSource.URL"],

@@ -1,9 +1,13 @@
 // A wrapper for the "deep equals" comparisons used to determine if a record has been updated.
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%gpii-diff");
+fluid.popLogging();
+
 fluid.registerNamespace("gpii.ul.imports");
 
 /**

@@ -5,6 +5,7 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -19,6 +20,9 @@ var md5File = require("md5-file");
 
 fluid.require("path");
 fluid.require("%ul-api/src/js/images/file/file-helpers.js");
+
+fluid.popLogging();
+
 fluid.registerNamespace("gpii.ul.imports.curation.md5");
 
 gpii.ul.imports.curation.md5.retrieveIncompleteRecordReport = function (that) {
@@ -131,11 +135,7 @@ fluid.defaults("gpii.ul.imports.curation.md5.launcher", {
     optionsFile: "%ul-imports/configs/curation-md5-prod.json",
     "yargsOptions": {
         "describe": {
-            "updateAll": "Set to true to update md5 checksums for all image records.  The default is to only update records that lack checksum data.",
-            "setLogging": "The logging level to use.  Set to `true` by default."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
+            "updateAll": "Set to true to update md5 checksums for all image records.  The default is to only update records that lack checksum data."
         }
     }
 });

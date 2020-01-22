@@ -1,6 +1,7 @@
 // A set of additional transforms to assist in migrating data.
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
 var cheerio = require("cheerio");
 
 var gpii = fluid.registerNamespace("gpii");
@@ -9,6 +10,8 @@ fluid.registerNamespace("gpii.ul.imports.transforms");
 
 require("gpii-universal");
 fluid.require("%settingsHandlers");
+
+fluid.popLogging();
 
 // These functions have no configuration available, so we are fine with the implied `fluid.standardTransformFunction` grade
 

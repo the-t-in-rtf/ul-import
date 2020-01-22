@@ -7,6 +7,8 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 var request = require("request");
@@ -16,6 +18,8 @@ fluid.require("%ul-imports");
 require("../launcher");
 require("../login");
 require("../concurrent-promise-queue");
+
+fluid.popLogging();
 
 fluid.registerNamespace("gpii.ul.imports.sai.deletes");
 
@@ -179,12 +183,8 @@ fluid.defaults("gpii.ul.imports.sai.deletes.launcher", {
         "describe": {
             "username":         "The username to use when writing records to the UL.",
             "password":         "The password to use when writing records to the UL.",
-            "setLogging":       "The logging level to use.  Set to `false` (only errors and warnings) by default.",
             "urls.sai.deletes": "The URL to use when retrieving merged/deleted record data from the SAI.",
             "commit":           "Whether or not to update the unified records (defaults to 'false')."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
         }
     }
 });

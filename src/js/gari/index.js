@@ -78,12 +78,8 @@ fluid.defaults("gpii.ul.imports.gari.launcher", {
             "username": "The username to use when writing records to the UL.",
             "password": "The password to use when writing records to the UL.",
             "source": "The UL source to sync records with.",
-            "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
             "urls.gari": "The URL to use when retrieving records from GARI.",
             "overrideDeprecationWarning": "Run this script, even though it's deprecated.  Set to `false` by default."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
         }
     }
 });

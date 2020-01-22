@@ -180,11 +180,7 @@ fluid.defaults("gpii.ul.imports.curation.urlChecker.launcher", {
     optionsFile: "%ul-imports/configs/curation-check-source-urls-prod.json",
     "yargsOptions": {
         "describe": {
-            "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
             "outputDir":  "The directory to save the output to.   By default, the operating system's temporary directory is used."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
         }
     }
 });

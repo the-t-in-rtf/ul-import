@@ -5,11 +5,15 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 require("./mail-update-report");
 
 fluid.require("%gpii-launcher");
+
+fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.mailUpdateReport.launcher", {
     gradeNames: ["gpii.launcher"],
@@ -20,17 +24,12 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport.launcher", {
         "describe": {
             "diffsAndUpdatesPath": "The path (absolute or package-relative) to the 'diffs and updates' JSON file generated for a given import.",
             "outputDir":           "The path (absolute or package-relative) to the directory where the output from this run will be saved.",
-            "setLogging":          "Whether to display verbose log messages.  Set to `true` by default.",
             "smtpPort":            "The mail server port to use when sending outgoing messages."
         },
         required: ["diffsAndUpdatesPath", "outputDir"],
         defaults: {
             "optionsFile": "{that}.options.optionsFile",
-            "outputDir":   "{that}.options.outputDir",
-            "setLogging":  false
-        },
-        coerce: {
-            "setLogging": JSON.parse
+            "outputDir":   "{that}.options.outputDir"
         },
         help: true
     }

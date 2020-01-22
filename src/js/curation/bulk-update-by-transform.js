@@ -125,14 +125,7 @@ fluid.defaults("gpii.ul.imports.curation.transformAndBulkUpdate.launcher", {
     optionsFile: "%ul-imports/configs/curation-transformAndBulkUpdate-prod.json",
     "yargsOptions": {
         "describe": {
-            "commit": "Whether to actually save the updated results.  Defaults to false.",
-            "setLogging": "The logging level to use.  Set to `true` by default."
-        },
-        "defaults": {
-            setLogging: false
-        },
-        "coerce": {
-            "setLogging": JSON.parse
+            "commit": "Whether to actually save the updated results.  Defaults to false."
         }
     }
 });

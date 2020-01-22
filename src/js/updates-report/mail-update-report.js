@@ -5,6 +5,8 @@
 */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%gpii-handlebars");
@@ -17,6 +19,8 @@ var fs            = require("fs");
 var juice         = require("juice");
 var nodemailer    = require("nodemailer");
 var smtpTransport = require("nodemailer-smtp-transport");
+
+fluid.popLogging();
 
 fluid.registerNamespace("gpii.ul.imports.mailUpdateReport");
 

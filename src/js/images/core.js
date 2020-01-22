@@ -5,18 +5,22 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 var request = require("request");
 
 fluid.require("%ul-imports");
 
-fluid.registerNamespace("gpii.ul.imports.images.core");
-
 require("./syncer.js");
 fluid.require("%gpii-launcher");
 
 require("./transformer");
+
+fluid.popLogging();
+
+fluid.registerNamespace("gpii.ul.imports.images.core");
 
 gpii.ul.imports.images.core.login = function (that) {
     that.jar = request.jar();
@@ -83,7 +87,6 @@ fluid.defaults("gpii.ul.imports.images.core", {
             "": "products"
         }
     },
-    setLogging: fluid.logLevel.IMPORTANT,
     messages: {
         errorLoadingImageData: "There was an error loading the source image data:"
     },
@@ -109,11 +112,6 @@ fluid.defaults("gpii.ul.imports.images.core", {
         }
     },
     listeners: {
-        "onCreate.setLogging": {
-            priority: "first",
-            funcName: "fluid.setLogging",
-            args:     ["{that}.options.setLogging"]
-        },
         "onCreate.login": {
             funcName: "gpii.ul.imports.images.core.login",
             args:     ["{that}"]
@@ -138,7 +136,6 @@ fluid.defaults("gpii.ul.imports.images.core.launcher", {
             "ports.api": "The port on which the API server is running",
             "ports.couch": "The port on which CouchDB is running",
             "imageDir": "The base directory in which we should store download images", // TODO: Remove this once we use the image API directly.
-            "setLogging": "The fluid.log log level.  Set to `true` to display messages at the INFO level or higher.",
             "sources": "The sources we are importing images from.  Should be stringified JSON representing a string (i.e. with quotes) or array of strings.",
             "username": "The username to use when saving records to the image API.",
             "password": "The password to use when saving records to the image API."
@@ -146,12 +143,10 @@ fluid.defaults("gpii.ul.imports.images.core.launcher", {
             // "tmpDir": "The temporary directory to store images in before uploading them to the image API."
         },
         coerce: {
-            setLogging: JSON.parse,
             sources:    JSON.parse
         },
         defaults: {
-            "optionsFile": "{that}.options.optionsFile",
-            setLogging: true
+            "optionsFile": "{that}.options.optionsFile"
         },
         help: true
     },

@@ -1,5 +1,6 @@
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii  = fluid.registerNamespace("gpii");
 
@@ -15,6 +16,8 @@ require("./launcher");
 require("./syncer");
 require("./transformer");
 
+fluid.popLogging();
+
 fluid.registerNamespace("gpii.ul.imports.importer");
 
 // Check to see if we have cached data.
@@ -29,8 +32,14 @@ gpii.ul.imports.importer.checkCache = function (that) {
         if (that.options.noCache) {
             fluid.log(fluid.logLevel.IMPORTANT, "Disabled loading from cache, vendor content will always be downloaded...");
         }
+        // Manually change the log level to suppress verbose log output from the data source.
+        fluid.setLogLevel(fluid.logLevel.WARN);
         var promise = that.downloader.get();
-        promise.then(that.saveData, fluid.fail);
+        promise.then(function (results) {
+            // Restore the previous log level.
+            fluid.popLogging();
+            that.saveData(results);
+        }, fluid.fail);
     }
 };
 
@@ -40,7 +49,6 @@ gpii.ul.imports.importer.saveDownload = function (that, data) {
 
 fluid.defaults("gpii.ul.imports.importer", {
     gradeNames: ["fluid.modelComponent"],
-    setLogging: fluid.logLevel.IMPORTANT,
     cacheDir:   tmpDir,
     cacheFilename: {
         expander: {
@@ -100,11 +108,6 @@ fluid.defaults("gpii.ul.imports.importer", {
         }
     },
     listeners: {
-        "onCreate.setLogging": {
-            priority: "first",
-            funcName: "fluid.setLogging",
-            args:     ["{that}.options.setLogging"]
-        },
         "onCreate.checkCache": {
             funcName: "gpii.ul.imports.importer.checkCache",
             args:     ["{that}"]

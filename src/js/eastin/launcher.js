@@ -18,12 +18,8 @@ fluid.defaults("gpii.ul.imports.eastin.launcher", {
             "username":                "The username to use when writing records to the UL.",
             "password":                "The password to use when writing records to the UL.",
             "source":                  "The UL source to sync records with.",
-            "setLogging":              "The logging level to use.  Set to `false` (only errors and warnings) by default.",
             "urls.eastin.listSimilar": "The URL to use to retrieve the list of product records from EASTIN.",
             "urls.eastin.detail":      "The URL to use to retrieve detailed information for each product from EASTIN."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
         }
     }
 });

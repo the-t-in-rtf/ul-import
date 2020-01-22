@@ -1,12 +1,16 @@
 // A component to transform AbleData's data into the format required by the Unified Listing.
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 require("gpii-universal");
 fluid.require("%settingsHandlers");
 require("../transforms");
 require("../helpers");
+
+fluid.popLogging();
 
 fluid.registerNamespace("gpii.ul.imports.ableData.transforms");
 

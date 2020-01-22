@@ -1,5 +1,7 @@
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%ul-imports");
@@ -8,6 +10,8 @@ require("../importer");
 require("../launcher");
 require("./transforms");
 require("../transforms");
+
+fluid.popLogging();
 
 /*
 
@@ -138,11 +142,7 @@ fluid.defaults("gpii.ul.imports.sai.launcher", {
             "username":   "The username to use when writing records to the UL.",
             "password":   "The password to use when writing records to the UL.",
             "source":     "The UL source to sync records with.",
-            "setLogging": "The logging level to use.  Set to `false` (only errors and warnings) by default.",
             "urls.sai":   "The URL to use when retrieving records from the SAI."
-        },
-        "coerce": {
-            "setLogging": JSON.parse
         }
     }
 });

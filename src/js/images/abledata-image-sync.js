@@ -30,12 +30,15 @@
  */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii = fluid.registerNamespace("gpii");
 
 fluid.require("%ul-imports");
 require("./core");
 require("../transformer");
+
+fluid.popLogging();
 
 fluid.registerNamespace("gpii.ul.imports.images.ableData");
 

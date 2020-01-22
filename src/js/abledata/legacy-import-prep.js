@@ -1,7 +1,6 @@
 /* Copy a canned import into the cache. */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogging(true);
 
 var os    = require("os");
 var fs    = require("fs");

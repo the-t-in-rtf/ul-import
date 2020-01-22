@@ -15,10 +15,14 @@
 "use strict";
 var fluid  = require("infusion");
 
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 require("../importer");
 require("./downloader");
 require("./transformer");
 require("./stats");
+
+fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.eastin", {
     gradeNames: [ "gpii.ul.imports.importer"],

@@ -1,11 +1,15 @@
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%ul-imports");
 fluid.require("%gpii-handlebars");
 
 require("../bundle-deps");
+
+fluid.popLogging();
 
 var bundlePromise = gpii.ul.imports.copyDependencies("/tmp/abledata-sandbox", {
     "":  ["%ul-imports/src/html/abledata-sandbox/index.html"],

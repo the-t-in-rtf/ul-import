@@ -1,11 +1,15 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 fluid.require("%gpii-handlebars");
 fluid.require("%gpii-diff");
 
 require("./sanitize-filename-helper");
 require("./resolvePath-helper");
+
+fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.renderer", {
     gradeNames: ["gpii.handlebars.standaloneRenderer"],

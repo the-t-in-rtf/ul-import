@@ -4,6 +4,8 @@
 /* eslint-env node */
 "use strict";
 var fluid = require("infusion");
+fluid.setLogLevel(fluid.logLevel.FAIL);
+
 var gpii  = fluid.registerNamespace("gpii");
 
 var fs    = require("fs");
@@ -15,6 +17,8 @@ require("../../../index");
 require("../zipper");
 require("./html-update-report");
 require("./mail-update-report");
+
+fluid.popLogging();
 
 fluid.registerNamespace("gpii.ul.imports.reportsFromDiffs");
 
