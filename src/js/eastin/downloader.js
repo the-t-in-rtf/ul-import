@@ -120,7 +120,8 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
                                 fluid.log(fluid.logLevel.WARN, "Exception returned by EASTIN API:", data.exceptionMessage || data.exceptionMessages);
                             }
                             else if (error) {
-                                fluid.log(fluid.logLevel.WARN, "Error retrieving record:", error);
+                                fluid.log(fluid.logLevel.TRACE, "Error retrieving record:", error);
+                                that.downloadErrors++;
                             }
                             else if (data.Record) {
                                 fluid.log(fluid.logLevel.TRACE, "Detailed record for '", data.Record.Database, ":", data.Record.ProductCode, "' retrieved...");
@@ -133,10 +134,12 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
                         catch (e) {
                             if (response && response.request) {
                                 // Ignore "junk" HTML records.
-                                fluid.log(fluid.logLevel.WARN, "Error retrieving record from '" + response.request.uri.href + "':\n", e);
+                                fluid.log(fluid.logLevel.TRACE, "Error retrieving record from '" + response.request.uri.href + "':\n", e);
+                                that.downloadErrors++;
                             }
                             else {
-                                fluid.log(fluid.logLevel.WARN, "Error retrieving record:\n", e);
+                                fluid.log(fluid.logLevel.TRACE, "Error retrieving record:\n", e);
+                                that.downloadErrors++;
                             }
                         }
                         promise.resolve();
@@ -152,6 +155,9 @@ gpii.ul.imports.eastin.downloader.retrieveFullRecords = function (that) {
     queue.then(
         function () {
             that.applier.change("records", that.originalRecords);
+            if (that.downloadErrors) {
+                fluid.log(fluid.logLevel.WARN, "Encountered " + that.downloadErrors + " download errors.");
+            }
             that.events.onRecordsRetrieved.fire(that);
         },
         function (error) {
@@ -181,8 +187,9 @@ fluid.defaults("gpii.ul.imports.eastin.downloader", {
     gradeNames: ["fluid.modelComponent"],
     excludedSources: ["Dlf Data"],
     members: {
-        isoRecordLists:     [],
-        originalRecords:    []
+        downloadErrors:  0,
+        isoRecordLists:  [],
+        originalRecords: []
     },
     detailedRecordTimeout: 120000, // Timeout in milliseconds
     pauseBetweenRequests: 2500,

@@ -33,8 +33,8 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.initAndStartSync = function (th
         // Get the HEAD information for the original image as a precursor to doing anything else.
         request.head(that.record.uri, { timeout: 5000 }, function (error, response, body) {
             if (error) {
-                fluid.log(fluid.logLevel.WARN, "Error downloading image file:", error);
-                fluid.log(fluid.logLevel.WARN, "Skipping record...");
+                fluid.log(fluid.logLevel.TRACE, "Error downloading image file:", error);
+                fluid.log(fluid.logLevel.TRACE, "Skipping record...");
                 that.promise.resolve();
             }
             else {
@@ -47,7 +47,7 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.initAndStartSync = function (th
 gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse = function (that, headerResponse) {
     var contentType = headerResponse.headers["content-type"];
     if (headerResponse.statusCode !== 200) {
-        fluid.log(fluid.logLevel.INFO, "Skipping image file that cannot be downloaded...");
+        fluid.log(fluid.logLevel.TRACE, "Skipping image file that cannot be downloaded...");
         that.promise.resolve();
     }
     else if (!gpii.ul.imports.images.extensions.extensionByMimeType[contentType]) {
@@ -68,17 +68,17 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse = function
                     gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
                 }
                 else {
-                    fluid.log(fluid.logLevel.WARN, "Skipping image file with invalid mime type '" + contentType + "' (file extension '" + extension + "' cannot be handled)...");
+                    fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type '" + contentType + "' (file extension '" + extension + "' cannot be handled)...");
                     that.promise.resolve();
                 }
             }
             else {
-                fluid.log(fluid.logLevel.WARN, "Skipping image file with invalid mime type '" + contentType + "' (secondary strategy could not determine filename)...");
+                fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type '" + contentType + "' (secondary strategy could not determine filename)...");
                 that.promise.resolve();
             }
         }
         else {
-            fluid.log(fluid.logLevel.WARN, "Skipping image file with invalid mime type and no content-disposition headers...");
+            fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type and no content-disposition headers...");
             that.promise.resolve();
         }
 
@@ -204,14 +204,14 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
                 request(that.record.uri)
                     .on("error", function (error) {
                         // that.promise.reject(error);
-                        fluid.log(fluid.logLevel.WARN, "Error downloading file:", error);
+                        fluid.log(fluid.logLevel.TRACE, "Error downloading file:", error);
                         that.promise.resolve();
                     })
                     .pipe(fs.createWriteStream(filePath))
                     .on("close", function (error) {
                         if (error) {
                             // that.promise.reject(error);
-                            fluid.log(fluid.logLevel.WARN, "Error downloading file:", error);
+                            fluid.log(fluid.logLevel.TRACE, "Error downloading file:", error);
                             that.promise.resolve();
                         }
                         else {
@@ -259,9 +259,11 @@ gpii.ul.imports.images.syncer.startSync = function (that) {
         // Only records with a uid and URI can be synced.
         if (!record.uid) {
             fluid.log(fluid.logLevel.TRACE, "Skipping record '" +  record.image_id + "' that lacks a UID...");
+            that.skippedRecords++;
         }
         else if (!record.uri) {
             fluid.log(fluid.logLevel.TRACE, "Skipping record '" +  record.image_id + "' that lacks an image URI...");
+            that.skippedRecords++;
         }
         else {
             promises.push(function () {
@@ -286,14 +288,22 @@ gpii.ul.imports.images.syncer.startSync = function (that) {
 
 gpii.ul.imports.images.syncer.handleSuccess = function (that, results) {
     fluid.log(fluid.stringTemplate(that.options.messages.savedRecords, { length: results.length }));
+
+    if (that.skippedRecords) {
+        fluid.log(fluid.stringTemplate(that.options.messages.skippedRecords, { length: that.skippedRecords}));
+    }
 };
 
 fluid.defaults("gpii.ul.imports.images.syncer", {
     gradeNames: ["fluid.modelComponent"],
     maxRequests: 10,
+    members: {
+        skippedRecords: 0
+    },
     messages: {
         errorSavingRecords: "There was an error syncing one or more records.",
-        savedRecords: "Successfully processed %length records."
+        savedRecords: "Successfully processed %length records.",
+        skippedRecords: "Skipped %length records that could not be downloaded or were not usable."
     },
     model: {
         recordsToSync: []

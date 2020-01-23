@@ -14,6 +14,7 @@ fluid.defaults("gpii.ul.imports.launcher", {
     gradeNames: ["gpii.launcher"],
     optionsFile: "%ul-imports/configs/base-prod.json",
     filterKeys: false,
+    logLevel:    fluid.logLevel.IMPORTANT,
     yargsOptions: {
         env: true,
         describe: {
