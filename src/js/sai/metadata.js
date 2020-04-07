@@ -34,7 +34,7 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
         function () {
             var lookupOptions = {
                 jar: true,
-                url: that.options.urls.products + "?sources=%22sai%22&limit=10000",
+                url: that.options.urls.products + "?sources=%22sai%22&limit=1000000&status=[%22deleted%22,%22new%22,%22active%22,%22discontinued%22]",
                 headers: {
                     "Accept": "application/json"
                 }
@@ -59,8 +59,14 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
 gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, results) {
     var recordsToUpdate = [];
     fluid.each(results.products, function (unifiedRecord) {
-        var saiRecord             = fluid.find(unifiedRecord.sources, function (sourceRecord) { return sourceRecord.source === "sai" ? sourceRecord : false; });
-        if (saiRecord) {
+        var saiRecords = [];
+        fluid.each(unifiedRecord.sources, function (sourceRecord) {
+            if (sourceRecord.source === "sai") {
+                saiRecords.push[sourceRecord];
+            }
+        });
+        if (saiRecords.length === 1) {
+            var saiRecord = saiRecords[0];
             var filteredSaiRecord     = fluid.filterKeys(saiRecord, that.options.fieldsToDiff);
             var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
             if (!gpii.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
@@ -68,6 +74,10 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
                 updatedRecord.updated = (new Date()).toISOString();
                 recordsToUpdate.push(updatedRecord);
             }
+        }
+        else if (saiRecords.length > 1) {
+            var sids = fluid.transform(saiRecords, function (saiRecord) { return saiRecord.sid; });
+            fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one SAI record: ('" + sids.join("', '") + "'.  Can't update the unified record.");
         }
     });
 
