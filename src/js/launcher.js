@@ -5,7 +5,7 @@ var fluid = require("infusion");
 // Avoids some (but not all) "registering module" and "infusion at path" messages.
 fluid.setLogLevel(fluid.logLevel.FAIL);
 
-fluid.require("%gpii-launcher");
+fluid.require("%fluid-launcher");
 fluid.require("%ul-imports");
 
 fluid.popLogging();

@@ -83,7 +83,7 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
 
                     // Create a page for each record that links back to the source and overall summaries.  Requires both the diff and the full updated record.s
                     fluid.each(diffsAndUpdates, function (diffAndUpdate) {
-                        var sid = gpii.diff.rightValue(diffAndUpdate.diff.sid);
+                        var sid = fluid.diff.rightValue(diffAndUpdate.diff.sid);
                         var individualdiffFilename = source + "-" +  gpii.ul.imports.sanitizeFilename(sid) + ".html";
                         var individualDiffHtml     = that.renderer.render(that.options.templateKeys.singleRecord, { options: that.options, diffAndUpdate: diffAndUpdate, dateStamp: dateStamp });
                         var individualDiffPath     = path.resolve(sourceOutputPath, individualdiffFilename);
@@ -109,7 +109,7 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
 gpii.ul.imports.updateReport.diffsAndUpdatesBySource = function (diffsAndUpdates) {
     var diffsAndUpdatesBySource = {};
     fluid.each(diffsAndUpdates, function (diffAndUpdate) {
-        var source = gpii.diff.rightValue(diffAndUpdate.diff.source);
+        var source = fluid.diff.rightValue(diffAndUpdate.diff.source);
         if (!diffsAndUpdatesBySource[source]) { diffsAndUpdatesBySource[source] = []; }
         diffsAndUpdatesBySource[source].push(diffAndUpdate);
     });
@@ -135,7 +135,7 @@ fluid.defaults("gpii.ul.imports.updateReport", {
         singleRecord:      "single-update-page"
     },
     depsToBundle: {
-        css: ["%gpii-diff/src/css/gpii-diff.css", "%ul-imports/src/css/ul-imports.css","%ul-imports/node_modules/foundation-sites/dist/css/foundation.css"],
+        css: ["%fluid-diff/src/css/fluid-diff.css", "%ul-imports/src/css/ul-imports.css","%ul-imports/node_modules/foundation-sites/dist/css/foundation.css"],
         js:  ["%infusion/dist/infusion-all.js", "%infusion/dist/infusion-all.js.map", "%ul-imports/src/js/client/toggleAllDetails.js"]
     },
     baseOutputDir: "/tmp",

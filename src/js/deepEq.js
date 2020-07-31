@@ -5,7 +5,7 @@ fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii  = fluid.registerNamespace("gpii");
 
-fluid.require("%gpii-diff");
+fluid.require("%fluid-diff");
 fluid.popLogging();
 
 fluid.registerNamespace("gpii.ul.imports");
@@ -25,5 +25,5 @@ gpii.ul.imports.filteredDeepEq = function (a, b, keys, exclude) {
     var filteredA = fluid.filterKeys(a, keys, exclude);
     var filteredB = fluid.filterKeys(b, keys, exclude);
 
-    return gpii.diff.equals(filteredA, filteredB);
+    return fluid.diff.equals(filteredA, filteredB);
 };

@@ -22,11 +22,11 @@ var fs   = require("fs");
 var os   = require("os");
 var path = require("path");
 
-fluid.require("%gpii-diff");
+fluid.require("%fluid-diff");
 
 fluid.popLogging();
 
-gpii.diff.loadMarkdownSupport();
+fluid.diff.loadMarkdownSupport();
 
 fluid.registerNamespace("gpii.ul.imports.diffImportResults");
 gpii.ul.imports.diffImportResults.generateOutputPath = function (that, baseDir) {
@@ -48,14 +48,14 @@ gpii.ul.imports.diffImportResults.generateDiff = function (originalsPath, update
         var originalRecord = fluid.get(originalsBySourceAndSid, updatedRecord.source + "." + updatedRecord.sid);
         var filteredUpdatedRecord = fluid.filterKeys(updatedRecord, diffFieldsToCompare);
         if (originalRecord === undefined) {
-            var allNewDiff = gpii.diff.compare({}, filteredUpdatedRecord, compareOptions);
+            var allNewDiff = fluid.diff.compare({}, filteredUpdatedRecord, compareOptions);
             diffsAndUpdates.push({ diff: allNewDiff, update: updatedRecord });
         }
         else {
             //fluid.log(fluid.logLevel.TRACE, "diffing ", originalRecord.source, ":", originalRecord.sid);
             var filteredOriginalRecord = fluid.filterKeys(originalRecord, diffFieldsToCompare);
-            if (!gpii.diff.equals(filteredOriginalRecord, filteredUpdatedRecord)) {
-                var diff = gpii.diff.compare(
+            if (!fluid.diff.equals(filteredOriginalRecord, filteredUpdatedRecord)) {
+                var diff = fluid.diff.compare(
                     filteredOriginalRecord,
                     filteredUpdatedRecord,
                     compareOptions

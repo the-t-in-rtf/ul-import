@@ -54,7 +54,7 @@ __NOTE:__ The GARI imports are no longer included in a "full" sync.
 
 ## Syncing Using Direct Commands
 
-This package provides a range of scripts that use [`gpii-launcher`](https://www.npmjs.com/package/gpii-launcher) to
+This package provides a range of scripts that use [`fluid-launcher`](https://www.npmjs.com/package/fluid-launcher) to
 run various commands, and to change the effective options used when running the command using options files,
 command-line switches, and environment variables.  The `configs` directory contains a range of configuration files.
 Usually, you will want to work with one of the "merged" config files that combines:
@@ -144,7 +144,7 @@ data, you will need to first run the SAI import or a full sync (see above for de
 
 ## Running Scripts with Custom Options
 
-The scripts in this package use the [`gpii-launcher`](https://github.com/the-t-in-rtf/gpii-launcher) package to allow
+The scripts in this package use the [`fluid-launcher`](https://github.com/the-t-in-rtf/fluid-launcher) package to allow
 you set options from the command-line or environment variable.  For example, let's say you want to run a "full sync"
 with a custom password.  You can do this using an argument, or an environment variable.  With an argument, you might
 use a command like:
@@ -160,7 +160,7 @@ Using an environment variable to set the same password, you might use a command 
 
 For more details about supported options, run any of the scripts in this package with the `--help` argument.  You can
 also create your own custom options files and use those instead of the included files.  For more details, see the
-`gpii-launcher` documentation.
+`fluid-launcher` documentation.
 
 ## Generating "Updates" Reports
 

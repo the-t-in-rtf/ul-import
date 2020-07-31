@@ -11,7 +11,7 @@ var gpii  = fluid.registerNamespace("gpii");
 var fs    = require("fs");
 var path  = require("path");
 
-fluid.require("%gpii-launcher");
+fluid.require("%fluid-launcher");
 require("../../../index");
 
 require("../zipper");

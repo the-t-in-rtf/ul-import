@@ -5,7 +5,7 @@ fluid.setLogLevel(fluid.logLevel.FAIL);
 var gpii  = fluid.registerNamespace("gpii");
 
 fluid.require("%ul-imports");
-fluid.require("%gpii-handlebars");
+fluid.require("%fluid-handlebars");
 
 require("../bundle-deps");
 
@@ -22,12 +22,12 @@ var bundlePromise = gpii.ul.imports.copyDependencies("/tmp/abledata-sandbox", {
         "%ul-imports/node_modules/markdown-it/dist/markdown-it.js",
         "%ul-imports/node_modules/handlebars/dist/handlebars.js",
         "%ul-imports/src/js/abledata/client/static-search.js",
-        "%gpii-handlebars/src/js/client/md-client.js",
-        "%gpii-handlebars/src/js/client/renderer.js",
-        "%gpii-handlebars/src/js/common/equals.js",
-        "%gpii-handlebars/src/js/common/helper.js",
-        "%gpii-handlebars/src/js/common/jsonify.js",
-        "%gpii-handlebars/src/js/common/md-common.js"
+        "%fluid-handlebars/src/js/client/md-client.js",
+        "%fluid-handlebars/src/js/client/renderer.js",
+        "%fluid-handlebars/src/js/common/equals.js",
+        "%fluid-handlebars/src/js/common/helper.js",
+        "%fluid-handlebars/src/js/common/jsonify.js",
+        "%fluid-handlebars/src/js/common/md-common.js"
     ]
 });
 

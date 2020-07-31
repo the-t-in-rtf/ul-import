@@ -18,7 +18,7 @@ require("../login");
 require("../transforms");
 require("../concurrent-promise-queue");
 
-fluid.require("%gpii-json-schema");
+fluid.require("%fluid-json-schema");
 fluid.require("%ul-api");
 
 fluid.registerNamespace("gpii.ul.imports.curation.invalidRecords");

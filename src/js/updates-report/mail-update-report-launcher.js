@@ -11,7 +11,7 @@ var gpii  = fluid.registerNamespace("gpii");
 
 require("./mail-update-report");
 
-fluid.require("%gpii-launcher");
+fluid.require("%fluid-launcher");
 
 fluid.popLogging();
 

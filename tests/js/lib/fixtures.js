@@ -5,7 +5,7 @@ var gpii  = fluid.registerNamespace("gpii");
 
 require("../../../index");
 
-fluid.require("%gpii-couchdb-test-harness");
+fluid.require("%fluid-couchdb-test-harness");
 fluid.require("%ul-api");
 
 gpii.ul.api.loadTestingSupport();

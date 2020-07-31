@@ -10,7 +10,7 @@ fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii   = fluid.registerNamespace("gpii");
 
-fluid.require("%gpii-launcher");
+fluid.require("%fluid-launcher");
 
 require("./html-update-report");
 

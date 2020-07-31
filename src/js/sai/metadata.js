@@ -18,7 +18,7 @@ var gpii  = fluid.registerNamespace("gpii");
 var request = require("request");
 
 fluid.require("%ul-imports");
-fluid.require("%gpii-diff");
+fluid.require("%fluid-diff");
 
 require("../launcher");
 require("../concurrent-promise-queue");
@@ -69,7 +69,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             var saiRecord = saiRecords[0];
             var filteredSaiRecord     = fluid.filterKeys(saiRecord, that.options.fieldsToDiff);
             var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
-            if (!gpii.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
+            if (!fluid.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
                 var updatedRecord = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredSaiRecord);
                 updatedRecord.updated = (new Date()).toISOString();
                 recordsToUpdate.push(updatedRecord);

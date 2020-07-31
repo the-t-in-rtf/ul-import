@@ -9,7 +9,7 @@ fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii  = fluid.registerNamespace("gpii");
 
-fluid.require("%gpii-handlebars");
+fluid.require("%fluid-handlebars");
 
 require("./sanitize-filename");
 

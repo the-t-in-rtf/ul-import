@@ -9,8 +9,8 @@ fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii  = fluid.registerNamespace("gpii");
 
-fluid.require("%gpii-handlebars");
-fluid.require("%gpii-diff");
+fluid.require("%fluid-handlebars");
+fluid.require("%fluid-diff");
 
 require("./lib/jsonLoader");
 require("./lib/renderer");
@@ -99,7 +99,7 @@ fluid.defaults("gpii.ul.imports.mailUpdateReport", {
     members: {
         queuePromise: "{that}.options.queuePromise"
     },
-    cssFiles: ["%gpii-diff/src/css/gpii-diff.css", "%ul-imports/src/css/ul-imports.css"],
+    cssFiles: ["%fluid-diff/src/css/fluid-diff.css", "%ul-imports/src/css/ul-imports.css"],
     transportOptions: {
         ignoreTLS: true,
         secure:    false,

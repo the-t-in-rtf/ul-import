@@ -4,7 +4,7 @@ fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii  = fluid.registerNamespace("gpii");
 
-fluid.require("%gpii-diff");
+fluid.require("%fluid-diff");
 
 fluid.popLogging();
 
@@ -21,7 +21,7 @@ gpii.ul.imports.sai.transformer.firstSaneValue = function (transformSpec, transf
     sanitizedTransformSpec.values = fluid.transform(sanitizedTransformSpec.values, function (value) {
         var expanded = transformer.expand(value);
 
-        if (expanded === "" || gpii.diff.equals([], expanded)) {
+        if (expanded === "" || fluid.diff.equals([], expanded)) {
             return "notfound";
         }
         else {

@@ -4,7 +4,7 @@ var fluid = require("infusion");
 fluid.setLogLevel(fluid.logLevel.FAIL);
 
 fluid.require("%kettle");
-fluid.require("%gpii-express/src/js/lib/querystring-coding.js");
+fluid.require("%fluid-express/src/js/lib/querystring-coding.js");
 
 fluid.popLogging();
 
@@ -17,7 +17,7 @@ fluid.defaults("gpii.ul.imports.dataSource", {
 });
 
 fluid.defaults("gpii.ul.imports.dataSource.urlEncodedJson", {
-    gradeNames: ["gpii.ul.imports.dataSource", "gpii.express.dataSource.urlEncodedJson"]
+    gradeNames: ["gpii.ul.imports.dataSource", "fluid.express.dataSource.urlEncodedJson"]
 });
 
 // Taken from: https://github.com/fluid-project/kettle/blob/master/lib/test/KettleTestUtils.http.js#L34

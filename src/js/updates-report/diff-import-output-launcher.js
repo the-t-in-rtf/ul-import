@@ -21,7 +21,7 @@ var gpii = fluid.registerNamespace("gpii");
 require("./diff-import-output");
 
 fluid.require("%ul-imports");
-fluid.require("%gpii-launcher");
+fluid.require("%fluid-launcher");
 
 fluid.popLogging();
 
