@@ -17,7 +17,7 @@ require("./html-update-report");
 fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.updateReport.launcher", {
-    gradeNames: ["gpii.launcher"],
+    gradeNames: ["fluid.launcher"],
     optionsFile: "%ul-imports/configs/updates-report-prod.json",
     filterKeys: false,
     "yargsOptions": {

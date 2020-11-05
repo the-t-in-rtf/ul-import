@@ -16,7 +16,7 @@ fluid.require("%fluid-launcher");
 fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.mailUpdateReport.launcher", {
-    gradeNames: ["gpii.launcher"],
+    gradeNames: ["fluid.launcher"],
     optionsFile: "%ul-imports/configs/updates-email.json",
     filterKeys: false,
     "yargsOptions": {

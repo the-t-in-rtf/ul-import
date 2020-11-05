@@ -14,7 +14,7 @@ var request = require("request");
 fluid.require("%ul-imports");
 
 require("./syncer.js");
-fluid.require("%gpii-launcher");
+fluid.require("%fluid-launcher");
 
 require("./transformer");
 
@@ -126,7 +126,7 @@ fluid.defaults("gpii.ul.imports.images.core", {
 });
 
 fluid.defaults("gpii.ul.imports.images.core.launcher", {
-    gradeNames: ["gpii.launcher"],
+    gradeNames: ["fluid.launcher"],
     mergePolicy: {
         "yargsOptions.demand": "nomerge"
     },

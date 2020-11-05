@@ -79,7 +79,7 @@ fluid.defaults("gpii.ul.imports.diffsFromImports", {
 });
 
 fluid.defaults("gpii.ul.imports.diffsFromImports.launcher", {
-    gradeNames: ["gpii.launcher"],
+    gradeNames: ["fluid.launcher"],
     optionsFile: "%ul-imports/configs/updates-process-incoming-import-results.json",
     filterKeys: false,
     "yargsOptions": {

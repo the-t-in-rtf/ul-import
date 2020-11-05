@@ -26,7 +26,7 @@ fluid.require("%fluid-launcher");
 fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.diffImportResults.launcher", {
-    gradeNames:  ["gpii.launcher"],
+    gradeNames:  ["fluid.launcher"],
     optionsFile: "%ul-imports/configs/updates-diff.json",
     filterKeys: false,
     "yargsOptions": {

@@ -11,7 +11,7 @@ fluid.require("%ul-imports");
 fluid.popLogging();
 
 fluid.defaults("gpii.ul.imports.launcher", {
-    gradeNames: ["gpii.launcher"],
+    gradeNames: ["fluid.launcher"],
     optionsFile: "%ul-imports/configs/base-prod.json",
     filterKeys: false,
     logLevel:    fluid.logLevel.IMPORTANT,
