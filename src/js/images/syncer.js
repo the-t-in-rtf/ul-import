@@ -18,11 +18,11 @@ fluid.registerNamespace("gpii.ul.imports.images.syncer.singleRecordSyncer");
 // TODO: Rewrite as a chained promise event or pipelined event`.
 
 gpii.ul.imports.images.syncer.singleRecordSyncer.initAndStartSync = function (that) {
-    setTimeout(function () {
-        if (!that.promise.disposition) {
-            that.promise.reject("Image sync timed out.");
-        }
-    }, that.options.timeout);
+    // setTimeout(function () {
+    //     if (!that.promise.disposition) {
+    //         that.promise.reject("Image sync timed out.");
+    //     }
+    // }, that.options.timeout);
 
     that.jar = request.jar();
 
