@@ -30,11 +30,9 @@ gpii.ul.imports.copyDependencies = function (outputDir, depsToBundle) {
         depDirPromises.push(function () {
             var depDirPromise = fluid.promise();
             var depSubDir     = depKey === "" ? resolvedOutputPath : path.resolve(resolvedOutputPath, depKey);
-            mkdirp(depSubDir, function (err) {
-                if (err) {
-                    depDirPromise.reject(err);
-                }
-                else {
+
+            mkdirp(depSubDir).then(
+                function () {
                     var fileCopyPromises = [];
                     fluid.each(depFiles, function (unresolvedSourcePath) {
                         fileCopyPromises.push(function () {
@@ -57,8 +55,9 @@ gpii.ul.imports.copyDependencies = function (outputDir, depsToBundle) {
                     });
                     var fileCopySequence = fluid.promise.sequence(fileCopyPromises);
                     fileCopySequence.then(depDirPromise.resolve, depDirPromise.reject);
-                }
-            });
+                },
+                depDirPromise.reject
+            );
             return depDirPromise;
         });
     });

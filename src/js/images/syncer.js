@@ -195,11 +195,8 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
     }
     else {
         // Create the full path if it does not already exist.
-        mkdirp(dirPath, function (error) {
-            if (error) {
-                that.promise.reject(error);
-            }
-            else {
+        mkdirp(dirPath).then(
+            function () {
                 // Adapted from: http://stackoverflow.com/questions/12740659/downloading-images-with-node-js
                 request(that.record.uri)
                     .on("error", function (error) {
@@ -229,8 +226,9 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
                             });
                         }
                     });
-            }
-        });
+            },
+            that.promise.reject
+        );
     }
 };
 

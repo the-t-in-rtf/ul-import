@@ -26,11 +26,8 @@ gpii.ul.imports.updateReport.createSummary = function (that) {
     var diffsAndUpdatesBySource = gpii.ul.imports.updateReport.diffsAndUpdatesBySource(diffsAndUpdates);
     // Create our output directory
     var resolvedOutputPath = fluid.module.resolvePath(that.options.outputDir);
-    mkdirp(resolvedOutputPath, function (err) {
-        if (err) {
-            that.queuePromise.reject(err);
-        }
-        else {
+    mkdirp(resolvedOutputPath).then(
+        function () {
             // Copy our required dependencies into the new directory.
             var dependencyPromise = gpii.ul.imports.copyDependencies(that.options.outputDir, that.options.depsToBundle);
             dependencyPromise.then(function () {
@@ -51,8 +48,9 @@ gpii.ul.imports.updateReport.createSummary = function (that) {
 
                 gpii.ul.imports.updateReport.createSourceReports(that, diffsAndUpdatesBySource, dateStamp);
             }, that.queuePromise.reject);
-        }
-    });
+        },
+        that.queuePromise.reject
+    );
 };
 
 gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdatesBySource, dateStamp) {
@@ -64,11 +62,8 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
             var diffsAndUpdates = diffsAndUpdatesBySource[source];
             var sourceOutputPath = path.resolve(resolvedOutputPath, source);
             // Create a subdirectory for this source.
-            mkdirp(sourceOutputPath, function (err) {
-                if (err) {
-                    reportPromise.reject(err);
-                }
-                else {
+            mkdirp(sourceOutputPath).then(
+                function () {
                     // Create an summary page for this source.  As we don't need access to the updated description, we can work with just the diffs for this source.
                     var sourceSummaryHtml = that.renderer.render(that.options.templateKeys.sourceSummary, { options: that.options, source: source, diffsAndUpdates: diffsAndUpdates, dateStamp: dateStamp });
                     var sourceSummaryPath = path.resolve(sourceOutputPath, "summary.html");
@@ -91,8 +86,9 @@ gpii.ul.imports.updateReport.createSourceReports = function (that, diffsAndUpdat
                     });
                     fluid.log(fluid.logLevel.IMPORTANT, "Saved ", diffsAndUpdates.length, " individual records for source '", source, "'.");
                     reportPromise.resolve();
-                }
-            });
+                },
+                reportPromise.reject
+            );
             return reportPromise;
         });
     });
