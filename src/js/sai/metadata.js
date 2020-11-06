@@ -58,6 +58,7 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
 
 gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, results) {
     var recordsToUpdate = [];
+    fluid.log(fluid.logLevel.IMPORTANT, "PARAMS:\n" + JSON.stringify(results.params, null, 2));
     fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + " SAI records to their associated unified records.");
     fluid.each(results.products, function (unifiedRecord) {
         var saiRecords = [];
