@@ -73,11 +73,13 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             if (sourceRecord.source === "sai") {
                 saiRecords.push[sourceRecord];
             }
+            else {
+                fluid.log(fluid.logLevel.IMPORTANT, "Skipping source record '" + sourceRecord.source + ":" + sourceRecord.sid + "'.");
+            }
         });
 
         if (saiRecords.length === 0) {
             fluid.log(fluid.logLevel.IMPORTANT, "No SAI source record(s) found for unified record '" + unifiedRecord.uid + "', something is wrong.");
-            fluid.log(fluid.logLevel.IMPORTANT, "Sources:" + JSON.stringify(unifiedRecord.sources, null, 2));
         }
         else if (saiRecords.length === 1) {
             var saiRecord = saiRecords[0];
