@@ -61,6 +61,8 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
     fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + " SAI records to their associated unified records.");
     fluid.each(results.products, function (unifiedRecord) {
         var saiRecords = [];
+        fluid.log(fluid.logLevel.IMPORTANT, "Examining " + unifiedRecord.sources.length + " source record(s) for unified record '" + unifiedRecord.uid + "'.");
+
         fluid.each(unifiedRecord.sources, function (sourceRecord) {
             if (sourceRecord.source === "sai") {
                 saiRecords.push[sourceRecord];
