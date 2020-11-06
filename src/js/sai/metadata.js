@@ -74,6 +74,9 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
                 updatedRecord.updated = (new Date()).toISOString();
                 recordsToUpdate.push(updatedRecord);
             }
+            else {
+                fluid.log("Unified record '" + unifiedRecord.uid + "' is up to date with the SAI metadata.");
+            }
         }
         else if (saiRecords.length > 1) {
             var sids = fluid.transform(saiRecords, function (saiRecord) { return saiRecord.sid; });
