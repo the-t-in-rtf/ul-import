@@ -58,7 +58,7 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
 
 gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, results) {
     var recordsToUpdate = [];
-    fluid.log("Comparing " + results.products.length + "SAI records to their associated unified records.");
+    fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + "SAI records to their associated unified records.");
     fluid.each(results.products, function (unifiedRecord) {
         var saiRecords = [];
         fluid.each(unifiedRecord.sources, function (sourceRecord) {
@@ -76,7 +76,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
                 recordsToUpdate.push(updatedRecord);
             }
             else {
-                fluid.log("Unified record '" + unifiedRecord.uid + "' is up to date with the SAI metadata.");
+                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' is up to date with the SAI metadata.");
             }
         }
         else if (saiRecords.length > 1) {
@@ -86,7 +86,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
     });
 
     if (recordsToUpdate.length === 0) {
-        fluid.log(fluid.logLevel.IMPORTANT, "All unified records are up to date with SAI metadata...");
+        fluid.log(fluid.logLevel.IMPORTANT, "All unified records are up to date with SAI metadata.");
     }
     else if (that.options.commit) {
         gpii.ul.imports.sai.metadata.updateRecords(that, recordsToUpdate);
