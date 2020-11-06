@@ -58,7 +58,7 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
 
 gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, results) {
     var recordsToUpdate = [];
-    fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + "SAI records to their associated unified records.");
+    fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + " SAI records to their associated unified records.");
     fluid.each(results.products, function (unifiedRecord) {
         var saiRecords = [];
         fluid.each(unifiedRecord.sources, function (sourceRecord) {
@@ -71,6 +71,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             var filteredSaiRecord     = fluid.filterKeys(saiRecord, that.options.fieldsToDiff);
             var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
             if (!fluid.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
+                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' needs to be updated.");
                 var updatedRecord = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredSaiRecord);
                 updatedRecord.updated = (new Date()).toISOString();
                 recordsToUpdate.push(updatedRecord);
