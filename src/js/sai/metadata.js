@@ -97,6 +97,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             }
         }
         else if (saiRecords.length > 1) {
+            fluid.log(fluid.logLevel.IMPORTANT, "SAI records by status keys: " + Object.keys(saiRecordsByStatus).join(", "));
             var nonDeletedSaiRecordCount = fluid.get(saiRecordsByStatus, "notDeleted.length") || 0;
             var deletedSaiRecordCount = fluid.get(saiRecordsByStatus, "deleted.length") || 0;
             // If all the records have been deleted, just update the status.
@@ -119,7 +120,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
                     recordsToUpdate.push(updatedRecordWithNonDeletedMetadata);
                 }
                 else {
-                    fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has " + deletedSaiRecordCount + " and " + nonDeletedSaiRecordCount + " non-deleted SAI records.  Can't update the unified record.");
+                    fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has " + deletedSaiRecordCount + " deleted and " + nonDeletedSaiRecordCount + " non-deleted SAI records.  Can't update the unified record.");
                 }
             }
         }
