@@ -96,7 +96,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
                     fluid.log(fluid.logLevel.INFO, "Unified record" + unifiedRecord.uid + " has already been flagged as deleted based on SAI metadata.");
                 }
                 else {
-                    fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one SAI record, but all have been deleted.  Flagging the record as deleted.");
+                    fluid.log(fluid.logLevel.INFO, "Unified record '" + unifiedRecord.uid + "' has more than one SAI record, but all have been deleted.  Flagging the record as deleted.");
 
                     var recordToDelete = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), { status: "deleted" });
                     recordToDelete.updated = (new Date()).toISOString();
