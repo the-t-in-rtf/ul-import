@@ -81,7 +81,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
         var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
 
         if (saiRecords.length === 0) {
-            fluid.log(fluid.logLevel.IMPORTANT, "No SAI source record(s) found for unified record '" + unifiedRecord.uid + "', something is wrong.");
+            fluid.log(fluid.logLevel.INFO, "No SAI source record(s) found for unified record '" + unifiedRecord.uid + "', something is wrong.");
         }
         else if (saiRecords.length === 1) {
             var saiRecord = saiRecords[0];
@@ -93,7 +93,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
                 recordsToUpdate.push(updatedRecord);
             }
             else {
-                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' is up to date with the SAI metadata.");
+                fluid.log(fluid.logLevel.INFO, "Unified record '" + unifiedRecord.uid + "' is up to date with the SAI metadata.");
             }
         }
         else if (saiRecords.length > 1) {
