@@ -62,7 +62,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
     fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + " SAI records to their associated unified records.");
     fluid.each(results.products, function (unifiedRecord) {
         var saiRecords = [];
-        var saiRecordsByStatus = {};
+        var saiRecordsByStatus = { deleted: [], notDeleted: []};
         // if (unifiedRecord.sources) {
         //     fluid.log(fluid.logLevel.IMPORTANT, "Examining " + unifiedRecord.sources.length + " source record(s) for unified record '" + unifiedRecord.uid + "'.");
         // }
@@ -74,7 +74,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             if (sourceRecord.source === "sai") {
                 saiRecords.push(sourceRecord);
                 var pseudoStatus = sourceRecord.status === "deleted" ? "deleted" : "notDeleted";
-                saiRecordsByStatus[pseudoStatus] = sourceRecord;
+                saiRecordsByStatus[pseudoStatus].push(sourceRecord);
             }
         });
 
