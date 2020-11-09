@@ -106,7 +106,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             // If there are multiple records but only one has not been deleted, use that one.
             else {
                 if (nonDeletedSaiRecordCount === 1) {
-                    fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one non-deleted SAI record, but only one has not been deleted.  Using that metadata.");
+                    fluid.log(fluid.logLevel.INFO, "Unified record '" + unifiedRecord.uid + "' has more than one non-deleted SAI record, but only one has not been deleted.  Using that metadata.");
                     saiRecord = saiRecordsByStatus.notDeleted[0];
                 }
                 else {
