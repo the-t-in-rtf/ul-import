@@ -62,6 +62,7 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
     fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + " SAI records to their associated unified records.");
     fluid.each(results.products, function (unifiedRecord) {
         var saiRecords = [];
+        var saiRecordsByStatus = {};
         // if (unifiedRecord.sources) {
         //     fluid.log(fluid.logLevel.IMPORTANT, "Examining " + unifiedRecord.sources.length + " source record(s) for unified record '" + unifiedRecord.uid + "'.");
         // }
@@ -72,8 +73,12 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
         fluid.each(unifiedRecord.sources, function (sourceRecord) {
             if (sourceRecord.source === "sai") {
                 saiRecords.push(sourceRecord);
+                var pseudoStatus = sourceRecord.status === "deleted" ? "deleted" : "notDeleted";
+                saiRecordsByStatus[pseudoStatus] = sourceRecord;
             }
         });
+
+        var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
 
         if (saiRecords.length === 0) {
             fluid.log(fluid.logLevel.IMPORTANT, "No SAI source record(s) found for unified record '" + unifiedRecord.uid + "', something is wrong.");
@@ -81,7 +86,6 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
         else if (saiRecords.length === 1) {
             var saiRecord = saiRecords[0];
             var filteredSaiRecord     = fluid.filterKeys(saiRecord, that.options.fieldsToDiff);
-            var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
             if (!fluid.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
                 fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' needs to be updated.");
                 var updatedRecord = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredSaiRecord);
@@ -93,8 +97,28 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             }
         }
         else if (saiRecords.length > 1) {
-            var sids = fluid.transform(saiRecords, function (saiRecord) { return saiRecord.sid; });
-            fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one SAI record: ('" + sids.join("', '") + "'.  Can't update the unified record.");
+            // If all the records have been deleted, just update the status.
+            if (fluid.get(saiRecordsByStatus, "deleted.length") === saiRecords.length) {
+                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one non-deleted SAI record, but all have been deleted.  Flagging the record as deleted.");
+
+                var recordToDelete = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), { status: "deleted" });
+                recordToDelete.updated = (new Date()).toISOString();
+                recordsToUpdate.push(recordToDelete);
+            }
+            // If there are multiple records but only one has not been deleted, use that one.
+            else if (fluid.get(saiRecordsByStatus, "notDeleted.length") === 1) {
+                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one non-deleted SAI record, but only one has not been deleted.  Using that metadata.");
+
+                var onlyNonDeletedSaiRecord = saiRecordsByStatus.notDeleted[0];
+                var filteredNonDeletedSaiRecord     = fluid.filterKeys(onlyNonDeletedSaiRecord, that.options.fieldsToDiff);
+                var updatedRecordWithNonDeletedMetadata = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredNonDeletedSaiRecord);
+                updatedRecordWithNonDeletedMetadata.updated = (new Date()).toISOString();
+                recordsToUpdate.push(updatedRecordWithNonDeletedMetadata);
+            }
+            else {
+                var sids = fluid.transform(saiRecords, function (saiRecord) { return saiRecord.sid; });
+                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one non-deleted SAI record: ('" + sids.join("', '") + "'.  Can't update the unified record.");
+            }
         }
     });
 
