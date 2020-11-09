@@ -58,7 +58,6 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
 
 gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, results) {
     var recordsToUpdate = [];
-    fluid.log(fluid.logLevel.IMPORTANT, "PARAMS:\n" + JSON.stringify(results.params, null, 2));
     fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + " SAI records to their associated unified records.");
     fluid.each(results.products, function (unifiedRecord) {
         var saiRecords = [];
@@ -97,11 +96,10 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             }
         }
         else if (saiRecords.length > 1) {
-            fluid.log(fluid.logLevel.IMPORTANT, "SAI records by status keys: " + Object.keys(saiRecordsByStatus).join(", "));
             var nonDeletedSaiRecordCount = fluid.get(saiRecordsByStatus, "notDeleted.length") || 0;
             var deletedSaiRecordCount = fluid.get(saiRecordsByStatus, "deleted.length") || 0;
             // If all the records have been deleted, just update the status.
-            if ( deletedSaiRecordCount === saiRecords.length) {
+            if ( deletedSaiRecordCount === saiRecords.length && unifiedRecord.status !== "deleted") {
                 fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one SAI record, but all have been deleted.  Flagging the record as deleted.");
 
                 var recordToDelete = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), { status: "deleted" });
