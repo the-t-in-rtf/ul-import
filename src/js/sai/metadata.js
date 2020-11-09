@@ -90,13 +90,18 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             // TODO: Add diff checks to avoid reprocessing records.
             var nonDeletedSaiRecordCount = fluid.get(saiRecordsByStatus, "notDeleted.length") || 0;
             var deletedSaiRecordCount = fluid.get(saiRecordsByStatus, "deleted.length") || 0;
-            // If all the records have been deleted, just update the status.
-            if ( deletedSaiRecordCount === saiRecords.length && unifiedRecord.status !== "deleted") {
-                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one SAI record, but all have been deleted.  Flagging the record as deleted.");
+            // If all the records have been deleted and the record hasn't, just update the status.
+            if ( deletedSaiRecordCount === saiRecords.length) {
+                if (unifiedRecord.status === "deleted") {
+                    fluid.log(fluid.logLevel.INFO, "Unified record" + unifiedRecord.uid + " has already been flagged as deleted based on SAI metadata.");
+                }
+                else {
+                    fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one SAI record, but all have been deleted.  Flagging the record as deleted.");
 
-                var recordToDelete = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), { status: "deleted" });
-                recordToDelete.updated = (new Date()).toISOString();
-                recordsToUpdate.push(recordToDelete);
+                    var recordToDelete = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), { status: "deleted" });
+                    recordToDelete.updated = (new Date()).toISOString();
+                    recordsToUpdate.push(recordToDelete);
+                }
             }
             // If there are multiple records but only one has not been deleted, use that one.
             else {
