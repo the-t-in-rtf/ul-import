@@ -78,24 +78,16 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
         });
 
         var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
+        var saiRecord = false;
 
         if (saiRecords.length === 0) {
             fluid.log(fluid.logLevel.INFO, "No SAI source record(s) found for unified record '" + unifiedRecord.uid + "', something is wrong.");
         }
         else if (saiRecords.length === 1) {
-            var saiRecord = saiRecords[0];
-            var filteredSaiRecord     = fluid.filterKeys(saiRecord, that.options.fieldsToDiff);
-            if (!fluid.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
-                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' needs to be updated.");
-                var updatedRecord = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredSaiRecord);
-                updatedRecord.updated = (new Date()).toISOString();
-                recordsToUpdate.push(updatedRecord);
-            }
-            else {
-                fluid.log(fluid.logLevel.INFO, "Unified record '" + unifiedRecord.uid + "' is up to date with the SAI metadata.");
-            }
+            saiRecord = saiRecords[0];
         }
         else if (saiRecords.length > 1) {
+            // TODO: Add diff checks to avoid reprocessing records.
             var nonDeletedSaiRecordCount = fluid.get(saiRecordsByStatus, "notDeleted.length") || 0;
             var deletedSaiRecordCount = fluid.get(saiRecordsByStatus, "deleted.length") || 0;
             // If all the records have been deleted, just update the status.
@@ -110,16 +102,24 @@ gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, result
             else {
                 if (nonDeletedSaiRecordCount === 1) {
                     fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has more than one non-deleted SAI record, but only one has not been deleted.  Using that metadata.");
-
-                    var onlyNonDeletedSaiRecord = saiRecordsByStatus.notDeleted[0];
-                    var filteredNonDeletedSaiRecord     = fluid.filterKeys(onlyNonDeletedSaiRecord, that.options.fieldsToDiff);
-                    var updatedRecordWithNonDeletedMetadata = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredNonDeletedSaiRecord);
-                    updatedRecordWithNonDeletedMetadata.updated = (new Date()).toISOString();
-                    recordsToUpdate.push(updatedRecordWithNonDeletedMetadata);
+                    saiRecord = saiRecordsByStatus.notDeleted[0];
                 }
                 else {
                     fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has " + deletedSaiRecordCount + " deleted and " + nonDeletedSaiRecordCount + " non-deleted SAI records.  Can't update the unified record.");
                 }
+            }
+        }
+
+        if (saiRecord) {
+            var filteredSaiRecord = fluid.filterKeys(saiRecord, that.options.fieldsToDiff);
+            if (!fluid.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
+                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' needs to be updated with metadata from the SAI.");
+                var updatedRecord = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredSaiRecord);
+                updatedRecord.updated = (new Date()).toISOString();
+                recordsToUpdate.push(updatedRecord);
+            }
+            else {
+                fluid.log(fluid.logLevel.INFO, "Unified record '" + unifiedRecord.uid + "' is up to date with the SAI metadata.");
             }
         }
     });
