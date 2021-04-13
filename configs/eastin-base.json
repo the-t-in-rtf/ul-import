@@ -13,6 +13,7 @@
             "Rehadat",
             "Hulpmiddelenwijzer",
             "Oaeg",
+            "Dlf data",
             "ATAust"
         ],
         "databases": {
@@ -39,6 +40,9 @@
             },
             "Oaeg": {
                 "language": "en_us"
+            },
+            "Dlf data": {
+                "language": "en_gb"
             },
             "ATAust": {
                 "language": "en_au"

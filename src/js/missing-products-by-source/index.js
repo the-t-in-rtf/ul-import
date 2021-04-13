@@ -175,6 +175,7 @@ fluid.defaults("gpii.ul.imports.missingProductsBySource", {
     },
     sources: [
         "ATAust",
+        "Dlf data",
         "EASTIN Admin",
         "Handicat",
         "Hjælpemiddelbasen",
