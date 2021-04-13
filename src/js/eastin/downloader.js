@@ -185,7 +185,7 @@ gpii.ul.imports.eastin.createThrottledQueue = function (originalPromises, pauseB
 
 fluid.defaults("gpii.ul.imports.eastin.downloader", {
     gradeNames: ["fluid.modelComponent"],
-    excludedSources: ["Dlf Data"],
+    excludedSources: [],
     members: {
         downloadErrors:  0,
         isoRecordLists:  [],
