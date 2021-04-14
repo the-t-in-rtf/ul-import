@@ -59,7 +59,7 @@ gpii.ul.imports.syncer.getExistingSourceRecords = function (that) {
             fluid.log(fluid.logLevel.WARN, "Error retrieving existing records:" + error);
         }
         else if (response.statusCode !== 200) {
-            fluid.log(fluid.logLevel.WARN, "Error messsage returned when retrieving existing records:\n" + JSON.stringify(body, null, 2));
+            fluid.log(fluid.logLevel.WARN, "Error message returned when retrieving existing records:\n" + JSON.stringify(body, null, 2));
         }
         else {
             that.existingRecordCount = body.products.length;

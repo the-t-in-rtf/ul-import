@@ -41,6 +41,11 @@ gpii.ul.imports.eastin.transformer.standardizeIsoCode = function (code) {
     return code.match(/\./) ? code : code.replace(/(\d\d)(\d\d)(\d\d)/, "$1.$2.$3");
 };
 
+gpii.ul.imports.eastin.transformer.fixCasing = function (sourceName) {
+    // In an exciting new variation, they actually changed the source name out from under us, we change it back to match our existing records.
+    return sourceName.replace("DLF Data", "Dlf data");
+};
+
 fluid.defaults("gpii.ul.imports.eastin.transformer", {
     gradeNames: ["fluid.modelComponent"],
     defaultValues: {
@@ -51,7 +56,12 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
         transformedJson: {}
     },
     mapRules: {
-        source:      "Database",
+        source: {
+            transform: {
+                type: "gpii.ul.imports.eastin.transformer.fixCasing",
+                inputPath: "Database"
+            }
+        },
         sid:         "ProductCode",
         name:        "CommercialName",
         sourceUrl:   {
