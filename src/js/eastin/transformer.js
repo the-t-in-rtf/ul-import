@@ -14,10 +14,6 @@ gpii.ul.imports.eastin.transformer.remapData = function (that) {
 
     var strippedJson = gpii.ul.imports.transforms.stripNonValues(remappedJson);
 
-    fluid.remove_if(strippedJson, function (singleRecord) {
-        return that.options.excludedSources.indexOf(singleRecord.source) !== -1;
-    });
-
     that.applier.change("transformedJson", strippedJson);
 };
 
@@ -50,7 +46,6 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
     defaultValues: {
         description: "No description available."
     },
-    excludedSources: ["DLF Data"],
     model: {
         rawJson:         {},
         transformedJson: {}

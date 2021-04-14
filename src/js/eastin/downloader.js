@@ -47,19 +47,12 @@ gpii.ul.imports.eastin.downloader.getRetrieveRecordListByIsoCodeFunction = funct
                     // If we receive an "ExceptionMessage" object, display its contents in the console.
                     if (!data.Ok && data.ExceptionMessages) {
                         fluid.each(data.ExceptionMessages, function (singleErrorMessage) {
-                            // Their API returns exceptions about DLF Data that we ignore.
-                            if (singleErrorMessage.indexOf("DLF Data") === -1) {
-                                fluid.log(fluid.logLevel.WARN, "Error retrieving records:\n" + singleErrorMessage);
-                            }
+                            fluid.log(fluid.logLevel.WARN, "Error retrieving records:\n" + singleErrorMessage);
                         });
                     }
 
                     fluid.log(fluid.logLevel.TRACE, "Retrieved ", data.Records.length , " records for ISO code '", myIsoCode, "'...");
-                    // Required because EASTIN still tells us about the missing DLF Data records in its "ISO" feed.
-                    var filteredRecords = data.Records.filter(function (singleRecord) {
-                        return that.options.excludedSources.indexOf(singleRecord.Database) === -1;
-                    });
-                    that.isoRecordLists.push(filteredRecords);
+                    that.isoRecordLists.push(data.Records);
                 }
                 catch (e) {
                     fluid.log(fluid.logLevel.WARN, "Error retrieving records from '" + response.request.uri.href + "':\n");
@@ -185,7 +178,6 @@ gpii.ul.imports.eastin.createThrottledQueue = function (originalPromises, pauseB
 
 fluid.defaults("gpii.ul.imports.eastin.downloader", {
     gradeNames: ["fluid.modelComponent"],
-    excludedSources: [],
     members: {
         downloadErrors:  0,
         isoRecordLists:  [],
