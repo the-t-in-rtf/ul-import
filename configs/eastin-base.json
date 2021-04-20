@@ -14,7 +14,8 @@
             "Hulpmiddelenwijzer",
             "Oaeg",
             "Dlf data",
-            "ATAust"
+            "ATAust",
+            "AZARIM"
         ],
         "databases": {
             "Handicat": {
@@ -46,6 +47,9 @@
             },
             "ATAust": {
                 "language": "en_au"
+            },
+            "AZARIM": {
+                "language": "he_il"
             }
         },
         "isoCodes": [

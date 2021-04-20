@@ -85,6 +85,6 @@
         "grunt": "1.2.1",
         "node-jqunit": "1.1.8",
         "nyc": "15.1.0",
-        "ul-api": "1.0.0-dev.20210413T091744Z.bfa8131.legacy-infusion"
+        "ul-api": " 1.0.0-dev.20210420T120913Z.95bff0f.eastin-integration"
     }
 }
