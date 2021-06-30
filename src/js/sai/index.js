@@ -116,9 +116,17 @@ fluid.defaults("gpii.ul.imports.sai", {
                     "source": { literalValue: "sai" },
                     "sid": "nid",
                     "manufacturer": {
-                        transform: {
-                            type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
-                            values: [ "manufacturer", { literalValue: { name: "Unknown" } } ]
+                        "name": {
+                            transform: {
+                                type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
+                                values: [ "manufacturer.mfgr_name", { literalValue: "Unknown" } ]
+                            }
+                        },
+                        "country": {
+                            transform: {
+                                type: "gpii.ul.imports.transforms.stripNonValues",
+                                inputPath: "manufacturer.mfgr_country"
+                            }
                         }
                     },
                     "sourceData": ""
